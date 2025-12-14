@@ -1,6 +1,5 @@
-// main.js - Teclado Interativo v4.1.0
-// Menu 15% maior e rodapé horizontal
-// Suporte a códigos HTML de emoji
+// main.js - Teclado Interativo v4.2.0
+// Menu e rodapé 25% menores, sem sobreposição
 
 class TecladoInterativo {
     constructor() {
@@ -44,50 +43,7 @@ class TecladoInterativo {
             '🎉': '&#127881',
             '🎊': '&#127882',
             '💯': '&#128175',
-            '❤️': '&#10084;&#65039',
-            '💔': '&#128148',
-            '💕': '&#128149',
-            '💖': '&#128150',
-            '💗': '&#128151',
-            '💘': '&#128152',
-            '💙': '&#128153',
-            '💚': '&#128154',
-            '💛': '&#128155',
-            '💜': '&#128156',
-            '🖤': '&#128420',
-            '🤍': '&#129293',
-            '🤎': '&#129294',
-            '💋': '&#128139',
-            '👁️': '&#128065;&#65039',
-            '🧠': '&#129504',
-            '🦴': '&#129460',
-            '🦷': '&#129463',
-            '👅': '&#128069',
-            '👄': '&#128068',
-            '👃': '&#128067',
-            '👂': '&#128066',
-            '👁': '&#128065',
-            '💪': '&#128170',
-            '🦵': '&#129461',
-            '🦶': '&#129462',
-            '👋': '&#128075',
-            '🤚': '&#129306',
-            '🖐️': '&#128400;&#65039',
-            '✋': '&#9995',
-            '🖖': '&#128406',
-            '👌': '&#128076',
-            '🤏': '&#129311',
-            '✌️': '&#9996;&#65039',
-            '🤞': '&#129310',
-            '🤟': '&#129311',
-            '🤘': '&#129304',
-            '🤙': '&#129305',
-            '👈': '&#128072',
-            '👉': '&#128073',
-            '👆': '&#128070',
-            '👇': '&#128071',
-            '🖕': '&#128405',
-            '☝️': '&#9757;&#65039'
+            '❤️': '&#10084;&#65039'
         };
         
         // Inicializar
@@ -97,7 +53,7 @@ class TecladoInterativo {
     // ========== INICIALIZAÇÃO ==========
     
     inicializar() {
-        console.log('🎹 Teclado Interativo v4.1.0 - Iniciando...');
+        console.log('🎹 Teclado Interativo v4.2.0 - Iniciando...');
         
         // Configurar modo noturno
         this.configurarModoNoturno();
@@ -143,7 +99,7 @@ class TecladoInterativo {
             
             // Salvar emoji original
             if (!tecla.dataset.emojiOriginal) {
-                tecla.dataset.emojiOriginal = tecla.textContent;
+                tecla.dataset.emojiOriginal = tecla.innerHTML;
             }
             
             // Configurar eventos
@@ -386,8 +342,8 @@ class TecladoInterativo {
                     <div class="grupo-form">
                         <label>Emoji/Texto:</label>
                         <input type="text" id="editar-emoji" class="input-emoji" 
-                               value="${tecla.textContent}" maxlength="15" placeholder="Digite emoji ou código HTML (ex: &#129300)">
-                        <small>Aceita emojis diretos ou códigos HTML (máx. 15 caracteres)</small>
+                               value="${tecla.innerHTML}" maxlength="15" placeholder="Digite emoji ou código HTML">
+                        <small>Aceita emojis diretos ou códigos HTML (ex: &#129300)</small>
                         ${exemplosEmoji}
                     </div>
                     
@@ -399,10 +355,18 @@ class TecladoInterativo {
                         </div>
                         
                         <div class="paleta-cores">
-                            ${['#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#118AB2',
-                               '#7209B7', '#3A86FF', '#FB5607', '#8338EC', '#FF006E'].map(cor => `
-                                <div class="cor-rapida" style="background: ${cor}" data-cor="${cor}"></div>
-                            `).join('')}
+                            <div class="cor-rapida" data-cor="#FF6B6B"></div>
+                            <div class="cor-rapida" data-cor="#4ECDC4"></div>
+                            <div class="cor-rapida" data-cor="#FFD166"></div>
+                            <div class="cor-rapida" data-cor="#06D6A0"></div>
+                            <div class="cor-rapida" data-cor="#118AB2"></div>
+                            <div class="cor-rapida" data-cor="#7209B7"></div>
+                            <div class="cor-rapida" data-cor="#3A86FF"></div>
+                            <div class="cor-rapida" data-cor="#FB5607"></div>
+                            <div class="cor-rapida" data-cor="#8338EC"></div>
+                            <div class="cor-rapida" data-cor="#FF006E"></div>
+                            <div class="cor-rapida" data-cor="#00FF88"></div>
+                            <div class="cor-rapida" data-cor="#FFDD00"></div>
                         </div>
                     </div>
                     
@@ -608,8 +572,9 @@ class TecladoInterativo {
     
     aplicarCoresAleatorias() {
         const cores = [
-            '#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe',
-            '#00f2fe', '#43e97b', '#38f9d7', '#fa709a', '#fee140'
+            '#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#118AB2',
+            '#7209B7', '#3A86FF', '#FB5607', '#8338EC', '#FF006E',
+            '#00FF88', '#FFDD00', '#667eea', '#f093fb', '#4facfe'
         ];
         
         document.querySelectorAll('.tecla').forEach(tecla => {
@@ -625,102 +590,6 @@ class TecladoInterativo {
         this.mostrarFeedback('🌈 Cores aleatórias aplicadas', 1500);
     }
     
-    abrirSeletorCores() {
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
-        
-        modal.innerHTML = `
-            <div class="modal-container">
-                <div class="modal-header">
-                    <h3>🎨 Personalizar Cores</h3>
-                    <button class="btn-fechar">×</button>
-                </div>
-                
-                <div class="modal-conteudo">
-                    <div class="grupo-form">
-                        <label>Aplicar cor única:</label>
-                        <input type="color" id="cor-unica" value="#667eea" style="width: 100%; height: 40px;">
-                    </div>
-                    
-                    <div class="grupo-form">
-                        <label>Cores pré-definidas:</label>
-                        <div class="paleta-grande">
-                            ${[
-                                '#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#118AB2',
-                                '#7209B7', '#3A86FF', '#FB5607', '#8338EC', '#FF006E'
-                            ].map(cor => `
-                                <div class="cor-rapida-grande" style="background: ${cor}" data-cor="${cor}"></div>
-                            `).join('')}
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="modal-botoes">
-                    <button class="btn-modal btn-aplicar">🎨 Aplicar Cor</button>
-                    <button class="btn-modal btn-aleatorias">🎲 Aleatórias</button>
-                    <button class="btn-modal btn-reset-cores">↩️ Resetar</button>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        
-        // Configurar eventos
-        const fecharModal = () => modal.remove();
-        modal.querySelector('.btn-fechar').onclick = fecharModal;
-        modal.onclick = (e) => e.target === modal && fecharModal();
-        
-        // Cores pré-definidas
-        modal.querySelectorAll('.cor-rapida-grande').forEach(cor => {
-            cor.onclick = () => {
-                modal.querySelector('#cor-unica').value = cor.dataset.cor;
-            };
-        });
-        
-        // Botões
-        modal.querySelector('.btn-aplicar').onclick = () => {
-            const cor = modal.querySelector('#cor-unica').value;
-            this.aplicarCorUnica(cor);
-            fecharModal();
-        };
-        
-        modal.querySelector('.btn-aleatorias').onclick = () => {
-            this.aplicarCoresAleatorias();
-            fecharModal();
-        };
-        
-        modal.querySelector('.btn-reset-cores').onclick = () => {
-            this.resetarTodasCores();
-            fecharModal();
-        };
-    }
-    
-    aplicarCorUnica(cor) {
-        const gradiente = `linear-gradient(145deg, ${cor}40, ${cor}80)`;
-        
-        document.querySelectorAll('.tecla').forEach(tecla => {
-            tecla.style.background = gradiente;
-            this.coresTeclas[tecla.className] = gradiente;
-            tecla.classList.add('editado');
-        });
-        
-        localStorage.setItem('coresTeclas', JSON.stringify(this.coresTeclas));
-        this.mostrarFeedback('🎨 Cor aplicada a todas', 1500);
-    }
-    
-    resetarTodasCores() {
-        if (confirm('Resetar cores de TODAS as teclas?')) {
-            document.querySelectorAll('.tecla').forEach(tecla => {
-                tecla.style.background = '';
-                tecla.classList.remove('editado');
-                delete this.coresTeclas[tecla.className];
-            });
-            
-            localStorage.removeItem('coresTeclas');
-            this.mostrarFeedback('↩️ Cores resetadas', 1500);
-        }
-    }
-
     // ========== MODO NOTURNO ==========
     
     configurarModoNoturno() {
@@ -755,7 +624,12 @@ class TecladoInterativo {
     resetarTudo() {
         if (confirm('Resetar TODAS as configurações?\n\n• Cores personalizadas\n• Emojis editados\n• Sons customizados')) {
             // Resetar cores
-            this.resetarTodasCores();
+            document.querySelectorAll('.tecla').forEach(tecla => {
+                tecla.style.background = '';
+                tecla.classList.remove('editado');
+                delete this.coresTeclas[tecla.className];
+            });
+            localStorage.removeItem('coresTeclas');
             
             // Resetar emojis
             document.querySelectorAll('.tecla').forEach(tecla => {
@@ -812,7 +686,7 @@ class TecladoInterativo {
     }
     
     exibirVersao() {
-        const versao = '4.1.0';
+        const versao = '4.2.0';
         const elemento = document.getElementById('versao-app');
         if (elemento) {
             elemento.textContent = versao;
@@ -834,7 +708,7 @@ class TecladoInterativo {
     configurarControles() {
         const controles = {
             'botao-editar': () => this.toggleModoEdicao(),
-            'botao-cor-teclas': () => this.abrirSeletorCores(),
+            // 'botao-cor-teclas' REMOVIDO conforme solicitado
             'botao-cores-aleatorias': () => this.aplicarCoresAleatorias(),
             'botao-modo': () => this.toggleModoNoturno(),
             'botao-parar': () => this.pararTodosSons(),
@@ -851,6 +725,12 @@ class TecladoInterativo {
                 }, { passive: false });
             }
         });
+        
+        // Remover botão de cores do DOM
+        const botaoCores = document.getElementById('botao-cor-teclas');
+        if (botaoCores) {
+            botaoCores.style.display = 'none';
+        }
     }
     
     configurarEventosGlobais() {
