@@ -1,4 +1,18 @@
 /* Reset básico já aplicado pelo reset.css */
+:root {
+  --vh: 1vh;
+}
+
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+.layout-principal {
+  min-height: 100vh;
+  min-height: calc(var(--vh, 1vh) * 100);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -405,17 +419,30 @@ body.modo-dia .contador-item {
 }
 
 /* Responsividade */
+/* ========== RESPONSIVIDADE ========== */
+
+/* Tablets (768px - 1024px) */
 @media (max-width: 1024px) {
   .layout-principal {
       flex-direction: column;
+      min-height: auto;
   }
   
   .menu-lateral {
       width: 100%;
       flex-direction: row;
+      flex-wrap: wrap;
       padding: 15px;
       border-right: none;
       border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
+  }
+  
+  body.modo-dia .menu-lateral {
+      background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
   }
   
   .logo {
@@ -425,13 +452,16 @@ body.modo-dia .contador-item {
   .controles-laterais {
       flex-direction: row;
       flex-wrap: wrap;
-      justify-content: center;
+      gap: 8px;
       flex: 1;
+      justify-content: center;
   }
   
   .botao-menu {
       flex: 1;
-      min-width: 150px;
+      min-width: 140px;
+      max-width: 180px;
+      padding: 12px 15px;
       justify-content: center;
   }
   
@@ -439,58 +469,371 @@ body.modo-dia .contador-item {
       display: none;
   }
   
+  .botao-menu .icone {
+      font-size: 1.3em;
+      min-width: 25px;
+  }
+  
   .info-sessao {
       display: none;
   }
   
-  .teclado-principal {
-      grid-template-columns: repeat(3, 1fr);
-      max-width: 600px;
+  .conteudo-principal {
+      padding: 20px 15px;
+      overflow: visible;
   }
-}
-
-@media (max-width: 768px) {
+  
+  .cabecalho {
+      margin-bottom: 25px;
+  }
+  
   .cabecalho h1 {
       font-size: 2em;
+      margin-bottom: 10px;
+  }
+  
+  .subtitulo {
+      font-size: 0.9em;
   }
   
   .teclado-principal {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 15px;
+      max-width: 600px;
   }
   
   .tecla {
       font-size: 2em;
+      border-radius: 15px;
+  }
+}
+
+/* Celulares Grandes (576px - 768px) */
+@media (max-width: 768px) {
+  .cabecalho h1 {
+      font-size: 1.8em;
+  }
+  
+  .teclado-principal {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+  }
+  
+  .tecla {
+      font-size: 1.8em;
+      border-radius: 12px;
+      aspect-ratio: 1/1;
+      min-height: 80px;
+  }
+  
+  .controles-laterais {
+      gap: 6px;
+  }
+  
+  .botao-menu {
+      min-width: 120px;
+      padding: 10px 12px;
+  }
+  
+  .botao-menu .icone {
+      font-size: 1.2em;
   }
   
   .contador-visitas {
       flex-direction: column;
       align-items: center;
-      gap: 15px;
+      gap: 12px;
+      margin-bottom: 10px;
   }
   
   .contador-item {
       width: 100%;
       max-width: 300px;
+      padding: 12px 20px;
   }
 }
 
+/* Celulares Pequenos (480px - 576px) */
+@media (max-width: 576px) {
+  .layout-principal {
+      min-height: 100vh;
+  }
+  
+  .conteudo-principal {
+      padding: 15px 10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+  }
+  
+  .cabecalho {
+      margin-bottom: 15px;
+  }
+  
+  .cabecalho h1 {
+      font-size: 1.5em;
+  }
+  
+  .subtitulo {
+      font-size: 0.8em;
+  }
+  
+  .menu-lateral {
+      padding: 10px;
+      position: relative;
+  }
+  
+  .controles-laterais {
+      gap: 4px;
+  }
+  
+  .botao-menu {
+      min-width: 60px;
+      max-width: 70px;
+      padding: 8px 5px;
+      border-radius: 8px;
+  }
+  
+  .botao-menu .icone {
+      font-size: 1em;
+      min-width: 20px;
+  }
+  
+  .teclado-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+  }
+  
+  .teclado-principal {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+  }
+  
+  .tecla {
+      font-size: 1.6em;
+      border-radius: 10px;
+      min-height: 70px;
+      box-shadow: 5px 5px 10px #1a1a2e,
+                  -5px -5px 10px #2a2a3e;
+  }
+  
+  body.modo-dia .tecla {
+      box-shadow: 5px 5px 10px #d9d9d9,
+                  -5px -5px 10px #ffffff;
+  }
+  
+  .tecla:hover {
+      transform: translateY(-3px);
+  }
+  
+  .rodape {
+      padding: 15px 10px;
+  }
+  
+  .contador-item {
+      min-width: auto;
+      width: 100%;
+      padding: 10px 15px;
+  }
+  
+  .contador-icon {
+      font-size: 1.5em;
+  }
+  
+  .contador-info {
+      font-size: 0.9em;
+  }
+  
+  .creditos {
+      font-size: 0.8em;
+      margin-top: 5px;
+  }
+}
+
+/* Celulares Muito Pequenos (até 480px) */
 @media (max-width: 480px) {
+  body {
+      min-height: 100vh;
+      overflow-x: hidden;
+  }
+  
+  .layout-principal {
+      min-height: calc(100vh - 120px);
+  }
+  
+  .cabecalho h1 {
+      font-size: 1.3em;
+      line-height: 1.2;
+  }
+  
+  .subtitulo {
+      display: none;
+  }
+  
+  .menu-lateral {
+      padding: 8px 5px;
+  }
+  
+  .controles-laterais {
+      justify-content: space-between;
+  }
+  
+  .botao-menu {
+      min-width: 50px;
+      max-width: 55px;
+      padding: 6px 4px;
+      margin: 1px;
+  }
+  
+  .botao-menu .icone {
+      font-size: 0.9em;
+  }
+  
+  .teclado-principal {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      max-width: 320px;
+  }
+  
+  .tecla {
+      font-size: 1.4em;
+      border-radius: 8px;
+      min-height: 60px;
+      aspect-ratio: 1/1;
+  }
+  
+  /* Ajustar grid para 4x3 em telas muito pequenas */
+  @media (max-height: 700px) {
+      .teclado-principal {
+          grid-template-columns: repeat(4, 1fr);
+          grid-template-rows: repeat(3, 1fr);
+          gap: 6px;
+          max-width: 100%;
+          padding: 0 5px;
+      }
+      
+      .tecla {
+          font-size: 1.2em;
+          min-height: 55px;
+      }
+  }
+  
+  .contador-visitas {
+      gap: 8px;
+  }
+  
+  .contador-item {
+      padding: 8px 12px;
+  }
+  
+  .contador-label {
+      font-size: 0.7em;
+  }
+  
+  .contador-valor {
+      font-size: 1em;
+  }
+}
+
+/* Modo paisagem (landscape) */
+@media (max-height: 600px) and (orientation: landscape) {
+  .layout-principal {
+      flex-direction: row;
+      min-height: auto;
+  }
+  
+  .menu-lateral {
+      width: 200px;
+      flex-direction: column;
+      padding: 15px;
+      border-right: 2px solid rgba(255, 255, 255, 0.1);
+      border-bottom: none;
+  }
+  
+  .botao-menu {
+      min-width: auto;
+      max-width: none;
+      padding: 10px 15px;
+      justify-content: flex-start;
+  }
+  
+  .botao-menu .texto {
+      display: inline;
+      font-size: 0.8em;
+  }
+  
+  .botao-menu .icone {
+      font-size: 1em;
+  }
+  
   .conteudo-principal {
       padding: 15px;
   }
   
   .teclado-principal {
-      grid-template-columns: 1fr;
-      max-width: 300px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 100%;
   }
   
-  .botao-menu {
-      min-width: 60px;
-      padding: 12px;
+  .tecla {
+      font-size: 1.5em;
+      min-height: 65px;
   }
   
-  .botao-menu .icone {
+  .cabecalho h1 {
+      font-size: 1.5em;
+      margin-bottom: 5px;
+  }
+  
+  .subtitulo {
+      display: none;
+  }
+}
+
+/* Ajustes para telas muito curtas */
+@media (max-height: 500px) {
+  .cabecalho {
+      display: none;
+  }
+  
+  .conteudo-principal {
+      padding: 10px;
+      justify-content: center;
+  }
+  
+  .teclado-principal {
+      gap: 5px;
+  }
+  
+  .tecla {
+      min-height: 50px;
       font-size: 1.2em;
+  }
+  
+  .rodape {
+      padding: 8px 5px;
+  }
+  
+  .contador-item {
+      padding: 6px 10px;
+      min-width: auto;
+  }
+}
+
+/* Otimização para iOS Safari */
+@supports (-webkit-touch-callout: none) {
+  .tecla {
+      -webkit-tap-highlight-color: transparent;
+  }
+  
+  .menu-lateral {
+      padding-bottom: env(safe-area-inset-bottom);
   }
 }

@@ -615,3 +615,45 @@ class TecladoInterativo {
 document.addEventListener('DOMContentLoaded', () => {
     window.tecladoInterativo = new TecladoInterativo();
 });
+
+// Otimizações para touch em dispositivos móveis
+function otimizarParaMobile() {
+    // Prevenir zoom com dois dedos
+    document.addEventListener('touchstart', function(event) {
+        if (event.touches.length > 1) {
+            event.preventDefault();
+        }
+    }, { passive: false });
+    
+    // Feedback visual melhor para touch
+    document.querySelectorAll('.tecla').forEach(tecla => {
+        tecla.addEventListener('touchstart', function(e) {
+            this.classList.add('ativa');
+            // Prevenir clique fantasma após touch
+            e.preventDefault();
+        }, { passive: false });
+        
+        tecla.addEventListener('touchend', function() {
+            this.classList.remove('ativa');
+        });
+        
+        tecla.addEventListener('touchcancel', function() {
+            this.classList.remove('ativa');
+        });
+    });
+    
+    // Ajustar altura da viewport em iOS
+    function ajustarAlturaiOS() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+    
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        ajustarAlturaiOS();
+        window.addEventListener('resize', ajustarAlturaiOS);
+        window.addEventListener('orientationchange', ajustarAlturaiOS);
+    }
+}
+
+// Inicializar otimizações mobile
+document.addEventListener('DOMContentLoaded', otimizarParaMobile);
