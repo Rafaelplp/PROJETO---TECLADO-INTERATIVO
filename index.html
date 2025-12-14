@@ -21,14 +21,12 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Menu Superior (25% menor, horizontal, sem opção "Cores") -->
+        <!-- Menu Superior (Sempre em linha) -->
         <nav class="menu-superior">
             <button id="botao-editar" class="botao-menu">
                 <span class="icone">✏️</span>
                 <span class="texto">Editar</span>
             </button>
-            
-            <!-- BOTÃO "CORES" REMOVIDO conforme solicitado -->
             
             <button id="botao-cores-aleatorias" class="botao-menu">
                 <span class="icone">🌈</span>
@@ -77,7 +75,7 @@
             </div>
         </main>
 
-        <!-- Rodapé (25% menor, horizontal) -->
+        <!-- Rodapé (Sempre em linha, texto alinhado à esquerda) -->
         <footer class="rodape">
             <div class="contador-visitas">
                 <div class="contador-item">
@@ -108,7 +106,7 @@
                     <span class="contador-icon">📱</span>
                     <div class="contador-info">
                         <span class="contador-label">Versão</span>
-                        <span class="contador-valor" id="versao-app">4.2.0</span>
+                        <span class="contador-valor" id="versao-app">4.3.0</span>
                     </div>
                 </div>
             </div>
@@ -196,12 +194,30 @@
                 setHeight();
                 window.addEventListener('resize', setHeight);
             }
+            
+            // Prevenir zoom com dois dedos
+            document.addEventListener('touchstart', (e) => {
+                if (e.touches.length > 1) e.preventDefault();
+            }, { passive: false });
+            
+            // Ajustar scroll horizontal suave
+            const menu = document.querySelector('.menu-superior');
+            const rodape = document.querySelector('.rodape');
+            
+            if (menu) {
+                menu.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    menu.scrollLeft += e.deltaY;
+                }, { passive: false });
+            }
+            
+            if (rodape) {
+                rodape.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    rodape.scrollLeft += e.deltaY;
+                }, { passive: false });
+            }
         });
-        
-        // Prevenir zoom com dois dedos
-        document.addEventListener('touchstart', (e) => {
-            if (e.touches.length > 1) e.preventDefault();
-        }, { passive: false });
     </script>
 </body>
 </html>

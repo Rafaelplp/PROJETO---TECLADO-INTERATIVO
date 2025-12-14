@@ -39,7 +39,7 @@ body.modo-dia {
   color: var(--cor-texto-claro);
 }
 
-/* ========== LAYOUT GERAL (SEM SOBREPOSIÇÃO) ========== */
+/* ========== LAYOUT GERAL ========== */
 .app-container {
   display: flex;
   flex-direction: column;
@@ -52,13 +52,13 @@ body.modo-dia {
   box-sizing: border-box;
 }
 
-/* ========== MENU SUPERIOR (25% MENOR, HORIZONTAL) ========== */
+/* ========== MENU SUPERIOR (SEMPRE EM LINHA) ========== */
 .menu-superior {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
-  padding: 10px 15px;
+  gap: 10px;
+  padding: 12px 15px;
   background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
   border-radius: var(--borda-radius);
   flex-shrink: 0;
@@ -69,9 +69,17 @@ body.modo-dia {
   box-sizing: border-box;
   transform: scale(0.75);
   transform-origin: center;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   flex-wrap: nowrap;
-  min-height: 70px;
+  min-height: 65px;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.menu-superior::-webkit-scrollbar {
+  display: none;
 }
 
 body.modo-dia .menu-superior {
@@ -80,7 +88,7 @@ body.modo-dia .menu-superior {
 }
 
 .botao-menu {
-  min-width: 70px;
+  min-width: 75px;
   padding: 8px 6px;
   border-radius: 8px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
@@ -95,7 +103,7 @@ body.modo-dia .menu-superior {
   gap: 4px;
   cursor: pointer;
   transition: var(--transicao);
-  flex: 0 1 auto;
+  flex: 0 0 auto;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   white-space: nowrap;
@@ -260,10 +268,10 @@ body.modo-dia .tecla {
   color: var(--cor-texto-claro);
 }
 
-/* ========== RODAPÉ (25% MENOR, HORIZONTAL) ========== */
+/* ========== RODAPÉ (SEMPRE EM LINHA, TEXTO ALINHADO À ESQUERDA) ========== */
 .rodape {
   background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
-  padding: 10px 15px;
+  padding: 12px 15px;
   border-radius: var(--borda-radius);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -274,8 +282,16 @@ body.modo-dia .tecla {
   transform: scale(0.75);
   transform-origin: center;
   box-sizing: border-box;
-  overflow: hidden;
-  min-height: 70px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-height: 65px;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.rodape::-webkit-scrollbar {
+  display: none;
 }
 
 body.modo-dia .rodape {
@@ -285,12 +301,18 @@ body.modo-dia .rodape {
 
 .contador-visitas {
   display: flex;
-  justify-content: space-around;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 5px;
   flex-wrap: nowrap;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+}
+
+.contador-visitas::-webkit-scrollbar {
+  display: none;
 }
 
 .contador-item {
@@ -298,13 +320,12 @@ body.modo-dia .rodape {
   align-items: center;
   gap: 8px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
-  padding: 8px 10px;
+  padding: 8px 12px;
   border-radius: 8px;
-  flex: 1;
-  min-width: 0;
+  flex: 0 0 auto;
+  min-width: 140px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-sizing: border-box;
-  max-width: 180px;
 }
 
 body.modo-dia .contador-item {
@@ -316,13 +337,18 @@ body.modo-dia .contador-item {
   font-size: 0.9rem;
   flex-shrink: 0;
   min-width: 24px;
+  text-align: center;
 }
 
+/* TEXTO ALINHADO À ESQUERDA */
 .contador-info {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
   min-width: 0;
   flex: 1;
+  text-align: left;
 }
 
 .contador-label {
@@ -335,6 +361,8 @@ body.modo-dia .contador-item {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
+  text-align: left;
 }
 
 .contador-valor {
@@ -343,6 +371,8 @@ body.modo-dia .contador-item {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
+  text-align: left;
 }
 
 #contador-online {
@@ -462,14 +492,15 @@ body.modo-dia .modal-header h3 {
   }
   
   .menu-superior {
-      gap: 6px;
-      padding: 8px 12px;
+      gap: 8px;
+      padding: 10px 12px;
       transform: scale(0.7);
+      min-height: 60px;
   }
   
   .botao-menu {
-      min-width: 60px;
-      padding: 6px 5px;
+      min-width: 70px;
+      padding: 7px 5px;
       font-size: 0.65rem;
   }
   
@@ -501,17 +532,18 @@ body.modo-dia .modal-header h3 {
   }
   
   .rodape {
-      padding: 8px 12px;
+      padding: 10px 12px;
       transform: scale(0.7);
+      min-height: 60px;
   }
   
   .contador-visitas {
-      gap: 8px;
+      gap: 10px;
   }
   
   .contador-item {
-      padding: 6px 8px;
-      max-width: 150px;
+      padding: 7px 10px;
+      min-width: 130px;
   }
   
   .contador-label {
@@ -525,19 +557,16 @@ body.modo-dia .modal-header h3 {
 
 @media (max-width: 480px) {
   .menu-superior {
-      flex-wrap: wrap;
-      gap: 5px;
-      padding: 6px 10px;
+      gap: 6px;
+      padding: 8px 10px;
       transform: scale(0.65);
-      min-height: 60px;
+      min-height: 55px;
   }
   
   .botao-menu {
-      min-width: calc(50% - 6px);
-      max-width: none;
-      padding: 5px 4px;
+      min-width: 65px;
+      padding: 6px 4px;
       font-size: 0.6rem;
-      margin: 1px;
   }
   
   .botao-menu .icone {
@@ -570,21 +599,14 @@ body.modo-dia .modal-header h3 {
   }
   
   .rodape {
-      padding: 6px 10px;
+      padding: 8px 10px;
       transform: scale(0.65);
-      min-height: 60px;
-  }
-  
-  .contador-visitas {
-      flex-wrap: wrap;
-      justify-content: center;
+      min-height: 55px;
   }
   
   .contador-item {
-      min-width: calc(50% - 8px);
-      max-width: calc(50% - 8px);
-      margin-bottom: 6px;
-      padding: 5px 8px;
+      min-width: 120px;
+      padding: 6px 9px;
   }
   
   .creditos {
@@ -593,6 +615,34 @@ body.modo-dia .modal-header h3 {
   }
 }
 
+/* Nunca quebrar em coluna - força horizontal mesmo em telas muito pequenas */
+@media (max-width: 350px) {
+  .menu-superior {
+      gap: 4px;
+      padding: 6px 8px;
+  }
+  
+  .botao-menu {
+      min-width: 60px;
+      padding: 5px 3px;
+      font-size: 0.55rem;
+  }
+  
+  .contador-item {
+      min-width: 110px;
+      padding: 5px 8px;
+  }
+  
+  .teclado-principal {
+      gap: 4px;
+  }
+  
+  .tecla {
+      font-size: 1.3rem;
+  }
+}
+
+/* Desktop específico */
 @media (min-width: 1200px) {
   .app-container {
       max-width: 1100px;
@@ -690,7 +740,7 @@ body.modo-dia .modal-header h3 {
   }
 }
 
-/* ========== ESTILOS ESPECÍFICOS PARA O MODAL DE EDIÇÃO ========== */
+/* ========== ESTILOS PARA O MODAL DE EDIÇÃO ========== */
 .modal-conteudo {
   display: flex;
   flex-direction: column;
@@ -724,7 +774,7 @@ body.modo-dia .modal-header h3 {
   box-sizing: border-box;
 }
 
-.input-emoji:focus, .input-cor:focus {
+.input-emoji:focus, .input-cor:focus, .input-som:focus {
   outline: none;
   border-color: #00d4ff;
   box-shadow: 0 0 12px rgba(0, 212, 255, 0.25);
@@ -919,7 +969,7 @@ small {
   }
 }
 
-/* ========== AJUSTES DE ALTURA PARA EVITAR SOBREPOSIÇÃO ========== */
+/* ========== AJUSTES DE ALTURA ========== */
 @media (max-height: 700px) {
   .app-container {
       gap: 5px;

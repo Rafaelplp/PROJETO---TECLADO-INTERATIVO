@@ -1,5 +1,7 @@
-// main.js - Teclado Interativo v4.2.0
-// Menu e rodapé 25% menores, sem sobreposição
+// main.js - Teclado Interativo v4.3.0
+// Texto do rodapé alinhado à esquerda
+// Menu e rodapé sempre em linha
+// Suporte para MP4 e outros formatos de áudio
 
 class TecladoInterativo {
     constructor() {
@@ -10,6 +12,19 @@ class TecladoInterativo {
         this.coresTeclas = JSON.parse(localStorage.getItem('coresTeclas')) || {};
         this.sonsEditados = JSON.parse(localStorage.getItem('sonsEditados')) || {};
         this.emojiEditados = JSON.parse(localStorage.getItem('emojiEditados')) || {};
+        
+        // Formatos de áudio suportados
+        this.formatosSuportados = [
+            'audio/mpeg',      // MP3
+            'audio/mp4',       // MP4/AAC
+            'audio/ogg',       // OGG
+            'audio/wav',       // WAV
+            'audio/webm',      // WebM
+            'audio/aac',       // AAC
+            'audio/x-m4a',     // M4A
+            'audio/x-ms-wma',  // WMA
+            'audio/flac'       // FLAC
+        ];
         
         // Controle de toque
         this.ultimoToque = 0;
@@ -53,7 +68,7 @@ class TecladoInterativo {
     // ========== INICIALIZAÇÃO ==========
     
     inicializar() {
-        console.log('🎹 Teclado Interativo v4.2.0 - Iniciando...');
+        console.log('🎹 Teclado Interativo v4.3.0 - Iniciando...');
         
         // Configurar modo noturno
         this.configurarModoNoturno();
@@ -82,6 +97,15 @@ class TecladoInterativo {
                 console.error(`❌ Erro no áudio ${audio.id}:`, e);
                 this.mostrarFeedback(`❌ Erro no som ${audio.id.replace('som_tecla_', '')}`, 3000);
             });
+            
+            // Verificar se o formato é suportado
+            const source = audio.querySelector('source');
+            if (source) {
+                const tipo = source.type;
+                if (!this.formatosSuportados.includes(tipo) && !tipo.includes('audio/')) {
+                    console.warn(`⚠️ Formato não padrão: ${tipo} em ${audio.id}`);
+                }
+            }
         });
     }
 
@@ -176,7 +200,7 @@ class TecladoInterativo {
         }, { passive: false });
     }
 
-    // ========== SISTEMA DE SOM ==========
+    // ========== SISTEMA DE SOM (SUPORTE PARA MP4 E OUTROS FORMATOS) ==========
     
     tocarSom(idElementoAudio) {
         const audioElement = document.querySelector(idElementoAudio);
@@ -276,7 +300,7 @@ class TecladoInterativo {
         this.mostrarFeedback('⏹️ Todos os sons parados', 1500);
     }
 
-    // ========== MODO EDIÇÃO ==========
+    // ========== MODO EDIÇÃO (COM SUPORTE PARA MP4) ==========
     
     toggleModoEdicao() {
         this.modoEdicao = !this.modoEdicao;
@@ -371,12 +395,16 @@ class TecladoInterativo {
                     </div>
                     
                     <div class="grupo-form">
-                        <label>Alterar som (opcional):</label>
-                        <input type="file" id="editar-som" accept="audio/*" class="input-som">
-                        <small>MP3, máximo 5MB</small>
+                        <label>Alterar som:</label>
+                        <input type="file" id="editar-som" accept="audio/*,video/mp4" class="input-som">
+                        <small>Formatos suportados: MP3, MP4, OGG, WAV, AAC, M4A, WMA, FLAC (máx. 10MB)</small>
                         <button class="btn-teste-som" data-som="${tecla.dataset.som}">
                             🔊 Testar som atual
                         </button>
+                        <div class="info-formatos">
+                            <span class="info-icon">ℹ️</span>
+                            <span class="info-texto">MP4 funciona como áudio (extrai o áudio do vídeo)</span>
+                        </div>
                     </div>
                 </div>
                 
@@ -390,11 +418,38 @@ class TecladoInterativo {
         
         document.body.appendChild(modal);
         
+        // Adicionar estilo para a info de formatos
+        const style = document.createElement('style');
+        style.textContent = `
+            .info-formatos {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                margin-top: 5px;
+                padding: 5px 8px;
+                background: rgba(0, 212, 255, 0.1);
+                border-radius: 6px;
+                border: 1px solid rgba(0, 212, 255, 0.2);
+            }
+            
+            .info-icon {
+                font-size: 0.8rem;
+                flex-shrink: 0;
+            }
+            
+            .info-texto {
+                font-size: 0.7rem;
+                opacity: 0.9;
+                line-height: 1.2;
+            }
+        `;
+        document.head.appendChild(style);
+        
         // Configurar eventos do modal
-        this.configurarModalEdicao(tecla, modal);
+        this.configurarModalEdicao(tecla, modal, style);
     }
     
-    configurarModalEdicao(tecla, modal) {
+    configurarModalEdicao(tecla, modal, styleElement) {
         // Elementos do modal
         const btnFechar = modal.querySelector('.btn-fechar');
         const btnCancelar = modal.querySelector('.btn-cancelar');
@@ -406,6 +461,7 @@ class TecladoInterativo {
         const coresRapidas = modal.querySelectorAll('.cor-rapida');
         const inputEmoji = modal.querySelector('#editar-emoji');
         const exemplosEmoji = modal.querySelectorAll('.emoji-exemplo');
+        const inputSom = modal.querySelector('#editar-som');
         
         // Cores rápidas
         coresRapidas.forEach(corEl => {
@@ -436,6 +492,35 @@ class TecladoInterativo {
             });
         });
         
+        // Validação do arquivo de som
+        inputSom.addEventListener('change', (e) => {
+            const arquivo = e.target.files[0];
+            if (arquivo) {
+                const tamanhoMB = arquivo.size / (1024 * 1024);
+                const tipo = arquivo.type;
+                
+                if (tamanhoMB > 10) {
+                    this.mostrarFeedback('❌ Arquivo muito grande (máx. 10MB)', 3000);
+                    e.target.value = '';
+                    return;
+                }
+                
+                // Verificar se é um formato suportado
+                const formatoSuportado = tipo.startsWith('audio/') || 
+                                       tipo === 'video/mp4' || 
+                                       tipo === 'video/quicktime' ||
+                                       this.formatosSuportados.includes(tipo);
+                
+                if (!formatoSuportado) {
+                    this.mostrarFeedback(`❌ Formato não suportado: ${tipo}`, 3000);
+                    e.target.value = '';
+                    return;
+                }
+                
+                this.mostrarFeedback(`✅ Arquivo válido: ${arquivo.name}`, 2000);
+            }
+        });
+        
         // Testar som
         btnTesteSom.addEventListener('click', () => {
             const somId = btnTesteSom.dataset.som;
@@ -452,11 +537,16 @@ class TecladoInterativo {
             if (confirm('Resetar esta tecla para o padrão?')) {
                 this.resetarTeclaIndividual(tecla);
                 modal.remove();
+                styleElement.remove();
             }
         });
         
         // Fechar
-        const fecharModal = () => modal.remove();
+        const fecharModal = () => {
+            modal.remove();
+            styleElement.remove();
+        };
+        
         btnFechar.addEventListener('click', fecharModal);
         btnCancelar.addEventListener('click', fecharModal);
         modal.addEventListener('click', (e) => {
@@ -490,21 +580,53 @@ class TecladoInterativo {
             tecla.classList.add('editado');
         }
         
-        // Salvar som
-        if (arquivoSom && arquivoSom.size <= 5 * 1024 * 1024) {
-            const url = URL.createObjectURL(arquivoSom);
-            const somId = tecla.dataset.som;
-            const audioElement = document.querySelector(`#som_tecla_${somId}`);
-            
-            if (audioElement) {
-                // Salvar original
-                if (!audioElement.dataset.srcOriginal) {
-                    audioElement.dataset.srcOriginal = audioElement.src;
-                }
+        // Salvar som (suporte para MP4 e outros formatos)
+        if (arquivoSom) {
+            const tamanhoMB = arquivoSom.size / (1024 * 1024);
+            if (tamanhoMB <= 10) {
+                const url = URL.createObjectURL(arquivoSom);
+                const somId = tecla.dataset.som;
+                const audioElement = document.querySelector(`#som_tecla_${somId}`);
                 
-                audioElement.src = url;
-                this.sonsEditados[somId] = url;
-                tecla.classList.add('editado');
+                if (audioElement) {
+                    // Salvar original
+                    if (!audioElement.dataset.srcOriginal) {
+                        audioElement.dataset.srcOriginal = audioElement.querySelector('source').src;
+                    }
+                    
+                    // Remover sources antigos
+                    while (audioElement.firstChild) {
+                        audioElement.removeChild(audioElement.firstChild);
+                    }
+                    
+                    // Criar novo source baseado no tipo do arquivo
+                    const source = document.createElement('source');
+                    
+                    // Determinar tipo MIME
+                    let tipoMIME = arquivoSom.type;
+                    if (tipoMIME === 'video/mp4') {
+                        tipoMIME = 'audio/mp4'; // Converter vídeo MP4 para áudio MP4
+                    } else if (tipoMIME === 'video/quicktime') {
+                        tipoMIME = 'audio/mp4'; // Converter MOV para áudio MP4
+                    } else if (!tipoMIME.startsWith('audio/')) {
+                        // Se não for um tipo de áudio conhecido, usar genérico
+                        tipoMIME = 'audio/mpeg';
+                    }
+                    
+                    source.src = url;
+                    source.type = tipoMIME;
+                    audioElement.appendChild(source);
+                    
+                    this.sonsEditados[somId] = {
+                        url: url,
+                        type: tipoMIME,
+                        name: arquivoSom.name
+                    };
+                    tecla.classList.add('editado');
+                    
+                    // Recarregar o áudio
+                    audioElement.load();
+                }
             }
         }
         
@@ -555,7 +677,18 @@ class TecladoInterativo {
         // Resetar som
         const audioElement = document.querySelector(`#som_tecla_${somId}`);
         if (audioElement && audioElement.dataset.srcOriginal) {
-            audioElement.src = audioElement.dataset.srcOriginal;
+            // Remover sources atuais
+            while (audioElement.firstChild) {
+                audioElement.removeChild(audioElement.firstChild);
+            }
+            
+            // Restaurar source original
+            const source = document.createElement('source');
+            source.src = audioElement.dataset.srcOriginal;
+            source.type = 'audio/mpeg'; // Assumir MP3 como padrão
+            audioElement.appendChild(source);
+            audioElement.load();
+            
             delete this.sonsEditados[somId];
         }
         
@@ -643,7 +776,14 @@ class TecladoInterativo {
             // Resetar sons
             document.querySelectorAll('audio').forEach(audio => {
                 if (audio.dataset.srcOriginal) {
-                    audio.src = audio.dataset.srcOriginal;
+                    while (audio.firstChild) {
+                        audio.removeChild(audio.firstChild);
+                    }
+                    const source = document.createElement('source');
+                    source.src = audio.dataset.srcOriginal;
+                    source.type = 'audio/mpeg';
+                    audio.appendChild(source);
+                    audio.load();
                 }
             });
             localStorage.removeItem('sonsEditados');
@@ -662,7 +802,17 @@ class TecladoInterativo {
     salvarConfiguracoes() {
         localStorage.setItem('emojiEditados', JSON.stringify(this.emojiEditados));
         localStorage.setItem('coresTeclas', JSON.stringify(this.coresTeclas));
-        localStorage.setItem('sonsEditados', JSON.stringify(this.sonsEditados));
+        
+        // Salvar sons editados de forma simplificada
+        const sonsEditadosSimples = {};
+        Object.entries(this.sonsEditados).forEach(([key, value]) => {
+            if (typeof value === 'object' && value.url) {
+                sonsEditadosSimples[key] = value.url;
+            } else {
+                sonsEditadosSimples[key] = value;
+            }
+        });
+        localStorage.setItem('sonsEditados', JSON.stringify(sonsEditadosSimples));
     }
     
     mostrarFeedback(mensagem, duracao = 1500) {
@@ -686,7 +836,7 @@ class TecladoInterativo {
     }
     
     exibirVersao() {
-        const versao = '4.2.0';
+        const versao = '4.3.0';
         const elemento = document.getElementById('versao-app');
         if (elemento) {
             elemento.textContent = versao;
@@ -696,11 +846,34 @@ class TecladoInterativo {
     
     restaurarConfiguracoes() {
         // Restaurar sons editados
-        Object.entries(this.sonsEditados).forEach(([somId, url]) => {
+        Object.entries(this.sonsEditados).forEach(([somId, value]) => {
             const audioElement = document.querySelector(`#som_tecla_${somId}`);
             if (audioElement && !audioElement.dataset.srcOriginal) {
-                audioElement.dataset.srcOriginal = audioElement.src;
-                audioElement.src = url;
+                // Salvar original
+                const sourceOriginal = audioElement.querySelector('source');
+                if (sourceOriginal) {
+                    audioElement.dataset.srcOriginal = sourceOriginal.src;
+                }
+                
+                // Aplicar som editado
+                if (value) {
+                    let url;
+                    if (typeof value === 'object' && value.url) {
+                        url = value.url;
+                    } else {
+                        url = value;
+                    }
+                    
+                    while (audioElement.firstChild) {
+                        audioElement.removeChild(audioElement.firstChild);
+                    }
+                    
+                    const source = document.createElement('source');
+                    source.src = url;
+                    source.type = typeof value === 'object' ? value.type : 'audio/mpeg';
+                    audioElement.appendChild(source);
+                    audioElement.load();
+                }
             }
         });
     }
@@ -708,7 +881,6 @@ class TecladoInterativo {
     configurarControles() {
         const controles = {
             'botao-editar': () => this.toggleModoEdicao(),
-            // 'botao-cor-teclas' REMOVIDO conforme solicitado
             'botao-cores-aleatorias': () => this.aplicarCoresAleatorias(),
             'botao-modo': () => this.toggleModoNoturno(),
             'botao-parar': () => this.pararTodosSons(),
@@ -726,7 +898,7 @@ class TecladoInterativo {
             }
         });
         
-        // Remover botão de cores do DOM
+        // Remover botão de cores do DOM se ainda existir
         const botaoCores = document.getElementById('botao-cor-teclas');
         if (botaoCores) {
             botaoCores.style.display = 'none';
@@ -748,6 +920,15 @@ class TecladoInterativo {
                 }
             }
         }, { once: true });
+        
+        // Prevenir comportamento padrão de arrastar arquivos
+        document.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+        
+        document.addEventListener('drop', (e) => {
+            e.preventDefault();
+        });
     }
 }
 
@@ -757,7 +938,6 @@ class TecladoInterativo {
 document.addEventListener('DOMContentLoaded', () => {
     window.tecladoInterativo = new TecladoInterativo();
 });
-
 // Adicionar em main.js
 const temas = {
     'neon': { primaria: '#0a0a0a', secundaria: '#1a1a1a', destaque: '#00ff88' },
