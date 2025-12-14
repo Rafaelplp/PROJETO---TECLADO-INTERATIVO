@@ -2,47 +2,15 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TECLADO MEME INTERATIVO &#128540</title>
+    <title>Teclado Meme Interativo</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="images/emoji-png-0017.png">
-    
-    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&display=swap">
     <link rel="stylesheet" href="css/estilos.css">
     <link rel="stylesheet" href="css/modais.css">
-    <style>
-        /* Prevenir zoom em inputs no iOS */
-        @media screen and (max-width: 768px) {
-            input, select, textarea {
-                font-size: 16px !important;
-            }
-            
-            /* Prevenir bounce/overscroll */
-            body {
-                overscroll-behavior: none;
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            /* Ajustar altura para mobile */
-            html, body {
-                height: 100%;
-                overflow: hidden;
-            }
-            
-            .layout-principal {
-                height: 100vh;
-                height: -webkit-fill-available;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="layout-principal">
-        <!-- Menu lateral esquerdo -->
         <aside class="menu-lateral">
             <div class="logo">
                 <h2>🎹 Teclado Meme</h2>
@@ -51,32 +19,32 @@
             <div class="controles-laterais">
                 <button id="botao-editar" class="botao-menu">
                     <span class="icone">✏️</span>
-                    <span class="texto">Editar Teclado</span>
+                    <span class="texto">Editar</span>
                 </button>
                 
                 <button id="botao-cor-teclas" class="botao-menu">
                     <span class="icone">🎨</span>
-                    <span class="texto">Cores Teclas</span>
+                    <span class="texto">Cores</span>
                 </button>
                 
                 <button id="botao-cores-aleatorias" class="botao-menu">
                     <span class="icone">🌈</span>
-                    <span class="texto">Cores Aleatórias</span>
+                    <span class="texto">Aleatório</span>
                 </button>
                 
                 <button id="botao-modo" class="botao-menu">
                     <span class="icone">🌙</span>
-                    <span class="texto">Modo Noturno</span>
+                    <span class="texto">Noturno</span>
                 </button>
                 
                 <button id="botao-parar" class="botao-menu">
                     <span class="icone">⏹️</span>
-                    <span class="texto">Parar Som</span>
+                    <span class="texto">Parar</span>
                 </button>
                 
                 <button id="botao-reset" class="botao-menu">
                     <span class="icone">🔄</span>
-                    <span class="texto">Resetar Tudo</span>
+                    <span class="texto">Resetar</span>
                 </button>
             </div>
             
@@ -91,61 +59,39 @@
             </div>
         </aside>
 
-        <!-- Conteúdo principal -->
         <main class="conteudo-principal">
             <header class="cabecalho">
-                <h1>TECLADO MEME INTERATIVO &#128540</h1>
-                <p class="subtitulo">Clique nas teclas para tocar sons! Use o menu à esquerda para personalizar.</p>
+                <h1>TECLADO MEME INTERATIVO</h1>
+                <p class="subtitulo">Clique nas teclas para tocar sons!</p>
             </header>
 
-            <!-- Teclado principal -->
             <section class="teclado-container">
                 <div class="teclado-principal">
-                    <!-- Primeira linha -->
                     <button class="tecla tecla_pom" data-som="pom">&#129300</button>
                     <button class="tecla tecla_clap" data-som="clap">&#129396</button>
                     <button class="tecla tecla_tim" data-som="tim">&#128578</button>
-                    <button class="tecla tecla_extra1" data-som="extra1">&#127918</button> <!-- 🎮 -->
+                    <button class="tecla tecla_extra1" data-som="extra1">🎮</button>
                     
-                    <!-- Segunda linha -->
                     <button class="tecla tecla_puff" data-som="puff">&#128565</button>
                     <button class="tecla tecla_splash" data-som="splash">&#128571</button>
                     <button class="tecla tecla_toim" data-som="toim">&#128572</button>
-                    <button class="tecla tecla_extra2" data-som="extra2">&#127925</button> <!-- 🎵 -->
+                    <button class="tecla tecla_extra2" data-som="extra2">🎵</button>
                     
-                    <!-- Terceira linha -->
                     <button class="tecla tecla_psh" data-som="psh">&#129303</button>
                     <button class="tecla tecla_tic" data-som="tic">&#129321</button>
                     <button class="tecla tecla_tom" data-som="tom">&#128520</button>
-                    <button class="tecla tecla_extra3" data-som="extra3">&#10024</button> <!-- ✨ -->
+                    <button class="tecla tecla_extra3" data-som="extra3">✨</button>
                 </div>
             </section>
         </main>
-        <!-- Indicador de status de áudio -->
-<div id="indicador-audio" class="indicador-audio inativo"></div>
-
-<!-- Instruções iniciais para mobile -->
-<div id="instrucoes-mobile" class="instrucoes-mobile" style="display: none;">
-    <p>📱 Para usar os sons no celular:</p>
-    <ol style="text-align: left; margin: 10px 0; font-size: 0.8em;">
-        <li>Toque em qualquer lugar da tela primeiro</li>
-        <li>Ou clique no botão "ATIVAR SONS"</li>
-        <li>Depois clique nas teclas normalmente</li>
-    </ol>
-    <button onclick="document.getElementById('instrucoes-mobile').style.display='none'">
-        Entendi 👍
-    </button>
-</div>
-
     </div>
 
-    <!-- Rodape com contadores -->
     <footer class="rodape">
         <div class="contador-visitas">
             <div class="contador-item">
                 <span class="contador-icon">👥</span>
                 <div class="contador-info">
-                    <span class="contador-label">Visitantes Online</span>
+                    <span class="contador-label">Online</span>
                     <span class="contador-valor" id="contador-online">1</span>
                 </div>
             </div>
@@ -153,7 +99,7 @@
             <div class="contador-item">
                 <span class="contador-icon">🌐</span>
                 <div class="contador-info">
-                    <span class="contador-label">Total de Acessos</span>
+                    <span class="contador-label">Total</span>
                     <span class="contador-valor" id="contador-total">1</span>
                 </div>
             </div>
@@ -161,26 +107,24 @@
             <div class="contador-item">
                 <span class="contador-icon">⏰</span>
                 <div class="contador-info">
-                    <span class="contador-label">Último acesso</span>
+                    <span class="contador-label">Último</span>
                     <span class="contador-valor" id="ultimo-acesso">Agora</span>
                 </div>
             </div>
-        </div>
-
-        <div class="contador-item">
-            <span class="contador-icon">📱</span>
-            <div class="contador-info">
-                <span class="contador-label">Versão</span>
-                <span class="contador-valor" id="versao-app">2.1.3</span>
+            
+            <div class="contador-item">
+                <span class="contador-icon">📱</span>
+                <div class="contador-info">
+                    <span class="contador-label">Versão</span>
+                    <span class="contador-valor" id="versao-app">3.1.0</span>
+                </div>
             </div>
         </div>
-
-    </div>
         
         <p class="creditos">Teclado Interativo &copy; 2024 - Desenvolvido com ❤️ por Rafael Lira.</p>
     </footer>
 
-    <!-- Elementos de Áudio -->
+    <!-- Áudios -->
     <audio src="sounds-memes/among-sound.mp3" id="som_tecla_pom"></audio>
     <audio src="sounds-memes/downer-noise.mp3" id="som_tecla_clap"></audio>
     <audio src="sounds-memes/creditos-finales.mp3" id="som_tecla_tim"></audio>
@@ -190,12 +134,33 @@
     <audio src="sounds-memes/yippee.mp3" id="som_tecla_psh"></audio>
     <audio src="sounds-memes/pedro-song.mp3" id="som_tecla_tic"></audio>
     <audio src="sounds-memes/para-tira-que-eu-vou-cagar.mp3" id="som_tecla_tom"></audio>
-    <audio id="som_tecla_extra1" src="sounds-memes/extra1.mp3"></audio>
-    <audio id="som_tecla_extra2" src="sounds-memes/extra2.mp3"></audio>
-    <audio id="som_tecla_extra3" src="sounds-memes/extra3.mp3"></audio>
+    <audio src="sounds-memes/extra1.mp3" id="som_tecla_extra1"></audio>
+    <audio src="sounds-memes/extra2.mp3" id="som_tecla_extra2"></audio>
+    <audio src="sounds-memes/extra3.mp3" id="som_tecla_extra3"></audio>
 
     <!-- Scripts -->
-    <script src="js/contadorVisitas.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/contadorVisitas.js"></script>
+    
+    <!-- CSS adicional inline para garantir -->
+    <style>
+        /* Remover absolutamente tudo que pisca */
+        *[style*="animation"][style*="blink"],
+        *[style*="animation"][style*="flash"],
+        *[style*="red"][style*="pulse"],
+        .piscando, .flashing, .blinking {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+        }
+        
+        /* Garantir que não há elementos fora da tela */
+        body {
+            overflow: hidden !important;
+            position: fixed !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
 </body>
 </html>
