@@ -55,12 +55,14 @@ body.modo-dia {
   overscroll-behavior: none;
 }
 
-/* ========== MENU SUPERIOR (COM SCROLL SEGURO) ========== */
 /* ========== MENU SUPERIOR (CENTRALIZADO E SEMPRE HORIZONTAL) ========== */
 .menu-superior {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  overflow-x: visible !important;
+  overflow-y: hidden !important;
   gap: 12px;
   padding: 12px 20px;
   background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
@@ -74,9 +76,6 @@ body.modo-dia {
   box-sizing: border-box;
   transform: scale(0.75);
   transform-origin: center;
-  overflow-x: visible;
-  overflow-y: hidden;
-  flex-wrap: nowrap;
   min-height: 65px;
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
@@ -92,9 +91,11 @@ body.modo-dia .menu-superior {
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* BOTÕES DO MENU - LADO A LADO, CENTRALIZADOS */
+/* BOTÕES DO MENU */
 .botao-menu {
-  min-width: 80px;
+  flex: 1 0 auto;
+  min-width: 60px;
+  max-width: 80px;
   padding: 10px 8px;
   border-radius: 10px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
@@ -109,7 +110,6 @@ body.modo-dia .menu-superior {
   gap: 5px;
   cursor: pointer;
   transition: var(--transicao);
-  flex: 0 0 auto;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
   white-space: nowrap;
@@ -120,151 +120,6 @@ body.modo-dia .menu-superior {
   touch-action: manipulation;
   position: relative;
   z-index: 1;
-}
-
-/* REMOVER OVERFLOW DO MENU PARA VISIBILIDADE TOTAL */
-.menu-superior {
-  overflow-x: visible !important;
-  overflow-y: hidden !important;
-}
-
-/* GARANTIR QUE OS BOTÕES NÃO QUEBRAM EM COLUNA */
-@media (max-width: 768px) {
-  .menu-superior {
-      max-width: 550px;
-      gap: 10px;
-      padding: 10px 15px;
-  }
-  
-  .botao-menu {
-      min-width: 70px;
-      padding: 8px 6px;
-      font-size: 0.68rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .menu-superior {
-      max-width: 400px;
-      gap: 8px;
-      padding: 8px 12px;
-      transform: scale(0.7);
-  }
-  
-  .botao-menu {
-      min-width: 65px;
-      padding: 7px 5px;
-      font-size: 0.65rem;
-  }
-}
-
-/* TELAS MUITO PEQUENAS - REDUZIR MAS MANTER HORIZONTAL */
-@media (max-width: 350px) {
-  .menu-superior {
-      max-width: 320px;
-      gap: 6px;
-      padding: 6px 10px;
-      transform: scale(0.65);
-  }
-  
-  .botao-menu {
-      min-width: 60px;
-      padding: 6px 4px;
-      font-size: 0.6rem;
-  }
-}
-
-/* DESKTOP GRANDE */
-@media (min-width: 1200px) {
-  .menu-superior {
-      max-width: 700px;
-      gap: 15px;
-      padding: 14px 24px;
-  }
-  
-  .botao-menu {
-      min-width: 85px;
-      padding: 12px 10px;
-      font-size: 0.75rem;
-  }
-}
-
-/* PAISAGEM - GARANTIR QUE FICA HORIZONTAL */
-@media (orientation: landscape) and (max-height: 600px) {
-  .menu-superior {
-      max-width: 95%;
-      transform: scale(0.6);
-      margin: 0 auto;
-  }
-
-}
-
-.menu-superior::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 3px;
-}
-
-.menu-superior::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 3px;
-}
-
-.menu-superior::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
-}
-
-body.modo-dia .menu-superior {
-  background: linear-gradient(180deg, #ffffff 0%, #f0f2f5 100%);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-body.modo-dia .menu-superior::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-body.modo-dia .menu-superior::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-}
-
-/* BOTÕES DO MENU COM PREVENÇÃO DE TOQUE DURANTE SCROLL */
-.botao-menu {
-  min-width: 75px;
-  padding: 8px 6px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
-  color: white;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.7rem;
-  font-weight: 600;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  cursor: pointer;
-  transition: var(--transicao);
-  flex: 0 0 auto;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  position: relative;
-  z-index: 1;
-}
-
-.botao-menu::before {
-  content: '';
-  position: absolute;
-  top: -10px;
-  left: -10px;
-  right: -10px;
-  bottom: -10px;
-  z-index: -1;
-  background: transparent;
 }
 
 body.modo-dia .botao-menu {
@@ -369,7 +224,6 @@ body.modo-dia .cabecalho h1 {
   box-sizing: border-box;
 }
 
-/* PREVENÇÃO DE TOQUE NAS TECLAS DURANTE SCROLL */
 .tecla {
   aspect-ratio: 1;
   border: none;
@@ -433,47 +287,25 @@ body.modo-dia .tecla {
   color: var(--cor-texto-claro);
 }
 
-/* ========== RODAPÉ (INFORMAÇÕES CENTRALIZADAS, COM SCROLL SEGURO) ========== */
+/* ========== RODAPÉ (SEM SCROLL HORIZONTAL) ========== */
 .rodape {
   background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
   padding: 12px 15px;
   border-radius: var(--borda-radius);
-  backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
   width: 100%;
+  max-width: 650px;
   margin: 0 auto;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transform: scale(0.75);
   transform-origin: center;
   box-sizing: border-box;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: hidden;
   min-height: 65px;
-  white-space: nowrap;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-  overscroll-behavior-x: contain;
-  touch-action: pan-x;
-}
-
-.rodape::-webkit-scrollbar {
-  height: 6px;
-}
-
-.rodape::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 3px;
-}
-
-.rodape::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 3px;
-}
-
-.rodape::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 body.modo-dia .rodape {
@@ -481,44 +313,28 @@ body.modo-dia .rodape {
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-body.modo-dia .rodape::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-body.modo-dia .rodape::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-}
-
 .contador-visitas {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
   margin-bottom: 5px;
   flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 2px;
+  overflow: visible;
   width: 100%;
-  min-width: min-content;
+  padding: 0;
 }
 
-.contador-visitas::-webkit-scrollbar {
-  display: none;
-}
-
-/* CAIXAS DO RODAPÉ COM INFORMAÇÕES CENTRALIZADAS */
 .contador-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
-  padding: 8px 12px;
+  padding: 6px 8px;
   border-radius: 8px;
-  flex: 0 0 auto;
-  min-width: 140px;
-  max-width: 160px;
+  flex: 1;
+  min-width: 0;
+  max-width: 140px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-sizing: border-box;
   touch-action: manipulation;
@@ -538,7 +354,6 @@ body.modo-dia .contador-item {
   text-align: center;
 }
 
-/* INFORMAÇÕES CENTRALIZADAS VERTICALMENTE */
 .contador-info {
   display: flex;
   flex-direction: column;
@@ -550,10 +365,10 @@ body.modo-dia .contador-item {
 }
 
 .contador-label {
-  font-size: 0.6rem;
+  font-size: 0.55rem !important;
   opacity: 0.8;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
   font-weight: 600;
   margin-bottom: 2px;
   white-space: nowrap;
@@ -566,7 +381,7 @@ body.modo-dia .contador-item {
 
 .contador-valor {
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: 0.7rem !important;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -595,11 +410,10 @@ body.modo-dia .contador-item {
 
 .creditos {
   text-align: center;
-  font-size: 0.95rem;
+  font-size: 0.7rem !important;
   opacity: 0.6;
   margin: 3px 0 0 0;
   font-weight: 500;
-  letter-spacing: 0.3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -698,14 +512,14 @@ body.modo-dia .modal-header h3 {
   .menu-superior {
       gap: 8px;
       padding: 10px 12px;
-      transform: scale(0.7);
+      transform: scale(0.7) !important;
       min-height: 60px;
   }
   
   .botao-menu {
-      min-width: 70px;
+      min-width: 65px;
       padding: 7px 5px;
-      font-size: 0.65rem;
+      font-size: 0.65rem !important;
   }
   
   .botao-menu .icone {
@@ -737,26 +551,26 @@ body.modo-dia .modal-header h3 {
   
   .rodape {
       padding: 10px 12px;
-      transform: scale(0.7);
+      transform: scale(0.7) !important;
       min-height: 60px;
   }
   
   .contador-visitas {
-      gap: 10px;
+      gap: 8px;
   }
   
   .contador-item {
-      padding: 7px 10px;
-      min-width: 130px;
-      max-width: 145px;
+      padding: 5px 7px;
+      min-width: 110px;
+      max-width: 130px;
   }
   
   .contador-label {
-      font-size: 0.55rem;
+      font-size: 0.5rem !important;
   }
   
   .contador-valor {
-      font-size: 0.7rem;
+      font-size: 0.65rem !important;
   }
 }
 
@@ -764,14 +578,14 @@ body.modo-dia .modal-header h3 {
   .menu-superior {
       gap: 6px;
       padding: 8px 10px;
-      transform: scale(0.65);
+      transform: scale(0.65) !important;
       min-height: 55px;
   }
   
   .botao-menu {
-      min-width: 65px;
+      min-width: 55px;
       padding: 6px 4px;
-      font-size: 0.6rem;
+      font-size: 0.6rem !important;
   }
   
   .botao-menu .icone {
@@ -805,39 +619,56 @@ body.modo-dia .modal-header h3 {
   
   .rodape {
       padding: 8px 10px;
-      transform: scale(0.65);
+      transform: scale(0.65) !important;
       min-height: 55px;
   }
   
   .contador-item {
-      min-width: 120px;
-      max-width: 135px;
-      padding: 6px 9px;
+      min-width: 90px;
+      max-width: 110px;
+      padding: 4px 6px;
   }
   
   .creditos {
-      font-size: 0.95rem;
+      font-size: 0.65rem !important;
       margin-top: 3px;
   }
 }
 
-/* TELAS MUITO PEQUENAS - GARANTIR HORIZONTAL */
+/* TELAS MUITO PEQUENAS */
 @media (max-width: 350px) {
   .menu-superior {
+      transform: scale(0.65) !important;
       gap: 4px;
       padding: 6px 8px;
   }
   
   .botao-menu {
-      min-width: 60px;
-      padding: 5px 3px;
-      font-size: 0.55rem;
+      min-width: 55px;
+      max-width: 60px;
+      padding: 4px 2px;
+      font-size: 0.55rem !important;
+  }
+  
+  .botao-menu .icone {
+      font-size: 0.8rem !important;
+  }
+  
+  .rodape {
+      transform: scale(0.65) !important;
   }
   
   .contador-item {
-      min-width: 110px;
-      max-width: 125px;
-      padding: 5px 8px;
+      min-width: 90px;
+      padding: 4px 5px;
+  }
+  
+  .contador-label {
+      font-size: 0.5rem !important;
+  }
+  
+  .contador-valor {
+      font-size: 0.65rem !important;
   }
   
   .teclado-principal {
@@ -855,6 +686,11 @@ body.modo-dia .modal-header h3 {
       max-width: 1100px;
   }
   
+  .menu-superior {
+      max-width: 700px;
+      transform: scale(0.8) !important;
+  }
+  
   .teclado-principal {
       max-width: 600px;
       gap: 12px;
@@ -863,9 +699,14 @@ body.modo-dia .modal-header h3 {
   .tecla {
       font-size: 2rem;
   }
+  
+  .rodape {
+      max-width: 700px;
+      transform: scale(0.8) !important;
+  }
 }
 
-/* MODO PAISAGEM - MOBILE (SCROLL SEGURO) */
+/* ========== PAISAGEM (HORIZONTAL) - AJUSTES CRÍTICOS ========== */
 @media (orientation: landscape) and (max-height: 600px) {
   .app-container {
       flex-direction: row;
@@ -873,65 +714,118 @@ body.modo-dia .modal-header h3 {
       padding: 5px;
       gap: 5px;
       overflow-y: auto;
-      overscroll-behavior: contain;
+      height: 100vh;
   }
   
   .menu-superior {
       order: 1;
       width: 100%;
-      transform: scale(0.6);
+      max-width: 95%;
+      transform: scale(0.6) !important;
       min-height: 50px;
-      margin-bottom: 0;
-      touch-action: pan-x;
+      margin: 0 auto;
   }
   
   .cabecalho {
       order: 2;
-      display: none;
+      width: 100%;
+      min-height: 40px;
+      padding: 2px 0;
+  }
+  
+  .cabecalho h1 {
+      font-size: 1.1rem !important;
+      margin-bottom: 2px;
+  }
+  
+  .subtitulo {
+      font-size: 0.65rem !important;
   }
   
   .teclado-container {
       order: 3;
       flex: 1;
       min-width: 0;
-      padding: 0 5px;
-      touch-action: pan-y;
+      height: calc(100vh - 200px);
       overflow-y: auto;
-      overflow-x: hidden;
+      padding: 0 5px;
   }
   
   .teclado-principal {
-      gap: 6px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
       max-width: 100%;
+      padding: 5px;
   }
   
   .tecla {
-      font-size: 1.4rem;
-      min-height: 70px;
+      font-size: 1.3rem;
+      min-height: 60px;
+      border-radius: 10px;
   }
   
   .rodape {
       order: 4;
       width: 100%;
-      transform: scale(0.6);
+      max-width: 95%;
+      transform: scale(0.6) !important;
       min-height: 50px;
-      margin-top: 0;
-      touch-action: pan-x;
+      margin: 0 auto;
+      padding: 8px 10px;
   }
   
-  /* AJUSTE PARA SCROLL VERTICAL NO TECLADO EM PAISAGEM */
-  .teclado-container::-webkit-scrollbar {
-      width: 6px;
+  .contador-item {
+      padding: 4px 6px;
+      max-width: 120px;
   }
   
-  .teclado-container::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 3px;
+  .contador-label {
+      font-size: 0.5rem !important;
   }
   
-  .teclado-container::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.3);
-      border-radius: 3px;
+  .contador-valor {
+      font-size: 0.65rem !important;
+  }
+  
+  .creditos {
+      font-size: 0.65rem !important;
+  }
+}
+
+/* AJUSTE PARA CELULARES PEQUENOS EM PAISAGEM */
+@media (orientation: landscape) and (max-height: 400px) {
+  .menu-superior {
+      transform: scale(0.5) !important;
+      min-height: 40px;
+  }
+  
+  .cabecalho {
+      min-height: 30px;
+      display: none;
+  }
+  
+  .teclado-principal {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+  }
+  
+  .tecla {
+      font-size: 1.2rem;
+      min-height: 50px;
+  }
+  
+  .rodape {
+      transform: scale(0.5) !important;
+      min-height: 40px;
+  }
+  
+  .contador-visitas {
+      gap: 4px;
+  }
+  
+  .contador-item {
+      padding: 3px 4px;
+      max-width: 100px;
   }
 }
 
@@ -1212,6 +1106,7 @@ small {
   .menu-superior {
       min-height: 60px;
       padding: 6px 10px;
+      transform: scale(0.7) !important;
   }
   
   .cabecalho {
@@ -1230,6 +1125,7 @@ small {
   .rodape {
       min-height: 60px;
       padding: 6px 10px;
+      transform: scale(0.7) !important;
   }
 }
 
@@ -1248,102 +1144,5 @@ small {
   
   .tecla {
       font-size: 1.4rem;
-  }
-}
-
-/* ========== GARANTIR MENU HORIZONTAL E CENTRALIZADO ========== */
-.menu-superior-container {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin: 0 auto;
-  overflow: visible;
-}
-
-/* Forçar que os botões não quebrem linha */
-.menu-superior {
-  display: inline-flex !important;
-  flex-wrap: nowrap !important;
-  justify-content: center !important;
-  overflow: visible !important;
-}
-
-/* Remover qualquer transform que possa causar overflow */
-.menu-superior {
-  transform: none !important;
-}
-
-/* Ajustar tamanho dos botões para caber na tela */
-@media (max-width: 768px) {
-  .botao-menu {
-      min-width: 70px !important;
-      max-width: 80px !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .botao-menu {
-      min-width: 60px !important;
-      max-width: 70px !important;
-      font-size: 0.6rem !important;
-      padding: 6px 4px !important;
-  }
-  
-  .botao-menu .icone {
-      font-size: 0.9rem !important;
-  }
-}
-
-/* Tela muito pequena - botões mínimos */
-@media (max-width: 350px) {
-  .botao-menu {
-      min-width: 55px !important;
-      max-width: 60px !important;
-      font-size: 0.55rem !important;
-      padding: 5px 3px !important;
-  }
-  
-  .botao-menu .icone {
-      font-size: 0.8rem !important;
-  }
-  
-  .menu-superior {
-      gap: 5px !important;
-      padding: 5px 8px !important;
-  }
-}
-
-/* Garantir que não tenha scroll no menu */
-.menu-superior {
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
-}
-
-.menu-superior::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
-}
-
-/* Classe para quando o menu estiver ajustado */
-.menu-ajustado {
-  transform: scale(0.9);
-  transform-origin: center;
-}
-
-/* Versão alternativa: menu com grid */
-@media (max-width: 400px) {
-  .menu-superior {
-      display: grid !important;
-      grid-template-columns: repeat(5, 1fr) !important;
-      gap: 4px !important;
-      padding: 6px !important;
-  }
-  
-  .botao-menu {
-      min-width: auto !important;
-      max-width: 100% !important;
-      width: 100% !important;
-      padding: 5px 2px !important;
   }
 }

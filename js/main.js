@@ -1,5 +1,5 @@
 // main.js - Teclado Interativo v4.4.1
-// Rodapé centralizado + Scroll seguro sem ativar botões
+// Rodapé completo + Adaptação responsiva completa
 
 class TecladoInterativo {
     constructor() {
@@ -16,8 +16,10 @@ class TecladoInterativo {
         this.scrollTimeout = null;
         this.touchStartX = 0;
         this.touchStartY = 0;
-        this.touchMoveThreshold = 10; // pixels para considerar como scroll
+        this.touchMoveThreshold = 10;
         this.isScrolling = false;
+        this.resizeTimeout = null;
+        this.ultimaOrientacao = window.orientation;
         
         // Formatos de áudio suportados
         this.formatosSuportados = [
@@ -92,39 +94,146 @@ class TecladoInterativo {
         // Ajustar menu para caber na tela
         this.ajustarMenuParaTela();
         
+        // Ajustar layout dinamicamente
+        setTimeout(() => this.ajustarLayoutDinamico(), 100);
+        
         // Inicializar áudio
         this.inicializarAudio();
         
         console.log('✅ Teclado pronto para uso!');
     }
     
-    // Adicionar novo método para ajustar o menu:
+    // ========== AJUSTE DINÂMICO DE LAYOUT ==========
+    
+    ajustarLayoutDinamico() {
+        const isLandscape = window.innerWidth > window.innerHeight;
+        const larguraTela = window.innerWidth;
+        const alturaTela = window.innerHeight;
+        
+        // Elementos
+        const menu = document.querySelector('.menu-superior');
+        const rodape = document.querySelector('.rodape');
+        const contadorVisitas = document.querySelector('.contador-visitas');
+        const itensContador = document.querySelectorAll('.contador-item');
+        
+        if (!menu || !rodape || !contadorVisitas) return;
+        
+        // 1. Ajustar Menu
+        this.ajustarMenuParaTela();
+        
+        // 2. Ajustar Rodapé para caber SEM scroll
+        const larguraRodape = rodape.offsetWidth || larguraTela * 0.9;
+        const larguraDisponivel = larguraRodape * 0.9;
+        
+        // Calcular largura total dos itens
+        let larguraTotalItens = 0;
+        itensContador.forEach(item => {
+            const estilo = window.getComputedStyle(item);
+            const margem = parseInt(estilo.marginLeft) + parseInt(estilo.marginRight);
+            larguraTotalItens += item.offsetWidth + margem;
+        });
+        
+        // Adicionar gap
+        const estiloContador = window.getComputedStyle(contadorVisitas);
+        const gap = parseInt(estiloContador.gap) || 8;
+        larguraTotalItens += gap * (itensContador.length - 1);
+        
+        // Se não couber, reduzir escala do rodapé
+        if (larguraTotalItens > larguraDisponivel && larguraDisponivel > 0) {
+            const fatorReducao = larguraDisponivel / larguraTotalItens;
+            const escala = Math.min(fatorReducao * 0.9, 0.65);
+            rodape.style.transform = `scale(${escala})`;
+            
+            // Ajustar também o contador
+            contadorVisitas.style.gap = `${Math.max(gap * 0.7, 4)}px`;
+        } else {
+            rodape.style.transform = isLandscape ? 'scale(0.6)' : 'scale(0.75)';
+            contadorVisitas.style.gap = '8px';
+        }
+        
+        rodape.style.transformOrigin = 'center';
+        
+        // 3. Ajustar teclado em paisagem
+        if (isLandscape) {
+            const tecladoContainer = document.querySelector('.teclado-container');
+            if (tecladoContainer) {
+                const alturaMenu = menu.offsetHeight || 50;
+                const alturaRodape = rodape.offsetHeight || 50;
+                const alturaDisponivel = alturaTela - alturaMenu - alturaRodape - 100;
+                tecladoContainer.style.maxHeight = `${Math.max(alturaDisponivel, 200)}px`;
+                tecladoContainer.style.overflowY = 'auto';
+            }
+            
+            // Reduzir cabeçalho em paisagem
+            const cabecalho = document.querySelector('.cabecalho');
+            if (cabecalho && alturaTela < 500) {
+                cabecalho.style.display = 'none';
+            } else if (cabecalho) {
+                cabecalho.style.display = 'flex';
+            }
+        } else {
+            // Restaurar modo retrato
+            const tecladoContainer = document.querySelector('.teclado-container');
+            if (tecladoContainer) {
+                tecladoContainer.style.maxHeight = 'none';
+                tecladoContainer.style.overflowY = 'visible';
+            }
+            
+            const cabecalho = document.querySelector('.cabecalho');
+            if (cabecalho) {
+                cabecalho.style.display = 'flex';
+            }
+        }
+        
+        // 4. Garantir que não haja scroll horizontal no rodapé
+        rodape.style.overflowX = 'hidden';
+        rodape.style.overflowY = 'hidden';
+        
+        // Forçar quebra de linha se necessário (último recurso)
+        if (larguraTotalItens > larguraDisponivel * 1.5) {
+            contadorVisitas.style.flexWrap = 'wrap';
+            contadorVisitas.style.justifyContent = 'center';
+        } else {
+            contadorVisitas.style.flexWrap = 'nowrap';
+        }
+    }
+    
     ajustarMenuParaTela() {
         const menu = document.querySelector('.menu-superior');
         if (!menu) return;
         
-        // Verificar se o menu cabe na tela
-        const verificarAjuste = () => {
-            const botoes = menu.querySelectorAll('.botao-menu');
-            const larguraMenu = menu.offsetWidth;
-            const larguraBotoes = Array.from(bots).reduce((total, botao) => {
-                return total + botao.offsetWidth;
-            }, 0);
-            
-            // Adicionar gap (12px * número de gaps)
-            const gapTotal = (botoes.length - 1) * 12;
-            const larguraTotalNecessaria = larguraBotoes + gapTotal + 40; // + padding
-            
-            // Se não couber, reduzir escala
-            if (larguraTotalNecessaria > larguraMenu && larguraMenu > 0) {
-                const fatorEscala = larguraMenu / larguraTotalNecessaria * 0.9;
-                menu.style.transform = `scale(${Math.min(fatorEscala, 0.75)})`;
-            }
-        };
+        const botoes = menu.querySelectorAll('.botao-menu');
+        const larguraMenu = menu.offsetWidth || window.innerWidth * 0.9;
         
-        // Verificar após carregamento e redimensionamento
-        setTimeout(verificarAjuste, 100);
-        window.addEventListener('resize', verificarAjuste);
+        // Calcular largura necessária
+        let larguraTotal = 0;
+        botoes.forEach(botao => {
+            const estilo = window.getComputedStyle(botao);
+            const margem = parseInt(estilo.marginLeft) + parseInt(estilo.marginRight);
+            larguraTotal += botao.offsetWidth + margem;
+        });
+        
+        // Adicionar gap
+        const estiloMenu = window.getComputedStyle(menu);
+        const gap = parseInt(estiloMenu.gap) || 12;
+        larguraTotal += gap * (botoes.length - 1);
+        
+        // Adicionar padding
+        larguraTotal += parseInt(estiloMenu.paddingLeft) + parseInt(estiloMenu.paddingRight);
+        
+        // Calcular fator de escala
+        const isLandscape = window.innerWidth > window.innerHeight;
+        const larguraMaxima = window.innerWidth * (isLandscape ? 0.95 : 0.9);
+        const larguraAlvo = Math.min(larguraMaxima, 650);
+        
+        if (larguraTotal > larguraAlvo && larguraAlvo > 0) {
+            const fatorEscala = larguraAlvo / larguraTotal;
+            menu.style.transform = `scale(${Math.min(fatorEscala * 0.95, 0.75)})`;
+        } else {
+            menu.style.transform = isLandscape ? 'scale(0.6)' : 'scale(0.75)';
+        }
+        
+        menu.style.transformOrigin = 'center';
     }
     
     inicializarAudio() {
@@ -144,20 +253,7 @@ class TecladoInterativo {
     // ========== SISTEMA DE SCROLL SEGURO ==========
     
     configurarEventosScroll() {
-        // Elementos que têm scroll horizontal - REMOVER MENU DA LISTA
-        const elementosComScroll = [
-            '.rodape',
-            '.contador-visitas'
-        ];
-        
-        elementosComScroll.forEach(seletor => {
-            const elementos = document.querySelectorAll(seletor);
-            elementos.forEach(elemento => {
-                this.configurarScrollSeguro(elemento);
-            });
-        });
-        
-        // Configurar para o teclado também
+        // Configurar para o teclado
         const tecladoContainer = document.querySelector('.teclado-container');
         if (tecladoContainer) {
             this.configurarScrollVerticalSeguro(tecladoContainer);
@@ -165,79 +261,6 @@ class TecladoInterativo {
         
         // Configurar eventos de touch para detectar scroll
         this.configurarDetecaoScroll();
-    }
-    
-    configurarScrollSeguro(elemento) {
-        if (!elemento) return;
-        
-        // Prevenir comportamento padrão de arrastar
-        elemento.addEventListener('touchstart', (e) => {
-            this.touchStartX = e.touches[0].clientX;
-            this.touchStartY = e.touches[0].clientY;
-            this.isScrolling = false;
-            
-            // Adicionar classe de scroll ativo
-            elemento.classList.add('scrolling-active');
-            
-            // Adicionar classe scrolling aos botões dentro do elemento
-            const botoes = elemento.querySelectorAll('.botao-menu, .contador-item');
-            botoes.forEach(botao => botao.classList.add('scrolling'));
-        }, { passive: true });
-        
-        elemento.addEventListener('touchmove', (e) => {
-            if (!this.touchStartX || !this.touchStartY) return;
-            
-            const touchX = e.touches[0].clientX;
-            const touchY = e.touches[0].clientY;
-            
-            const deltaX = Math.abs(touchX - this.touchStartX);
-            const deltaY = Math.abs(touchY - this.touchStartY);
-            
-            // Se o movimento for maior que o threshold, é scroll
-            if (deltaX > this.touchMoveThreshold || deltaY > this.touchMoveThreshold) {
-                this.isScrolling = true;
-                
-                // Manter classe scrolling nos botões
-                const botoes = elemento.querySelectorAll('.botao-menu, .contador-item');
-                botoes.forEach(botao => botao.classList.add('scrolling'));
-            }
-        }, { passive: true });
-        
-        elemento.addEventListener('touchend', (e) => {
-            // Limpar timeout anterior
-            if (this.scrollTimeout) {
-                clearTimeout(this.scrollTimeout);
-            }
-            
-            // Remover classe scrolling após um delay
-            this.scrollTimeout = setTimeout(() => {
-                this.isScrolling = false;
-                elemento.classList.remove('scrolling-active');
-                
-                const botoes = elemento.querySelectorAll('.botao-menu, .contador-item');
-                botoes.forEach(botao => botao.classList.remove('scrolling'));
-            }, 100);
-            
-            this.touchStartX = 0;
-            this.touchStartY = 0;
-        }, { passive: true });
-        
-        // Também para mouse wheel
-        elemento.addEventListener('wheel', (e) => {
-            this.isScrolling = true;
-            elemento.classList.add('scrolling-active');
-            
-            const botoes = elemento.querySelectorAll('.botao-menu, .contador-item');
-            botoes.forEach(botao => botao.classList.add('scrolling'));
-            
-            // Remover após scroll
-            clearTimeout(this.scrollTimeout);
-            this.scrollTimeout = setTimeout(() => {
-                this.isScrolling = false;
-                elemento.classList.remove('scrolling-active');
-                botoes.forEach(botao => botao.classList.remove('scrolling'));
-            }, 150);
-        }, { passive: true });
     }
     
     configurarScrollVerticalSeguro(elemento) {
@@ -285,7 +308,7 @@ class TecladoInterativo {
         }, { passive: true });
     }
 
-    // ========== CONFIGURAÇÃO DAS TECLAS (COM PREVENÇÃO DE SCROLL) ==========
+    // ========== CONFIGURAÇÃO DAS TECLAS ==========
     
     configurarTeclas() {
         const teclas = document.querySelectorAll('.tecla');
@@ -463,8 +486,8 @@ class TecladoInterativo {
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
-            oscillator.frequency.value = 1; // Frequência muito baixa
-            gainNode.gain.value = 0.001; // Quase inaudível
+            oscillator.frequency.value = 1;
+            gainNode.gain.value = 0.001;
             
             oscillator.start();
             oscillator.stop(audioContext.currentTime + 0.001);
@@ -1067,7 +1090,7 @@ class TecladoInterativo {
     }
     
     exibirVersao() {
-        const versao = '4.4.0';
+        const versao = '4.4.1';
         const elemento = document.getElementById('versao-app');
         if (elemento) {
             elemento.textContent = versao;
@@ -1186,65 +1209,39 @@ class TecladoInterativo {
                 e.preventDefault();
             }
         }, { passive: false });
+        
+        // Ajustar layout ao redimensionar
+        window.addEventListener('resize', () => {
+            clearTimeout(this.resizeTimeout);
+            this.resizeTimeout = setTimeout(() => {
+                this.ajustarLayoutDinamico();
+            }, 100);
+        });
+        
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                this.ajustarLayoutDinamico();
+            }, 300);
+        });
     }
-     // Novo método para otimizar layout
-     otimizarLayout() {
+    
+    otimizarLayout() {
         // Função para ajustar layout baseado na orientação
         const ajustarLayout = () => {
             const isLandscape = window.innerWidth > window.innerHeight;
-            const appContainer = document.querySelector('.app-container');
-            const tecladoContainer = document.querySelector('.teclado-container');
-            const rodape = document.querySelector('.rodape');
-            
-            if (!appContainer || !tecladoContainer || !rodape) return;
             
             if (isLandscape) {
                 // Modo paisagem
                 document.body.style.overflowY = 'auto';
-                appContainer.style.minHeight = 'auto';
-                
-                // Calcular altura disponível
-                const alturaViewport = window.innerHeight;
-                const alturaMenu = document.querySelector('.menu-superior').offsetHeight;
-                const alturaCabecalho = document.querySelector('.cabecalho').offsetHeight;
-                const alturaRodape = rodape.offsetHeight;
-                const margens = 40;
-                
-                const alturaDisponivel = alturaViewport - alturaMenu - alturaCabecalho - alturaRodape - margens;
-                
-                // Ajustar teclado
-                tecladoContainer.style.maxHeight = `${Math.max(alturaDisponivel, 200)}px`;
-                tecladoContainer.style.overflowY = 'auto';
                 
                 // Garantir que rodapé esteja visível
-                rodape.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                const rodape = document.querySelector('.rodape');
+                if (rodape) {
+                    rodape.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
             } else {
                 // Modo retrato
                 document.body.style.overflowY = 'auto';
-                appContainer.style.minHeight = '100vh';
-                tecladoContainer.style.maxHeight = 'none';
-                tecladoContainer.style.overflowY = 'visible';
-            }
-            
-            // Garantir que o rodapé não tenha scroll horizontal
-            rodape.style.overflowX = 'hidden';
-            rodape.style.whiteSpace = 'normal';
-            
-            // Ajustar contador para caber sem scroll
-            const contadorVisitas = rodape.querySelector('.contador-visitas');
-            if (contadorVisitas) {
-                const larguraRodape = rodape.offsetWidth;
-                const larguraItens = Array.from(contadorVisitas.children).reduce((total, item) => {
-                    return total + item.offsetWidth;
-                }, 0);
-                
-                // Se não couber em uma linha, quebrar
-                if (larguraItens > larguraRodape * 0.9) {
-                    contadorVisitas.style.flexWrap = 'wrap';
-                    contadorVisitas.style.justifyContent = 'center';
-                } else {
-                    contadorVisitas.style.flexWrap = 'nowrap';
-                }
             }
         };
         
@@ -1259,9 +1256,6 @@ class TecladoInterativo {
         
         // Ajustar quando conteúdo carregar
         window.addEventListener('load', ajustarLayout);
-        
-        // Verificar periodicamente
-        setInterval(ajustarLayout, 2000);
     }
 }
 
@@ -1289,14 +1283,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-// Adicionar em main.js
-const temas = {
-    'neon': { primaria: '#0a0a0a', secundaria: '#1a1a1a', destaque: '#00ff88' },
-    'pastel': { primaria: '#f8f9fa', secundaria: '#e9ecef', destaque: '#ff6b8b' },
-    'retro': { primaria: '#2d3047', secundaria: '#419d78', destaque: '#e0a458' }
-  };
+// Função global para forçar ajustes
+function forcarAjusteLayout() {
+    const app = window.tecladoInterativo;
+    if (app && app.ajustarLayoutDinamico) {
+        app.ajustarLayoutDinamico();
+    }
+    
+    // Garantir que rodapé não tenha scroll
+    const rodape = document.querySelector('.rodape');
+    if (rodape) {
+        rodape.style.overflowX = 'hidden';
+        rodape.style.overflowY = 'hidden';
+        
+        // Forçar quebra de linha se necessário
+        const contador = rodape.querySelector('.contador-visitas');
+        if (contador) {
+            const larguraRodape = rodape.offsetWidth;
+            const larguraContador = contador.scrollWidth;
+            
+            if (larguraContador > larguraRodape * 0.9) {
+                contador.style.flexWrap = 'wrap';
+                contador.style.justifyContent = 'center';
+            } else {
+                contador.style.flexWrap = 'nowrap';
+            }
+        }
+    }
+}
 
-  // Adicionar suporte a atalhos de teclado
+// Executar ao carregar e redimensionar
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(forcarAjusteLayout, 200);
+    
+    // Ajustar após imagens/carregamento
+    window.addEventListener('load', () => {
+        setTimeout(forcarAjusteLayout, 500);
+    });
+    
+    // Monitorar redimensionamento
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(forcarAjusteLayout, 250);
+    });
+    
+    // Monitorar mudança de orientação
+    window.addEventListener('orientationchange', () => {
+        setTimeout(forcarAjusteLayout, 400);
+    });
+});
+
+// Adicionar suporte a atalhos de teclado
 document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;
     
@@ -1320,54 +1358,3 @@ document.addEventListener('keydown', (e) => {
       if (tecla) tecla.click();
     }
   });
-
-  // Script para garantir menu horizontal e centralizado
-function garantirMenuHorizontal() {
-    const menu = document.querySelector('.menu-superior');
-    if (!menu) return;
-    
-    // Remover overflow e scroll
-    menu.style.overflowX = 'visible';
-    menu.style.overflowY = 'hidden';
-    
-    // Calcular largura total dos botões
-    const botoes = menu.querySelectorAll('.botao-menu');
-    let larguraTotal = 0;
-    
-    botoes.forEach(botao => {
-        const estilo = window.getComputedStyle(botao);
-        const margem = parseInt(estilo.marginLeft) + parseInt(estilo.marginRight);
-        larguraTotal += botao.offsetWidth + margem;
-    });
-    
-    // Adicionar gap
-    const estiloMenu = window.getComputedStyle(menu);
-    const gap = parseInt(estiloMenu.gap) || 12;
-    larguraTotal += gap * (botoes.length - 1);
-    
-    // Adicionar padding
-    larguraTotal += parseInt(estiloMenu.paddingLeft) + parseInt(estiloMenu.paddingRight);
-    
-    // Se for maior que a tela, reduzir proporcionalmente
-    const larguraTela = window.innerWidth * 0.9; // 90% da tela
-    if (larguraTotal > larguraTela) {
-        const fatorReducao = larguraTela / larguraTotal;
-        menu.style.transform = `scale(${Math.min(fatorReducao, 0.8)})`;
-    } else {
-        menu.style.transform = 'scale(0.75)';
-    }
-    
-    // Centralizar
-    menu.style.marginLeft = 'auto';
-    menu.style.marginRight = 'auto';
-    menu.style.justifyContent = 'center';
-}
-
-// Executar quando carregar e redimensionar
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(garantirMenuHorizontal, 100);
-    window.addEventListener('resize', garantirMenuHorizontal);
-    window.addEventListener('orientationchange', () => {
-        setTimeout(garantirMenuHorizontal, 300);
-    });
-});
