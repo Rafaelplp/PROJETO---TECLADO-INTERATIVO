@@ -32,6 +32,8 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 body.modo-dia {
@@ -50,26 +52,29 @@ body.modo-dia {
   gap: 10px;
   overflow: hidden;
   box-sizing: border-box;
+  overscroll-behavior: none;
 }
 
-/* ========== MENU SUPERIOR (SEMPRE EM LINHA) ========== */
+/* ========== MENU SUPERIOR (COM SCROLL SEGURO) ========== */
+/* ========== MENU SUPERIOR (CENTRALIZADO E SEMPRE HORIZONTAL) ========== */
 .menu-superior {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  padding: 12px 15px;
+  gap: 12px;
+  padding: 12px 20px;
   background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
   border-radius: var(--borda-radius);
   flex-shrink: 0;
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(8px);
   width: 100%;
+  max-width: 650px;
   margin: 0 auto;
   box-sizing: border-box;
   transform: scale(0.75);
   transform-origin: center;
-  overflow-x: auto;
+  overflow-x: visible;
   overflow-y: hidden;
   flex-wrap: nowrap;
   min-height: 65px;
@@ -87,6 +92,141 @@ body.modo-dia .menu-superior {
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+/* BOTÕES DO MENU - LADO A LADO, CENTRALIZADOS */
+.botao-menu {
+  min-width: 80px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: var(--transicao);
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  position: relative;
+  z-index: 1;
+}
+
+/* REMOVER OVERFLOW DO MENU PARA VISIBILIDADE TOTAL */
+.menu-superior {
+  overflow-x: visible !important;
+  overflow-y: hidden !important;
+}
+
+/* GARANTIR QUE OS BOTÕES NÃO QUEBRAM EM COLUNA */
+@media (max-width: 768px) {
+  .menu-superior {
+      max-width: 550px;
+      gap: 10px;
+      padding: 10px 15px;
+  }
+  
+  .botao-menu {
+      min-width: 70px;
+      padding: 8px 6px;
+      font-size: 0.68rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-superior {
+      max-width: 400px;
+      gap: 8px;
+      padding: 8px 12px;
+      transform: scale(0.7);
+  }
+  
+  .botao-menu {
+      min-width: 65px;
+      padding: 7px 5px;
+      font-size: 0.65rem;
+  }
+}
+
+/* TELAS MUITO PEQUENAS - REDUZIR MAS MANTER HORIZONTAL */
+@media (max-width: 350px) {
+  .menu-superior {
+      max-width: 320px;
+      gap: 6px;
+      padding: 6px 10px;
+      transform: scale(0.65);
+  }
+  
+  .botao-menu {
+      min-width: 60px;
+      padding: 6px 4px;
+      font-size: 0.6rem;
+  }
+}
+
+/* DESKTOP GRANDE */
+@media (min-width: 1200px) {
+  .menu-superior {
+      max-width: 700px;
+      gap: 15px;
+      padding: 14px 24px;
+  }
+  
+  .botao-menu {
+      min-width: 85px;
+      padding: 12px 10px;
+      font-size: 0.75rem;
+  }
+}
+
+/* PAISAGEM - GARANTIR QUE FICA HORIZONTAL */
+@media (orientation: landscape) and (max-height: 600px) {
+  .menu-superior {
+      max-width: 95%;
+      transform: scale(0.6);
+      margin: 0 auto;
+  }
+
+}
+
+.menu-superior::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.menu-superior::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.menu-superior::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+body.modo-dia .menu-superior {
+  background: linear-gradient(180deg, #ffffff 0%, #f0f2f5 100%);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.modo-dia .menu-superior::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+body.modo-dia .menu-superior::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* BOTÕES DO MENU COM PREVENÇÃO DE TOQUE DURANTE SCROLL */
 .botao-menu {
   min-width: 75px;
   padding: 8px 6px;
@@ -109,6 +249,22 @@ body.modo-dia .menu-superior {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  position: relative;
+  z-index: 1;
+}
+
+.botao-menu::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  z-index: -1;
+  background: transparent;
 }
 
 body.modo-dia .botao-menu {
@@ -117,17 +273,17 @@ body.modo-dia .botao-menu {
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.botao-menu:hover {
+.botao-menu:hover:not(.scrolling) {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.12));
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-body.modo-dia .botao-menu:hover {
+body.modo-dia .botao-menu:hover:not(.scrolling) {
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.05));
 }
 
-.botao-menu:active {
+.botao-menu:active:not(.scrolling) {
   transform: scale(0.95);
   transition: transform 0.1s;
 }
@@ -141,6 +297,7 @@ body.modo-dia .botao-menu:hover {
 .botao-menu .icone {
   font-size: 1rem;
   line-height: 1;
+  pointer-events: none;
 }
 
 .botao-menu .texto {
@@ -149,6 +306,7 @@ body.modo-dia .botao-menu:hover {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  pointer-events: none;
 }
 
 /* ========== CABEÇALHO ========== */
@@ -164,7 +322,7 @@ body.modo-dia .botao-menu:hover {
 }
 
 .cabecalho h1 {
-  font-size: 1.6rem;
+  font-size: 1.9rem;
   color: var(--cor-destaque);
   margin: 0 0 5px 0;
   font-weight: 700;
@@ -178,13 +336,13 @@ body.modo-dia .cabecalho h1 {
 }
 
 .subtitulo {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   opacity: 0.9;
   font-weight: 500;
   margin: 0;
 }
 
-/* ========== TECLADO PRINCIPAL ========== */
+/* ========== TECLADO PRINCIPAL (COM SCROLL SEGURO) ========== */
 .teclado-container {
   flex: 1;
   display: flex;
@@ -192,8 +350,12 @@ body.modo-dia .cabecalho h1 {
   align-items: center;
   padding: 5px 0;
   min-height: 0;
-  overflow: hidden;
+  overflow: hidden auto;
   box-sizing: border-box;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  width: 100%;
 }
 
 .teclado-principal {
@@ -207,6 +369,7 @@ body.modo-dia .cabecalho h1 {
   box-sizing: border-box;
 }
 
+/* PREVENÇÃO DE TOQUE NAS TECLAS DURANTE SCROLL */
 .tecla {
   aspect-ratio: 1;
   border: none;
@@ -226,23 +389,25 @@ body.modo-dia .cabecalho h1 {
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
+  touch-action: manipulation;
 }
 
-.tecla::after {
+.tecla::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: -15px;
+  left: -15px;
+  right: -15px;
+  bottom: -15px;
   background: transparent;
+  z-index: -1;
 }
 
-.tecla:active {
+.tecla:active:not(.scrolling) {
   transform: scale(0.95);
 }
 
-.tecla.tocando {
+.tecla.tocando:not(.scrolling) {
   animation: pulsarTecla 0.2s ease;
 }
 
@@ -268,7 +433,7 @@ body.modo-dia .tecla {
   color: var(--cor-texto-claro);
 }
 
-/* ========== RODAPÉ (SEMPRE EM LINHA, TEXTO ALINHADO À ESQUERDA) ========== */
+/* ========== RODAPÉ (INFORMAÇÕES CENTRALIZADAS, COM SCROLL SEGURO) ========== */
 .rodape {
   background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
   padding: 12px 15px;
@@ -287,11 +452,28 @@ body.modo-dia .tecla {
   min-height: 65px;
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
 }
 
 .rodape::-webkit-scrollbar {
-  display: none;
+  height: 6px;
+}
+
+.rodape::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.rodape::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.rodape::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
 }
 
 body.modo-dia .rodape {
@@ -299,9 +481,18 @@ body.modo-dia .rodape {
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+body.modo-dia .rodape::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+body.modo-dia .rodape::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+}
+
 .contador-visitas {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
   margin-bottom: 5px;
   flex-wrap: nowrap;
@@ -309,12 +500,15 @@ body.modo-dia .rodape {
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 2px;
+  width: 100%;
+  min-width: min-content;
 }
 
 .contador-visitas::-webkit-scrollbar {
   display: none;
 }
 
+/* CAIXAS DO RODAPÉ COM INFORMAÇÕES CENTRALIZADAS */
 .contador-item {
   display: flex;
   align-items: center;
@@ -324,8 +518,12 @@ body.modo-dia .rodape {
   border-radius: 8px;
   flex: 0 0 auto;
   min-width: 140px;
+  max-width: 160px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-sizing: border-box;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 body.modo-dia .contador-item {
@@ -340,15 +538,15 @@ body.modo-dia .contador-item {
   text-align: center;
 }
 
-/* TEXTO ALINHADO À ESQUERDA */
+/* INFORMAÇÕES CENTRALIZADAS VERTICALMENTE */
 .contador-info {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   min-width: 0;
   flex: 1;
-  text-align: left;
+  text-align: center;
 }
 
 .contador-label {
@@ -357,12 +555,13 @@ body.modo-dia .contador-item {
   text-transform: uppercase;
   letter-spacing: 0.3px;
   font-weight: 600;
-  margin-bottom: 1px;
+  margin-bottom: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
-  text-align: left;
+  text-align: center;
+  line-height: 1.1;
 }
 
 .contador-valor {
@@ -372,7 +571,8 @@ body.modo-dia .contador-item {
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
-  text-align: left;
+  text-align: center;
+  line-height: 1.2;
 }
 
 #contador-online {
@@ -395,7 +595,7 @@ body.modo-dia .contador-item {
 
 .creditos {
   text-align: center;
-  font-size: 0.65rem;
+  font-size: 0.95rem;
   opacity: 0.6;
   margin: 3px 0 0 0;
   font-weight: 500;
@@ -403,6 +603,7 @@ body.modo-dia .contador-item {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
 }
 
 /* ========== MODAL ========== */
@@ -419,6 +620,7 @@ body.modo-dia .contador-item {
   z-index: 10000;
   padding: 15px;
   backdrop-filter: blur(10px);
+  overscroll-behavior: contain;
 }
 
 .modal-container {
@@ -432,6 +634,7 @@ body.modo-dia .contador-item {
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
+  overscroll-behavior: contain;
 }
 
 body.modo-dia .modal-container {
@@ -476,6 +679,7 @@ body.modo-dia .modal-header h3 {
   justify-content: center;
   border-radius: 50%;
   transition: var(--transicao);
+  touch-action: manipulation;
 }
 
 .btn-fechar:hover {
@@ -544,6 +748,7 @@ body.modo-dia .modal-header h3 {
   .contador-item {
       padding: 7px 10px;
       min-width: 130px;
+      max-width: 145px;
   }
   
   .contador-label {
@@ -606,16 +811,17 @@ body.modo-dia .modal-header h3 {
   
   .contador-item {
       min-width: 120px;
+      max-width: 135px;
       padding: 6px 9px;
   }
   
   .creditos {
-      font-size: 0.6rem;
-      margin-top: 2px;
+      font-size: 0.95rem;
+      margin-top: 3px;
   }
 }
 
-/* Nunca quebrar em coluna - força horizontal mesmo em telas muito pequenas */
+/* TELAS MUITO PEQUENAS - GARANTIR HORIZONTAL */
 @media (max-width: 350px) {
   .menu-superior {
       gap: 4px;
@@ -630,6 +836,7 @@ body.modo-dia .modal-header h3 {
   
   .contador-item {
       min-width: 110px;
+      max-width: 125px;
       padding: 5px 8px;
   }
   
@@ -642,7 +849,7 @@ body.modo-dia .modal-header h3 {
   }
 }
 
-/* Desktop específico */
+/* DESKTOP ESPECÍFICO */
 @media (min-width: 1200px) {
   .app-container {
       max-width: 1100px;
@@ -658,7 +865,7 @@ body.modo-dia .modal-header h3 {
   }
 }
 
-/* Modo paisagem - mobile */
+/* MODO PAISAGEM - MOBILE (SCROLL SEGURO) */
 @media (orientation: landscape) and (max-height: 600px) {
   .app-container {
       flex-direction: row;
@@ -666,6 +873,7 @@ body.modo-dia .modal-header h3 {
       padding: 5px;
       gap: 5px;
       overflow-y: auto;
+      overscroll-behavior: contain;
   }
   
   .menu-superior {
@@ -674,6 +882,7 @@ body.modo-dia .modal-header h3 {
       transform: scale(0.6);
       min-height: 50px;
       margin-bottom: 0;
+      touch-action: pan-x;
   }
   
   .cabecalho {
@@ -686,6 +895,9 @@ body.modo-dia .modal-header h3 {
       flex: 1;
       min-width: 0;
       padding: 0 5px;
+      touch-action: pan-y;
+      overflow-y: auto;
+      overflow-x: hidden;
   }
   
   .teclado-principal {
@@ -704,6 +916,22 @@ body.modo-dia .modal-header h3 {
       transform: scale(0.6);
       min-height: 50px;
       margin-top: 0;
+      touch-action: pan-x;
+  }
+  
+  /* AJUSTE PARA SCROLL VERTICAL NO TECLADO EM PAISAGEM */
+  .teclado-container::-webkit-scrollbar {
+      width: 6px;
+  }
+  
+  .teclado-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+  }
+  
+  .teclado-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
   }
 }
 
@@ -727,6 +955,7 @@ body.modo-dia .modal-header h3 {
   animation: feedbackEntrada 0.3s ease;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   pointer-events: none;
+  user-select: none;
 }
 
 @keyframes feedbackEntrada {
@@ -772,6 +1001,7 @@ body.modo-dia .modal-header h3 {
   transition: var(--transicao);
   width: 100%;
   box-sizing: border-box;
+  touch-action: manipulation;
 }
 
 .input-emoji:focus, .input-cor:focus, .input-som:focus {
@@ -796,7 +1026,7 @@ body.modo-dia .modal-header h3 {
   flex-shrink: 0;
 }
 
-/* ========== PALETA DE CORES MELHORADA ========== */
+/* ========== PALETA DE CORES ========== */
 .paleta-cores {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -813,6 +1043,7 @@ body.modo-dia .modal-header h3 {
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+  touch-action: manipulation;
 }
 
 .cor-rapida:hover {
@@ -860,6 +1091,7 @@ body.modo-dia .modal-header h3 {
   cursor: pointer;
   transition: var(--transicao);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  touch-action: manipulation;
 }
 
 .emoji-exemplo:hover {
@@ -884,6 +1116,7 @@ body.modo-dia .modal-header h3 {
   justify-content: center;
   gap: 6px;
   width: 100%;
+  touch-action: manipulation;
 }
 
 .btn-teste-som:hover {
@@ -913,6 +1146,7 @@ body.modo-dia .modal-header h3 {
   transition: var(--transicao);
   text-transform: uppercase;
   letter-spacing: 0.4px;
+  touch-action: manipulation;
 }
 
 .btn-salvar {
@@ -1014,5 +1248,102 @@ small {
   
   .tecla {
       font-size: 1.4rem;
+  }
+}
+
+/* ========== GARANTIR MENU HORIZONTAL E CENTRALIZADO ========== */
+.menu-superior-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+/* Forçar que os botões não quebrem linha */
+.menu-superior {
+  display: inline-flex !important;
+  flex-wrap: nowrap !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+/* Remover qualquer transform que possa causar overflow */
+.menu-superior {
+  transform: none !important;
+}
+
+/* Ajustar tamanho dos botões para caber na tela */
+@media (max-width: 768px) {
+  .botao-menu {
+      min-width: 70px !important;
+      max-width: 80px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .botao-menu {
+      min-width: 60px !important;
+      max-width: 70px !important;
+      font-size: 0.6rem !important;
+      padding: 6px 4px !important;
+  }
+  
+  .botao-menu .icone {
+      font-size: 0.9rem !important;
+  }
+}
+
+/* Tela muito pequena - botões mínimos */
+@media (max-width: 350px) {
+  .botao-menu {
+      min-width: 55px !important;
+      max-width: 60px !important;
+      font-size: 0.55rem !important;
+      padding: 5px 3px !important;
+  }
+  
+  .botao-menu .icone {
+      font-size: 0.8rem !important;
+  }
+  
+  .menu-superior {
+      gap: 5px !important;
+      padding: 5px 8px !important;
+  }
+}
+
+/* Garantir que não tenha scroll no menu */
+.menu-superior {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.menu-superior::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Classe para quando o menu estiver ajustado */
+.menu-ajustado {
+  transform: scale(0.9);
+  transform-origin: center;
+}
+
+/* Versão alternativa: menu com grid */
+@media (max-width: 400px) {
+  .menu-superior {
+      display: grid !important;
+      grid-template-columns: repeat(5, 1fr) !important;
+      gap: 4px !important;
+      padding: 6px !important;
+  }
+  
+  .botao-menu {
+      min-width: auto !important;
+      max-width: 100% !important;
+      width: 100% !important;
+      padding: 5px 2px !important;
   }
 }

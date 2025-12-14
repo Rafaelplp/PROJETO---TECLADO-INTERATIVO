@@ -21,33 +21,34 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Menu Superior (Sempre em linha) -->
-        <nav class="menu-superior">
-            <button id="botao-editar" class="botao-menu">
-                <span class="icone">✏️</span>
-                <span class="texto">Editar</span>
-            </button>
-            
-            <button id="botao-cores-aleatorias" class="botao-menu">
-                <span class="icone">🌈</span>
-                <span class="texto">Aleatório</span>
-            </button>
-            
-            <button id="botao-modo" class="botao-menu">
-                <span class="icone">🌙</span>
-                <span class="texto">Noturno</span>
-            </button>
-            
-            <button id="botao-parar" class="botao-menu">
-                <span class="icone">⏹️</span>
-                <span class="texto">Parar</span>
-            </button>
-            
-            <button id="botao-reset" class="botao-menu">
-                <span class="icone">🔄</span>
-                <span class="texto">Resetar</span>
-            </button>
-        </nav>
+        <!-- Menu Superior (com scroll seguro) -->
+       <!-- Menu Superior (Centralizado e sempre horizontal) -->
+<nav class="menu-superior">
+    <button id="botao-editar" class="botao-menu">
+        <span class="icone">✏️</span>
+        <span class="texto">Editar</span>
+    </button>
+    
+    <button id="botao-cores-aleatorias" class="botao-menu">
+        <span class="icone">🌈</span>
+        <span class="texto">Aleatório</span>
+    </button>
+    
+    <button id="botao-modo" class="botao-menu">
+        <span class="icone">🌙</span>
+        <span class="texto">Noturno</span>
+    </button>
+    
+    <button id="botao-parar" class="botao-menu">
+        <span class="icone">⏹️</span>
+        <span class="texto">Parar</span>
+    </button>
+    
+    <button id="botao-reset" class="botao-menu">
+        <span class="icone">🔄</span>
+        <span class="texto">Resetar</span>
+    </button>
+</nav>
 
         <!-- Cabeçalho -->
         <header class="cabecalho">
@@ -55,7 +56,7 @@
             <p class="subtitulo">Toque nas teclas para tocar sons!</p>
         </header>
 
-        <!-- Teclado -->
+        <!-- Teclado (com scroll vertical seguro) -->
         <main class="teclado-container">
             <div class="teclado-principal">
                 <button class="tecla tecla_pom" data-som="pom">&#129300</button>
@@ -75,7 +76,7 @@
             </div>
         </main>
 
-        <!-- Rodapé (Sempre em linha, texto alinhado à esquerda) -->
+        <!-- Rodapé (informações centralizadas, com scroll seguro) -->
         <footer class="rodape">
             <div class="contador-visitas">
                 <div class="contador-item">
@@ -106,12 +107,12 @@
                     <span class="contador-icon">📱</span>
                     <div class="contador-info">
                         <span class="contador-label">Versão</span>
-                        <span class="contador-valor" id="versao-app">4.3.0</span>
+                        <span class="contador-valor" id="versao-app">4.4.1</span>
                     </div>
                 </div>
             </div>
             
-            <p class="creditos">Teclado Interativo &copy; 2024</p>
+            <p class="creditos">Teclado Interativo &copy; 2024 - Feito com 💖 por Rafael Lira. </p>
         </footer>
     </div>
 
@@ -193,29 +194,6 @@
                 };
                 setHeight();
                 window.addEventListener('resize', setHeight);
-            }
-            
-            // Prevenir zoom com dois dedos
-            document.addEventListener('touchstart', (e) => {
-                if (e.touches.length > 1) e.preventDefault();
-            }, { passive: false });
-            
-            // Ajustar scroll horizontal suave
-            const menu = document.querySelector('.menu-superior');
-            const rodape = document.querySelector('.rodape');
-            
-            if (menu) {
-                menu.addEventListener('wheel', (e) => {
-                    e.preventDefault();
-                    menu.scrollLeft += e.deltaY;
-                }, { passive: false });
-            }
-            
-            if (rodape) {
-                rodape.addEventListener('wheel', (e) => {
-                    e.preventDefault();
-                    rodape.scrollLeft += e.deltaY;
-                }, { passive: false });
             }
         });
     </script>

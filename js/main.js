@@ -1,7 +1,5 @@
-// main.js - Teclado Interativo v4.3.0
-// Texto do rodapé alinhado à esquerda
-// Menu e rodapé sempre em linha
-// Suporte para MP4 e outros formatos de áudio
+// main.js - Teclado Interativo v4.4.1
+// Rodapé centralizado + Scroll seguro sem ativar botões
 
 class TecladoInterativo {
     constructor() {
@@ -12,6 +10,14 @@ class TecladoInterativo {
         this.coresTeclas = JSON.parse(localStorage.getItem('coresTeclas')) || {};
         this.sonsEditados = JSON.parse(localStorage.getItem('sonsEditados')) || {};
         this.emojiEditados = JSON.parse(localStorage.getItem('emojiEditados')) || {};
+        
+        // Controle de scroll
+        this.scrollAtivo = false;
+        this.scrollTimeout = null;
+        this.touchStartX = 0;
+        this.touchStartY = 0;
+        this.touchMoveThreshold = 10; // pixels para considerar como scroll
+        this.isScrolling = false;
         
         // Formatos de áudio suportados
         this.formatosSuportados = [
@@ -68,7 +74,7 @@ class TecladoInterativo {
     // ========== INICIALIZAÇÃO ==========
     
     inicializar() {
-        console.log('🎹 Teclado Interativo v4.3.0 - Iniciando...');
+        console.log('🎹 Teclado Interativo v4.4.1 - Iniciando...');
         
         // Configurar modo noturno
         this.configurarModoNoturno();
@@ -78,12 +84,45 @@ class TecladoInterativo {
         this.configurarControles();
         this.restaurarConfiguracoes();
         this.configurarEventosGlobais();
+        this.configurarEventosScroll();
         this.exibirVersao();
+        
+        // Ajustar menu para caber na tela
+        this.ajustarMenuParaTela();
         
         // Inicializar áudio
         this.inicializarAudio();
         
         console.log('✅ Teclado pronto para uso!');
+    }
+    
+    // Adicionar novo método para ajustar o menu:
+    ajustarMenuParaTela() {
+        const menu = document.querySelector('.menu-superior');
+        if (!menu) return;
+        
+        // Verificar se o menu cabe na tela
+        const verificarAjuste = () => {
+            const botoes = menu.querySelectorAll('.botao-menu');
+            const larguraMenu = menu.offsetWidth;
+            const larguraBotoes = Array.from(bots).reduce((total, botao) => {
+                return total + botao.offsetWidth;
+            }, 0);
+            
+            // Adicionar gap (12px * número de gaps)
+            const gapTotal = (botoes.length - 1) * 12;
+            const larguraTotalNecessaria = larguraBotoes + gapTotal + 40; // + padding
+            
+            // Se não couber, reduzir escala
+            if (larguraTotalNecessaria > larguraMenu && larguraMenu > 0) {
+                const fatorEscala = larguraMenu / larguraTotalNecessaria * 0.9;
+                menu.style.transform = `scale(${Math.min(fatorEscala, 0.75)})`;
+            }
+        };
+        
+        // Verificar após carregamento e redimensionamento
+        setTimeout(verificarAjuste, 100);
+        window.addEventListener('resize', verificarAjuste);
     }
     
     inicializarAudio() {
@@ -97,19 +136,154 @@ class TecladoInterativo {
                 console.error(`❌ Erro no áudio ${audio.id}:`, e);
                 this.mostrarFeedback(`❌ Erro no som ${audio.id.replace('som_tecla_', '')}`, 3000);
             });
-            
-            // Verificar se o formato é suportado
-            const source = audio.querySelector('source');
-            if (source) {
-                const tipo = source.type;
-                if (!this.formatosSuportados.includes(tipo) && !tipo.includes('audio/')) {
-                    console.warn(`⚠️ Formato não padrão: ${tipo} em ${audio.id}`);
-                }
-            }
         });
     }
 
-    // ========== CONFIGURAÇÃO DAS TECLAS ==========
+    // ========== SISTEMA DE SCROLL SEGURO ==========
+    
+    configurarEventosScroll() {
+        // Elementos que têm scroll horizontal - REMOVER MENU DA LISTA
+        const elementosComScroll = [
+            '.rodape',
+            '.contador-visitas'
+        ];
+        
+        elementosComScroll.forEach(seletor => {
+            const elementos = document.querySelectorAll(seletor);
+            elementos.forEach(elemento => {
+                this.configurarScrollSeguro(elemento);
+            });
+        });
+        
+        // Configurar para o teclado também
+        const tecladoContainer = document.querySelector('.teclado-container');
+        if (tecladoContainer) {
+            this.configurarScrollVerticalSeguro(tecladoContainer);
+        }
+        
+        // Configurar eventos de touch para detectar scroll
+        this.configurarDetecaoScroll();
+    }
+    
+    configurarScrollSeguro(elemento) {
+        if (!elemento) return;
+        
+        // Prevenir comportamento padrão de arrastar
+        elemento.addEventListener('touchstart', (e) => {
+            this.touchStartX = e.touches[0].clientX;
+            this.touchStartY = e.touches[0].clientY;
+            this.isScrolling = false;
+            
+            // Adicionar classe de scroll ativo
+            elemento.classList.add('scrolling-active');
+            
+            // Adicionar classe scrolling aos botões dentro do elemento
+            const botoes = elemento.querySelectorAll('.botao-menu, .contador-item');
+            botoes.forEach(botao => botao.classList.add('scrolling'));
+        }, { passive: true });
+        
+        elemento.addEventListener('touchmove', (e) => {
+            if (!this.touchStartX || !this.touchStartY) return;
+            
+            const touchX = e.touches[0].clientX;
+            const touchY = e.touches[0].clientY;
+            
+            const deltaX = Math.abs(touchX - this.touchStartX);
+            const deltaY = Math.abs(touchY - this.touchStartY);
+            
+            // Se o movimento for maior que o threshold, é scroll
+            if (deltaX > this.touchMoveThreshold || deltaY > this.touchMoveThreshold) {
+                this.isScrolling = true;
+                
+                // Manter classe scrolling nos botões
+                const botoes = elemento.querySelectorAll('.botao-menu, .contador-item');
+                botoes.forEach(botao => botao.classList.add('scrolling'));
+            }
+        }, { passive: true });
+        
+        elemento.addEventListener('touchend', (e) => {
+            // Limpar timeout anterior
+            if (this.scrollTimeout) {
+                clearTimeout(this.scrollTimeout);
+            }
+            
+            // Remover classe scrolling após um delay
+            this.scrollTimeout = setTimeout(() => {
+                this.isScrolling = false;
+                elemento.classList.remove('scrolling-active');
+                
+                const botoes = elemento.querySelectorAll('.botao-menu, .contador-item');
+                botoes.forEach(botao => botao.classList.remove('scrolling'));
+            }, 100);
+            
+            this.touchStartX = 0;
+            this.touchStartY = 0;
+        }, { passive: true });
+        
+        // Também para mouse wheel
+        elemento.addEventListener('wheel', (e) => {
+            this.isScrolling = true;
+            elemento.classList.add('scrolling-active');
+            
+            const botoes = elemento.querySelectorAll('.botao-menu, .contador-item');
+            botoes.forEach(botao => botao.classList.add('scrolling'));
+            
+            // Remover após scroll
+            clearTimeout(this.scrollTimeout);
+            this.scrollTimeout = setTimeout(() => {
+                this.isScrolling = false;
+                elemento.classList.remove('scrolling-active');
+                botoes.forEach(botao => botao.classList.remove('scrolling'));
+            }, 150);
+        }, { passive: true });
+    }
+    
+    configurarScrollVerticalSeguro(elemento) {
+        if (!elemento) return;
+        
+        elemento.addEventListener('touchstart', (e) => {
+            this.touchStartY = e.touches[0].clientY;
+            this.isScrolling = false;
+        }, { passive: true });
+        
+        elemento.addEventListener('touchmove', (e) => {
+            if (!this.touchStartY) return;
+            
+            const touchY = e.touches[0].clientY;
+            const deltaY = Math.abs(touchY - this.touchStartY);
+            
+            if (deltaY > this.touchMoveThreshold) {
+                this.isScrolling = true;
+                
+                // Adicionar classe scrolling nas teclas
+                const teclas = elemento.querySelectorAll('.tecla');
+                teclas.forEach(tecla => tecla.classList.add('scrolling'));
+            }
+        }, { passive: true });
+        
+        elemento.addEventListener('touchend', () => {
+            // Remover classe scrolling das teclas
+            const teclas = elemento.querySelectorAll('.tecla');
+            teclas.forEach(tecla => tecla.classList.remove('scrolling'));
+            
+            this.touchStartY = 0;
+            this.isScrolling = false;
+        }, { passive: true });
+    }
+    
+    configurarDetecaoScroll() {
+        // Detectar scroll global
+        document.addEventListener('scroll', () => {
+            this.scrollAtivo = true;
+            
+            clearTimeout(this.scrollTimeout);
+            this.scrollTimeout = setTimeout(() => {
+                this.scrollAtivo = false;
+            }, 100);
+        }, { passive: true });
+    }
+
+    // ========== CONFIGURAÇÃO DAS TECLAS (COM PREVENÇÃO DE SCROLL) ==========
     
     configurarTeclas() {
         const teclas = document.querySelectorAll('.tecla');
@@ -126,7 +300,7 @@ class TecladoInterativo {
                 tecla.dataset.emojiOriginal = tecla.innerHTML;
             }
             
-            // Configurar eventos
+            // Configurar eventos com prevenção de scroll
             this.configurarEventosTecla(tecla, idAudio);
         });
     }
@@ -147,8 +321,14 @@ class TecladoInterativo {
     }
     
     configurarEventosTecla(tecla, idAudio) {
-        // Evento de clique (desktop)
+        // Evento de clique (desktop) - com verificação de scroll
         tecla.addEventListener('click', (e) => {
+            if (this.scrollAtivo || this.isScrolling || tecla.classList.contains('scrolling')) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            
             e.preventDefault();
             e.stopPropagation();
             
@@ -163,8 +343,12 @@ class TecladoInterativo {
             }
         });
         
-        // Eventos de touch (mobile)
+        // Eventos de touch (mobile) - com prevenção durante scroll
         tecla.addEventListener('touchstart', (e) => {
+            if (this.isScrolling || tecla.classList.contains('scrolling')) {
+                return;
+            }
+            
             e.preventDefault();
             e.stopPropagation();
             
@@ -179,30 +363,45 @@ class TecladoInterativo {
             this.ultimoToque = agora;
             
             tecla.classList.add('ativa');
-            
-            if (this.modoEdicao) {
-                this.abrirModalEdicao(tecla);
-            } else {
-                this.tocarSom(idAudio);
-            }
-            
-            setTimeout(() => {
-                this.touchAtivo = false;
-                tecla.classList.remove('ativa');
-            }, this.toqueDelay);
-            
         }, { passive: false });
         
         tecla.addEventListener('touchend', (e) => {
+            if (this.isScrolling || tecla.classList.contains('scrolling')) {
+                tecla.classList.remove('ativa');
+                return;
+            }
+            
             e.preventDefault();
             e.stopPropagation();
+            
+            if (this.touchAtivo) {
+                if (this.modoEdicao) {
+                    this.abrirModalEdicao(tecla);
+                } else {
+                    this.tocarSom(idAudio);
+                }
+            }
+            
+            this.touchAtivo = false;
             tecla.classList.remove('ativa');
+            
+            // Reset após delay
+            setTimeout(() => {
+                this.touchAtivo = false;
+            }, this.toqueDelay);
         }, { passive: false });
+        
+        tecla.addEventListener('touchcancel', () => {
+            tecla.classList.remove('ativa');
+            this.touchAtivo = false;
+        });
     }
 
-    // ========== SISTEMA DE SOM (SUPORTE PARA MP4 E OUTROS FORMATOS) ==========
+    // ========== SISTEMA DE SOM ==========
     
     tocarSom(idElementoAudio) {
+        if (this.isScrolling || this.scrollAtivo) return;
+        
         const audioElement = document.querySelector(idElementoAudio);
         
         if (!audioElement) {
@@ -275,7 +474,7 @@ class TecladoInterativo {
         const somId = audioElement.id.replace('som_tecla_', '');
         const tecla = document.querySelector(`[data-som="${somId}"]`);
         
-        if (tecla) {
+        if (tecla && !tecla.classList.contains('scrolling')) {
             tecla.classList.add('tocando');
             setTimeout(() => tecla.classList.remove('tocando'), 300);
         }
@@ -300,9 +499,11 @@ class TecladoInterativo {
         this.mostrarFeedback('⏹️ Todos os sons parados', 1500);
     }
 
-    // ========== MODO EDIÇÃO (COM SUPORTE PARA MP4) ==========
+    // ========== MODO EDIÇÃO ==========
     
     toggleModoEdicao() {
+        if (this.isScrolling || this.scrollAtivo) return;
+        
         this.modoEdicao = !this.modoEdicao;
         const botao = document.getElementById('botao-editar');
         
@@ -323,6 +524,8 @@ class TecladoInterativo {
     }
     
     abrirModalEdicao(tecla) {
+        if (this.isScrolling || this.scrollAtivo) return;
+        
         // Fechar modal existente
         const modalExistente = document.querySelector('.modal-overlay');
         if (modalExistente) modalExistente.remove();
@@ -463,23 +666,47 @@ class TecladoInterativo {
         const exemplosEmoji = modal.querySelectorAll('.emoji-exemplo');
         const inputSom = modal.querySelector('#editar-som');
         
+        // Prevenir interação durante scroll no modal
+        const elementosInterativos = [btnFechar, btnCancelar, btnSalvar, btnReset, btnTesteSom, inputCor, inputEmoji, inputSom];
+        
+        elementosInterativos.forEach(elemento => {
+            if (elemento) {
+                elemento.addEventListener('touchstart', (e) => {
+                    if (this.isScrolling) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }, { passive: false });
+            }
+        });
+        
         // Cores rápidas
         coresRapidas.forEach(corEl => {
             corEl.addEventListener('click', () => {
+                if (this.isScrolling) return;
                 const cor = corEl.dataset.cor;
                 inputCor.value = cor;
                 previewCor.style.background = cor;
             });
+            
+            corEl.addEventListener('touchstart', (e) => {
+                if (this.isScrolling) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }, { passive: false });
         });
         
         // Atualizar preview da cor
         inputCor.addEventListener('input', () => {
+            if (this.isScrolling) return;
             previewCor.style.background = inputCor.value;
         });
         
         // Exemplos de emoji
         exemplosEmoji.forEach(exemplo => {
             exemplo.addEventListener('click', () => {
+                if (this.isScrolling) return;
                 const emoji = exemplo.dataset.emoji;
                 inputEmoji.value = emoji;
                 // Feedback visual
@@ -490,10 +717,19 @@ class TecladoInterativo {
                     exemplo.style.background = '';
                 }, 300);
             });
+            
+            exemplo.addEventListener('touchstart', (e) => {
+                if (this.isScrolling) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }, { passive: false });
         });
         
         // Validação do arquivo de som
         inputSom.addEventListener('change', (e) => {
+            if (this.isScrolling) return;
+            
             const arquivo = e.target.files[0];
             if (arquivo) {
                 const tamanhoMB = arquivo.size / (1024 * 1024);
@@ -523,17 +759,20 @@ class TecladoInterativo {
         
         // Testar som
         btnTesteSom.addEventListener('click', () => {
+            if (this.isScrolling) return;
             const somId = btnTesteSom.dataset.som;
             this.tocarSom(`#som_tecla_${somId}`);
         });
         
         // Salvar
         btnSalvar.addEventListener('click', () => {
+            if (this.isScrolling) return;
             this.salvarEdicaoTecla(tecla, modal);
         });
         
         // Resetar
         btnReset.addEventListener('click', () => {
+            if (this.isScrolling) return;
             if (confirm('Resetar esta tecla para o padrão?')) {
                 this.resetarTeclaIndividual(tecla);
                 modal.remove();
@@ -550,6 +789,7 @@ class TecladoInterativo {
         btnFechar.addEventListener('click', fecharModal);
         btnCancelar.addEventListener('click', fecharModal);
         modal.addEventListener('click', (e) => {
+            if (this.isScrolling) return;
             if (e.target === modal) fecharModal();
         });
     }
@@ -580,7 +820,7 @@ class TecladoInterativo {
             tecla.classList.add('editado');
         }
         
-        // Salvar som (suporte para MP4 e outros formatos)
+        // Salvar som
         if (arquivoSom) {
             const tamanhoMB = arquivoSom.size / (1024 * 1024);
             if (tamanhoMB <= 10) {
@@ -591,7 +831,10 @@ class TecladoInterativo {
                 if (audioElement) {
                     // Salvar original
                     if (!audioElement.dataset.srcOriginal) {
-                        audioElement.dataset.srcOriginal = audioElement.querySelector('source').src;
+                        const sourceOriginal = audioElement.querySelector('source');
+                        if (sourceOriginal) {
+                            audioElement.dataset.srcOriginal = sourceOriginal.src;
+                        }
                     }
                     
                     // Remover sources antigos
@@ -605,11 +848,10 @@ class TecladoInterativo {
                     // Determinar tipo MIME
                     let tipoMIME = arquivoSom.type;
                     if (tipoMIME === 'video/mp4') {
-                        tipoMIME = 'audio/mp4'; // Converter vídeo MP4 para áudio MP4
+                        tipoMIME = 'audio/mp4';
                     } else if (tipoMIME === 'video/quicktime') {
-                        tipoMIME = 'audio/mp4'; // Converter MOV para áudio MP4
+                        tipoMIME = 'audio/mp4';
                     } else if (!tipoMIME.startsWith('audio/')) {
-                        // Se não for um tipo de áudio conhecido, usar genérico
                         tipoMIME = 'audio/mpeg';
                     }
                     
@@ -640,24 +882,11 @@ class TecladoInterativo {
     // ========== FUNÇÕES PARA TRATAR EMOJIS ==========
     
     decodificarEmoji(codigo) {
-        // Se já for um emoji direto, retorna
         if (!codigo.includes('&#')) return codigo;
         
-        // Converte código HTML para emoji
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = codigo;
         return tempDiv.textContent || tempDiv.innerText || codigo;
-    }
-    
-    codificarParaHTML(emoji) {
-        // Tenta encontrar código HTML correspondente
-        for (const [key, value] of Object.entries(this.emojiCodes)) {
-            if (key === emoji) {
-                return value;
-            }
-        }
-        // Se não encontrar, retorna o emoji original
-        return emoji;
     }
 
     resetarTeclaIndividual(tecla) {
@@ -677,15 +906,13 @@ class TecladoInterativo {
         // Resetar som
         const audioElement = document.querySelector(`#som_tecla_${somId}`);
         if (audioElement && audioElement.dataset.srcOriginal) {
-            // Remover sources atuais
             while (audioElement.firstChild) {
                 audioElement.removeChild(audioElement.firstChild);
             }
             
-            // Restaurar source original
             const source = document.createElement('source');
             source.src = audioElement.dataset.srcOriginal;
-            source.type = 'audio/mpeg'; // Assumir MP3 como padrão
+            source.type = 'audio/mpeg';
             audioElement.appendChild(source);
             audioElement.load();
             
@@ -704,6 +931,8 @@ class TecladoInterativo {
     // ========== SISTEMA DE CORES ==========
     
     aplicarCoresAleatorias() {
+        if (this.isScrolling || this.scrollAtivo) return;
+        
         const cores = [
             '#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#118AB2',
             '#7209B7', '#3A86FF', '#FB5607', '#8338EC', '#FF006E',
@@ -736,6 +965,8 @@ class TecladoInterativo {
     }
     
     toggleModoNoturno() {
+        if (this.isScrolling || this.scrollAtivo) return;
+        
         this.modoNoturno = !this.modoNoturno;
         document.body.classList.toggle('modo-dia', this.modoNoturno);
         localStorage.setItem('modoNoturno', this.modoNoturno);
@@ -755,6 +986,8 @@ class TecladoInterativo {
     // ========== RESET GERAL ==========
     
     resetarTudo() {
+        if (this.isScrolling || this.scrollAtivo) return;
+        
         if (confirm('Resetar TODAS as configurações?\n\n• Cores personalizadas\n• Emojis editados\n• Sons customizados')) {
             // Resetar cores
             document.querySelectorAll('.tecla').forEach(tecla => {
@@ -803,7 +1036,6 @@ class TecladoInterativo {
         localStorage.setItem('emojiEditados', JSON.stringify(this.emojiEditados));
         localStorage.setItem('coresTeclas', JSON.stringify(this.coresTeclas));
         
-        // Salvar sons editados de forma simplificada
         const sonsEditadosSimples = {};
         Object.entries(this.sonsEditados).forEach(([key, value]) => {
             if (typeof value === 'object' && value.url) {
@@ -816,18 +1048,15 @@ class TecladoInterativo {
     }
     
     mostrarFeedback(mensagem, duracao = 1500) {
-        // Remover anterior
         const anterior = document.querySelector('.feedback-rapido');
         if (anterior) anterior.remove();
         
-        // Criar novo
         const feedback = document.createElement('div');
         feedback.className = 'feedback-rapido';
         feedback.textContent = mensagem;
         
         document.body.appendChild(feedback);
         
-        // Remover após duração
         setTimeout(() => {
             feedback.style.opacity = '0';
             feedback.style.transition = 'opacity 0.3s';
@@ -836,7 +1065,7 @@ class TecladoInterativo {
     }
     
     exibirVersao() {
-        const versao = '4.3.0';
+        const versao = '4.4.0';
         const elemento = document.getElementById('versao-app');
         if (elemento) {
             elemento.textContent = versao;
@@ -845,17 +1074,14 @@ class TecladoInterativo {
     }
     
     restaurarConfiguracoes() {
-        // Restaurar sons editados
         Object.entries(this.sonsEditados).forEach(([somId, value]) => {
             const audioElement = document.querySelector(`#som_tecla_${somId}`);
             if (audioElement && !audioElement.dataset.srcOriginal) {
-                // Salvar original
                 const sourceOriginal = audioElement.querySelector('source');
                 if (sourceOriginal) {
                     audioElement.dataset.srcOriginal = sourceOriginal.src;
                 }
                 
-                // Aplicar som editado
                 if (value) {
                     let url;
                     if (typeof value === 'object' && value.url) {
@@ -890,15 +1116,30 @@ class TecladoInterativo {
         Object.entries(controles).forEach(([id, funcao]) => {
             const botao = document.getElementById(id);
             if (botao) {
-                botao.addEventListener('click', funcao);
-                botao.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
+                // Configurar eventos com prevenção de scroll
+                const handler = (e) => {
+                    if (this.isScrolling || this.scrollAtivo || botao.classList.contains('scrolling')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return;
+                    }
                     funcao();
+                };
+                
+                botao.addEventListener('click', handler);
+                botao.addEventListener('touchstart', (e) => {
+                    if (this.isScrolling || botao.classList.contains('scrolling')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return;
+                    }
+                    e.preventDefault();
+                    handler(e);
                 }, { passive: false });
             }
         });
         
-        // Remover botão de cores do DOM se ainda existir
+        // Remover botão de cores se existir
         const botaoCores = document.getElementById('botao-cor-teclas');
         if (botaoCores) {
             botaoCores.style.display = 'none';
@@ -921,7 +1162,7 @@ class TecladoInterativo {
             }
         }, { once: true });
         
-        // Prevenir comportamento padrão de arrastar arquivos
+        // Prevenir comportamento padrão de arrastar
         document.addEventListener('dragover', (e) => {
             e.preventDefault();
         });
@@ -929,15 +1170,29 @@ class TecladoInterativo {
         document.addEventListener('drop', (e) => {
             e.preventDefault();
         });
+        
+        // Prevenir zoom com dois dedos
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        // Melhorar performance de scroll
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
     }
 }
 
 // ========== INICIALIZAÇÃO ==========
 
-// Inicializar quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => {
     window.tecladoInterativo = new TecladoInterativo();
 });
+
 // Adicionar em main.js
 const temas = {
     'neon': { primaria: '#0a0a0a', secundaria: '#1a1a1a', destaque: '#00ff88' },
@@ -969,3 +1224,54 @@ document.addEventListener('keydown', (e) => {
       if (tecla) tecla.click();
     }
   });
+
+  // Script para garantir menu horizontal e centralizado
+function garantirMenuHorizontal() {
+    const menu = document.querySelector('.menu-superior');
+    if (!menu) return;
+    
+    // Remover overflow e scroll
+    menu.style.overflowX = 'visible';
+    menu.style.overflowY = 'hidden';
+    
+    // Calcular largura total dos botões
+    const botoes = menu.querySelectorAll('.botao-menu');
+    let larguraTotal = 0;
+    
+    botoes.forEach(botao => {
+        const estilo = window.getComputedStyle(botao);
+        const margem = parseInt(estilo.marginLeft) + parseInt(estilo.marginRight);
+        larguraTotal += botao.offsetWidth + margem;
+    });
+    
+    // Adicionar gap
+    const estiloMenu = window.getComputedStyle(menu);
+    const gap = parseInt(estiloMenu.gap) || 12;
+    larguraTotal += gap * (botoes.length - 1);
+    
+    // Adicionar padding
+    larguraTotal += parseInt(estiloMenu.paddingLeft) + parseInt(estiloMenu.paddingRight);
+    
+    // Se for maior que a tela, reduzir proporcionalmente
+    const larguraTela = window.innerWidth * 0.9; // 90% da tela
+    if (larguraTotal > larguraTela) {
+        const fatorReducao = larguraTela / larguraTotal;
+        menu.style.transform = `scale(${Math.min(fatorReducao, 0.8)})`;
+    } else {
+        menu.style.transform = 'scale(0.75)';
+    }
+    
+    // Centralizar
+    menu.style.marginLeft = 'auto';
+    menu.style.marginRight = 'auto';
+    menu.style.justifyContent = 'center';
+}
+
+// Executar quando carregar e redimensionar
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(garantirMenuHorizontal, 100);
+    window.addEventListener('resize', garantirMenuHorizontal);
+    window.addEventListener('orientationchange', () => {
+        setTimeout(garantirMenuHorizontal, 300);
+    });
+});
