@@ -158,6 +158,25 @@ class ContadorVisitas {
 // Inicializa o contador quando a página carrega
 document.addEventListener('DOMContentLoaded', () => {
     window.contadorVisitas = new ContadorVisitas();
+
+    // Exibir versão do app
+function exibirVersaoApp() {
+    const versao = '2.0.0'; // Atualize conforme novas versões
+    const elementoVersao = document.getElementById('versao-app');
+    
+    if (elementoVersao) {
+        elementoVersao.textContent = versao;
+    }
+    
+    // Salvar no localStorage para referência
+    localStorage.setItem('app_version', versao);
+    
+    // Log para debugging
+    console.log(`🎹 Teclado Interativo v${versao}`);
+}
+
+// Chamar na inicialização
+document.addEventListener('DOMContentLoaded', exibirVersaoApp);
     
     // Adiciona botão de reset (opcional)
     /*const rodape = document.querySelector('.rodape');

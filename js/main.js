@@ -7,27 +7,307 @@ class TecladoInterativo {
         this.coresTeclas = JSON.parse(localStorage.getItem('coresTeclas')) || {};
         this.sonsEditados = JSON.parse(localStorage.getItem('sonsEditados')) || {};
         this.emojiEditados = JSON.parse(localStorage.getItem('emojiEditados')) || {};
+        this.contextoAudio = null; // Adicionar contexto Web Audio
+        this.sonsCarregados = {}; // Cache de áudios decodificados
         
         this.inicializar();
     }
+    // NOVA FUNÇÃO: Detectar interação do usuário
+detectarInteracao() {
+    const eventos = ['touchstart', 'click', 'keydown'];
+    
+    eventos.forEach(evento => {
+        document.addEventListener(evento, () => {
+            // Ativar contexto de áudio se estiver suspenso
+            if (this.contextoAudio && this.contextoAudio.state === 'suspended') {
+                this.contextoAudio.resume().then(() => {
+                    console.log('Áudio ativado por interação do usuário');
+                    this.atualizarIndicadorAudio(true);
+                });
+            }
+            
+            // Esconder instruções após primeira interação
+            const instrucoes = document.getElementById('instrucoes-mobile');
+            if (instrucoes && instrucoes.style.display !== 'none') {
+                setTimeout(() => {
+                    instrucoes.style.display = 'none';
+                }, 3000);
+            }
+        }, { once: true }); // Executar apenas uma vez
+    });
+}
+
+// NOVA FUNÇÃO: Atualizar indicador de áudio
+atualizarIndicadorAudio(ativo) {
+    const indicador = document.getElementById('indicador-audio');
+    if (indicador) {
+        if (ativo) {
+            indicador.classList.remove('inativo');
+        } else {
+            indicador.classList.add('inativo');
+        }
+    }
+}
+
+// NOVA FUNÇÃO: Mostrar instruções mobile
+mostrarInstrucoesMobile() {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        setTimeout(() => {
+            const instrucoes = document.getElementById('instrucoes-mobile');
+            if (instrucoes) {
+                instrucoes.style.display = 'block';
+                
+                // Auto-esconder após 10 segundos
+                setTimeout(() => {
+                    if (instrucoes.style.display === 'block') {
+                        instrucoes.style.display = 'none';
+                    }
+                }, 10000);
+            }
+        }, 1000);
+    }
+}
 
     inicializar() {
         this.configurarModoNoturno();
+        this.inicializarAudio(); // Inicializar áudio primeiro
         this.configurarTeclas();
         this.configurarControles();
         this.restaurarConfiguracoes();
         this.atualizarContadorSons();
         
-        // Configurar eventos globais
+        // Inicializar Web Audio API para mobile
+        this.inicializarWebAudio();
+        
+        // Configurar eventos
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') this.pararTodosSons();
-            if (e.key === 'e' && e.ctrlKey) {
-                e.preventDefault();
-                this.toggleModoEdicao();
+        });
+        
+        // Botão de ativação de áudio para mobile
+        this.criarBotaoAtivacaoAudio();
+    }
+
+    // NOVA FUNÇÃO: Inicializar Web Audio API
+    inicializarWebAudio() {
+        try {
+            // Criar contexto de áudio
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.contextoAudio = new AudioContext();
+            
+            // Carregar todos os sons no cache
+            this.carregarSonsCache();
+            
+            console.log('Web Audio API inicializado');
+        } catch (error) {
+            console.error('Erro ao inicializar Web Audio:', error);
+        }
+    }
+
+    // NOVA FUNÇÃO: Carregar sons em cache
+    async carregarSonsCache() {
+        const elementosAudio = document.querySelectorAll('audio');
+        
+        for (const audioElement of elementosAudio) {
+            const id = audioElement.id;
+            
+            try {
+                const response = await fetch(audioElement.src);
+                const arrayBuffer = await response.arrayBuffer();
+                const audioBuffer = await this.contextoAudio.decodeAudioData(arrayBuffer);
+                
+                this.sonsCarregados[id] = audioBuffer;
+                console.log(`Áudio carregado em cache: ${id}`);
+            } catch (error) {
+                console.error(`Erro ao carregar áudio ${id}:`, error);
             }
+        }
+    }
+
+    // NOVA FUNÇÃO: Criar botão de ativação de áudio
+    criarBotaoAtivacaoAudio() {
+        // Verificar se é mobile
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+            const botaoAtivar = document.createElement('button');
+            botaoAtivar.id = 'botao-ativar-audio';
+            botaoAtivar.className = 'botao-ativar-audio';
+            botaoAtivar.innerHTML = '🎵 ATIVAR SONS';
+            botaoAtivar.onclick = () => this.ativarAudioMobile();
+            
+            document.querySelector('.cabecalho')?.appendChild(botaoAtivar);
+            
+            // CSS para o botão
+            const style = document.createElement('style');
+            style.textContent = `
+                .botao-ativar-audio {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                    color: white;
+                    border: none;
+                    padding: 12px 20px;
+                    border-radius: 25px;
+                    font-family: 'Montserrat', sans-serif;
+                    font-weight: 600;
+                    font-size: 0.9em;
+                    cursor: pointer;
+                    z-index: 1000;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                    animation: pulsar-importante 2s infinite;
+                }
+                
+                @keyframes pulsar-importante {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
+                    100% { transform: scale(1); }
+                }
+                
+                .botao-ativar-audio:hover {
+                    background: linear-gradient(135deg, #764ba2, #667eea);
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    // NOVA FUNÇÃO: Ativar áudio no mobile
+    ativarAudioMobile() {
+        // Iniciar contexto de áudio (necessário para iOS)
+        if (this.contextoAudio && this.contextoAudio.state === 'suspended') {
+            this.contextoAudio.resume();
+        }
+        
+        // Tocar um som silencioso para desbloquear
+        this.tocarSomSilencioso();
+        
+        // Remover botão
+        const botao = document.getElementById('botao-ativar-audio');
+        if (botao) botao.remove();
+        
+        this.mostrarFeedback('✅ Sons ativados! Clique nas teclas.');
+    }
+
+    // NOVA FUNÇÃO: Tocar som silencioso para desbloquear
+    tocarSomSilencioso() {
+        try {
+            // Método 1: Usando Web Audio API
+            if (this.contextoAudio) {
+                const source = this.contextoAudio.createBufferSource();
+                const buffer = this.contextoAudio.createBuffer(1, 1, 22050);
+                source.buffer = buffer;
+                source.connect(this.contextoAudio.destination);
+                source.start(0);
+                source.stop(0.01);
+            }
+            
+            // Método 2: Usando áudio HTML5
+            const audio = new Audio();
+            audio.volume = 0.001; // Quase inaudível
+            audio.play().catch(e => console.log('Som silencioso para desbloquear'));
+            
+        } catch (error) {
+            console.log('Som silencioso executado');
+        }
+    }
+
+    // ATUALIZAR FUNÇÃO tocarSom() para mobile
+    tocarSom(idElementoAudio) {
+        // Verificar se o contexto de áudio está suspenso (iOS)
+        if (this.contextoAudio && this.contextoAudio.state === 'suspended') {
+            this.contextoAudio.resume().then(() => {
+                this.executarSom(idElementoAudio);
+            }).catch(error => {
+                console.error('Erro ao resumir áudio:', error);
+                this.mostrarFeedback('⚠️ Toque na tela para ativar sons');
+            });
+            return;
+        }
+        
+        this.executarSom(idElementoAudio);
+    }
+
+    // NOVA FUNÇÃO: Executar som
+    executarSom(idElementoAudio) {
+        const audioElement = document.querySelector(idElementoAudio);
+        
+        if (!audioElement) {
+            console.error(`Áudio não encontrado: ${idElementoAudio}`);
+            return;
+        }
+        
+        // Parar som atual
+        if (this.audioAtual && this.audioAtual !== audioElement) {
+            this.audioAtual.pause();
+            this.audioAtual.currentTime = 0;
+        }
+        
+        // Método 1: Tentar com Web Audio API primeiro (melhor para mobile)
+        if (this.contextoAudio && this.sonsCarregados[audioElement.id]) {
+            try {
+                const source = this.contextoAudio.createBufferSource();
+                source.buffer = this.sonsCarregados[audioElement.id];
+                source.connect(this.contextoAudio.destination);
+                source.start(0);
+                
+                // Atualizar feedback visual
+                this.atualizarFeedbackTecla(audioElement.id);
+                
+                // Incrementar contador
+                this.incrementarContador();
+                return;
+            } catch (error) {
+                console.log('Falha no Web Audio, tentando HTML5...');
+            }
+        }
+        
+        // Método 2: Usar HTML5 Audio (fallback)
+        this.audioAtual = audioElement;
+        this.audioAtual.currentTime = 0;
+        
+        audioElement.play().catch(error => {
+            console.error('Erro ao reproduzir áudio HTML5:', error);
+            
+            // Mostrar instruções para mobile
+            if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+                this.mostrarFeedback('📱 No iOS, toque primeiro em "ATIVAR SONS"');
+            } else if (/Android/.test(navigator.userAgent)) {
+                this.mostrarFeedback('📱 Toque na tela primeiro para permitir sons');
+            } else {
+                this.mostrarFeedback('❌ Erro ao reproduzir áudio');
+            }
+            
+            this.audioAtual = null;
+        }).then(() => {
+            // Sucesso
+            this.atualizarFeedbackTecla(audioElement.id);
+            this.incrementarContador();
         });
     }
 
+    // NOVA FUNÇÃO: Atualizar feedback visual da tecla
+    atualizarFeedbackTecla(audioId) {
+        const somId = audioId.replace('som_tecla_', '');
+        const tecla = document.querySelector(`[data-som="${somId}"]`);
+        
+        if (tecla) {
+            tecla.classList.add('ativa');
+            setTimeout(() => tecla.classList.remove('ativa'), 300);
+        }
+    }
+
+    // NOVA FUNÇÃO: Incrementar contador
+    incrementarContador() {
+        if (!this.modoEdicao) {
+            this.contadorSons++;
+            localStorage.setItem('contadorSons', this.contadorSons);
+            this.atualizarContadorSons();
+        }
+    }
     configurarModoNoturno() {
         const botaoModo = document.getElementById('botao-modo');
         if (this.modoNoturno) {
@@ -38,52 +318,52 @@ class TecladoInterativo {
         }
     }
 
-    configurarTeclas() {
-        document.querySelectorAll('.tecla').forEach(tecla => {
-            const somId = tecla.dataset.som;
-            const idAudio = `#som_tecla_${somId}`;
-            
-            // Configurar emoji editado (APLICAR PARA TODAS as teclas)
-            if (this.emojiEditados[tecla.className]) {
-                tecla.textContent = this.emojiEditados[tecla.className];
-                tecla.classList.add('editado');
+   configurarTeclas() {
+    document.querySelectorAll('.tecla').forEach(tecla => {
+        const somId = tecla.dataset.som;
+        const idAudio = `#som_tecla_${somId}`;
+        
+        // Configurar emoji editado (APLICAR PARA TODAS as teclas)
+        if (this.emojiEditados[tecla.className]) {
+            tecla.textContent = this.emojiEditados[tecla.className];
+            tecla.classList.add('editado');
+        }
+        
+        // Configurar cor personalizada (APLICAR PARA TODAS as teclas)
+        if (this.coresTeclas[tecla.className]) {
+            tecla.style.background = this.coresTeclas[tecla.className];
+            tecla.classList.add('editado');
+        }
+        
+        // Salvar emoji original para TODAS as teclas
+        if (!tecla.dataset.emojiOriginal) {
+            tecla.dataset.emojiOriginal = tecla.textContent;
+        }
+        
+        // Configurar eventos (IGUAL para todas as teclas)
+        tecla.onclick = () => {
+            if (this.modoEdicao) {
+                this.abrirModalEdicao(tecla);
+            } else {
+                this.tocarSom(idAudio);
             }
-            
-            // Configurar cor personalizada (APLICAR PARA TODAS as teclas)
-            if (this.coresTeclas[tecla.className]) {
-                tecla.style.background = this.coresTeclas[tecla.className];
-                tecla.classList.add('editado');
-            }
-            
-            // Salvar emoji original para TODAS as teclas
-            if (!tecla.dataset.emojiOriginal) {
-                tecla.dataset.emojiOriginal = tecla.textContent;
-            }
-            
-            // Configurar eventos (IGUAL para todas as teclas)
-            tecla.onclick = () => {
-                if (this.modoEdicao) {
-                    this.abrirModalEdicao(tecla);
-                } else {
+        };
+
+        tecla.onkeydown = (e) => {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                tecla.classList.add('ativa');
+                if (!this.modoEdicao) {
                     this.tocarSom(idAudio);
                 }
-            };
-    
-            tecla.onkeydown = (e) => {
-                if (e.code === 'Space' || e.code === 'Enter') {
-                    tecla.classList.add('ativa');
-                    if (!this.modoEdicao) {
-                        this.tocarSom(idAudio);
-                    }
-                    e.preventDefault();
-                }
-            };
-    
-            tecla.onkeyup = () => {
-                tecla.classList.remove('ativa');
-            };
-        });
-    }
+                e.preventDefault();
+            }
+        };
+
+        tecla.onkeyup = () => {
+            tecla.classList.remove('ativa');
+        };
+    });
+}
 
     tocarSom(idAudio) {
         const audioElement = document.querySelector(idAudio);
@@ -615,45 +895,3 @@ class TecladoInterativo {
 document.addEventListener('DOMContentLoaded', () => {
     window.tecladoInterativo = new TecladoInterativo();
 });
-
-// Otimizações para touch em dispositivos móveis
-function otimizarParaMobile() {
-    // Prevenir zoom com dois dedos
-    document.addEventListener('touchstart', function(event) {
-        if (event.touches.length > 1) {
-            event.preventDefault();
-        }
-    }, { passive: false });
-    
-    // Feedback visual melhor para touch
-    document.querySelectorAll('.tecla').forEach(tecla => {
-        tecla.addEventListener('touchstart', function(e) {
-            this.classList.add('ativa');
-            // Prevenir clique fantasma após touch
-            e.preventDefault();
-        }, { passive: false });
-        
-        tecla.addEventListener('touchend', function() {
-            this.classList.remove('ativa');
-        });
-        
-        tecla.addEventListener('touchcancel', function() {
-            this.classList.remove('ativa');
-        });
-    });
-    
-    // Ajustar altura da viewport em iOS
-    function ajustarAlturaiOS() {
-        const vh = window.innerHeight * 0.01;
-        document.documentElement.style.setProperty('--vh', `${vh}px`);
-    }
-    
-    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-        ajustarAlturaiOS();
-        window.addEventListener('resize', ajustarAlturaiOS);
-        window.addEventListener('orientationchange', ajustarAlturaiOS);
-    }
-}
-
-// Inicializar otimizações mobile
-document.addEventListener('DOMContentLoaded', otimizarParaMobile);

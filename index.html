@@ -121,6 +121,22 @@
                 </div>
             </section>
         </main>
+        <!-- Indicador de status de áudio -->
+<div id="indicador-audio" class="indicador-audio inativo"></div>
+
+<!-- Instruções iniciais para mobile -->
+<div id="instrucoes-mobile" class="instrucoes-mobile" style="display: none;">
+    <p>📱 Para usar os sons no celular:</p>
+    <ol style="text-align: left; margin: 10px 0; font-size: 0.8em;">
+        <li>Toque em qualquer lugar da tela primeiro</li>
+        <li>Ou clique no botão "ATIVAR SONS"</li>
+        <li>Depois clique nas teclas normalmente</li>
+    </ol>
+    <button onclick="document.getElementById('instrucoes-mobile').style.display='none'">
+        Entendi 👍
+    </button>
+</div>
+
     </div>
 
     <!-- Rodape com contadores -->
@@ -150,6 +166,16 @@
                 </div>
             </div>
         </div>
+
+        <div class="contador-item">
+            <span class="contador-icon">📱</span>
+            <div class="contador-info">
+                <span class="contador-label">Versão</span>
+                <span class="contador-valor" id="versao-app">2.1.3</span>
+            </div>
+        </div>
+
+    </div>
         
         <p class="creditos">Teclado Interativo &copy; 2024 - Desenvolvido com ❤️ por Rafael Lira.</p>
     </footer>
