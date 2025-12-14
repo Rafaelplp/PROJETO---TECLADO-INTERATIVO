@@ -4,6 +4,7 @@
   padding: 0;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 html, body {
@@ -11,6 +12,7 @@ html, body {
   height: 100%;
   overflow: hidden;
   font-family: 'Montserrat', sans-serif;
+  position: fixed; /* Prevenir bounce no iOS */
 }
 
 body {
@@ -18,6 +20,8 @@ body {
   color: #fff;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  min-height: -webkit-fill-available; /* iOS fix */
 }
 
 body.modo-dia {
@@ -30,19 +34,22 @@ body.modo-dia {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  max-height: -webkit-fill-available; /* Para iOS */
+  height: -webkit-fill-available; /* iOS fix */
   overflow: hidden;
+  position: relative;
 }
 
-/* ========== MENU SUPERIOR (Mobile) ========== */
+/* ========== MENU SUPERIOR CENTRALIZADO ========== */
 .menu-superior {
   display: flex;
+  justify-content: center; /* Centralizado */
   flex-wrap: wrap;
   gap: 8px;
-  padding: 12px;
+  padding: 12px 10px;
   background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
+  width: 100%;
 }
 
 body.modo-dia .menu-superior {
@@ -50,11 +57,11 @@ body.modo-dia .menu-superior {
   border-bottom-color: rgba(0, 0, 0, 0.1);
 }
 
+/* Botões do menu - centralizados e responsivos */
 .botao-menu {
-  flex: 1;
-  min-width: 80px;
-  max-width: 100px;
-  padding: 10px 8px;
+  min-width: 75px;
+  max-width: 90px;
+  padding: 10px 6px;
   border: none;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.08);
@@ -65,9 +72,13 @@ body.modo-dia .menu-superior {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   font-size: 0.75rem;
   transition: all 0.2s;
+  flex: 1;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 body.modo-dia .botao-menu {
@@ -75,8 +86,9 @@ body.modo-dia .botao-menu {
   color: #333;
 }
 
-.botao-menu:hover, .botao-menu:active {
-  background: rgba(255, 255, 255, 0.15);
+.botao-menu:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.15) !important;
 }
 
 .botao-menu.ativo {
@@ -85,11 +97,13 @@ body.modo-dia .botao-menu {
 
 .botao-menu .icone {
   font-size: 1.2rem;
+  pointer-events: none;
 }
 
 .botao-menu .texto {
   font-size: 0.7rem;
   line-height: 1;
+  pointer-events: none;
 }
 
 /* ========== CONTEÚDO PRINCIPAL ========== */
@@ -100,6 +114,7 @@ body.modo-dia .botao-menu {
   padding: 15px;
   overflow: hidden;
   min-height: 0;
+  width: 100%;
 }
 
 .cabecalho {
@@ -112,6 +127,7 @@ body.modo-dia .botao-menu {
   font-size: 1.4rem;
   color: #00d4ff;
   margin-bottom: 5px;
+  font-weight: 600;
 }
 
 body.modo-dia .cabecalho h1 {
@@ -123,7 +139,7 @@ body.modo-dia .cabecalho h1 {
   opacity: 0.8;
 }
 
-/* ========== TECLADO OTIMIZADO ========== */
+/* ========== TECLADO OTIMIZADO (SEM TOQUE DUPLO) ========== */
 .teclado-container {
   flex: 1;
   display: flex;
@@ -131,6 +147,7 @@ body.modo-dia .cabecalho h1 {
   align-items: center;
   min-height: 0;
   padding: 5px 0;
+  width: 100%;
 }
 
 .teclado-principal {
@@ -158,24 +175,41 @@ body.modo-dia .cabecalho h1 {
   color: white;
   padding: 0;
   min-height: 0;
-  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+  overflow: hidden;
 }
 
-.tecla:hover {
-  transform: translateY(-2px);
+/* PREVENIR TOQUE DUPLO */
+.tecla::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  pointer-events: none;
 }
 
-.tecla:active, .tecla.ativa {
-  transform: scale(0.96);
+.tecla:active {
+  transform: scale(0.96) !important;
+  transition: transform 0.1s !important;
 }
 
 .tecla.tocando {
-  animation: pulsarTecla 0.2s ease;
+  animation: pulsarTecla 0.3s ease;
 }
 
 .tecla.modo-edicao {
   border: 3px dashed #ff9900;
   animation: pulsarEdicao 2s infinite;
+}
+
+@keyframes pulsarTecla {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.96); }
 }
 
 @keyframes pulsarEdicao {
@@ -190,13 +224,14 @@ body.modo-dia .tecla {
   color: #333;
 }
 
-/* ========== RODAPÉ OTIMIZADO ========== */
+/* ========== RODAPÉ CENTRALIZADO E AJUSTADO ========== */
 .rodape {
   background-color: rgba(0, 0, 0, 0.3);
-  padding: 10px 12px;
+  padding: 10px 15px;
   backdrop-filter: blur(10px);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
+  width: 100%;
 }
 
 body.modo-dia .rodape {
@@ -205,8 +240,9 @@ body.modo-dia .rodape {
 }
 
 .contador-visitas {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  justify-content: center; /* Centralizado */
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 8px;
 }
@@ -216,9 +252,13 @@ body.modo-dia .rodape {
   align-items: center;
   gap: 8px;
   background-color: rgba(255, 255, 255, 0.08);
-  padding: 8px 10px;
-  border-radius: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
   min-width: 0;
+  flex: 1;
+  min-width: 140px; /* Tamanho mínimo */
+  max-width: 180px; /* Tamanho máximo */
+  justify-content: center; /* Centraliza conteúdo */
 }
 
 body.modo-dia .contador-item {
@@ -233,24 +273,28 @@ body.modo-dia .contador-item {
 .contador-info {
   display: flex;
   flex-direction: column;
+  align-items: center; /* Centralizado */
+  text-align: center;
   min-width: 0;
   flex: 1;
 }
 
 .contador-label {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   opacity: 0.8;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
 }
 
 .contador-valor {
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
 }
 
 #contador-online {
@@ -263,7 +307,7 @@ body.modo-dia .contador-item {
 
 #ultimo-acesso {
   color: #ffaa00;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
 }
 
 #versao-app {
@@ -273,16 +317,87 @@ body.modo-dia .contador-item {
 
 .creditos {
   text-align: center;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   opacity: 0.6;
   margin-top: 5px;
 }
 
-/* ========== RESPONSIVIDADE ESPECÍFICA 6.4" ========== */
-@media (max-height: 740px) and (max-width: 420px) {
-  /* Ajustes para telas menores */
-  .conteudo-principal {
-      padding: 10px;
+/* ========== RESPONSIVIDADE COMPLETA ========== */
+
+/* Tablets e telas maiores */
+@media (min-width: 768px) {
+  .menu-superior {
+      justify-content: center;
+      gap: 12px;
+      padding: 15px;
+  }
+  
+  .botao-menu {
+      min-width: 90px;
+      max-width: 110px;
+      padding: 12px 8px;
+  }
+  
+  .botao-menu .icone {
+      font-size: 1.4rem;
+  }
+  
+  .botao-menu .texto {
+      font-size: 0.8rem;
+  }
+  
+  .cabecalho h1 {
+      font-size: 1.8rem;
+  }
+  
+  .subtitulo {
+      font-size: 0.9rem;
+  }
+  
+  .teclado-principal {
+      max-width: 600px;
+      gap: 15px;
+  }
+  
+  .tecla {
+      font-size: 2.2rem;
+      border-radius: 18px;
+  }
+  
+  .contador-item {
+      min-width: 160px;
+      max-width: 200px;
+      padding: 10px 15px;
+  }
+  
+  .contador-label {
+      font-size: 0.8rem;
+  }
+  
+  .contador-valor {
+      font-size: 1rem;
+  }
+}
+
+/* Celulares pequenos (até 360px) */
+@media (max-width: 360px) {
+  .menu-superior {
+      gap: 6px;
+      padding: 10px 6px;
+  }
+  
+  .botao-menu {
+      min-width: 65px;
+      max-width: 75px;
+      padding: 8px 4px;
+  }
+  
+  .botao-menu .icone {
+      font-size: 1rem;
+  }
+  
+  .botao-menu .texto {
+      font-size: 0.65rem;
   }
   
   .cabecalho h1 {
@@ -294,47 +409,44 @@ body.modo-dia .contador-item {
   }
   
   .teclado-principal {
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
-      max-width: 400px;
   }
   
   .tecla {
       font-size: 1.6rem;
-      border-radius: 12px;
   }
   
-  .menu-superior {
-      padding: 10px 8px;
-      gap: 6px;
-  }
-  
-  .botao-menu {
-      min-width: 70px;
-      padding: 8px 6px;
-      font-size: 0.7rem;
-  }
-  
-  .botao-menu .icone {
-      font-size: 1rem;
-  }
-  
-  .rodape {
-      padding: 8px 10px;
+  .contador-visitas {
+      grid-template-columns: 1fr;
   }
   
   .contador-item {
-      padding: 6px 8px;
+      min-width: 100%;
+      max-width: 100%;
   }
 }
 
-@media (max-height: 680px) {
-  /* Ajustes para altura muito baixa */
+/* Telas muito altas */
+@media (min-height: 800px) {
+  .teclado-principal {
+      max-width: 550px;
+      gap: 12px;
+  }
+  
+  .tecla {
+      font-size: 2rem;
+  }
+}
+
+/* Telas muito baixas */
+@media (max-height: 600px) {
   .cabecalho {
       margin-bottom: 10px;
   }
   
   .cabecalho h1 {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
   }
   
   .subtitulo {
@@ -342,67 +454,246 @@ body.modo-dia .contador-item {
   }
   
   .teclado-principal {
-      gap: 6px;
+      gap: 8px;
   }
   
   .tecla {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
   }
 }
 
-@media (max-width: 360px) {
-  /* Ajustes para largura muito pequena */
-  .teclado-principal {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-  }
-  
-  .contador-visitas {
-      grid-template-columns: 1fr;
+/* ========== MODO PAISAGEM (LANDSCAPE) ========== */
+@media (orientation: landscape) {
+  .layout-principal {
+      flex-direction: row;
+      height: 100vh;
   }
   
   .menu-superior {
-      justify-content: center;
+      flex-direction: column;
+      width: auto;
+      height: 100%;
+      padding: 10px;
+      justify-content: flex-start;
+      border-bottom: none;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      overflow-y: auto;
+  }
+  
+  body.modo-dia .menu-superior {
+      border-right-color: rgba(0, 0, 0, 0.1);
   }
   
   .botao-menu {
-      min-width: 65px;
-      max-width: 75px;
-  }
-}
-
-/* Ajuste para modo paisagem */
-@media (orientation: landscape) and (max-height: 500px) {
-  .layout-principal {
-      flex-direction: row;
-  }
-  
-  .menu-superior {
-      display: none;
+      min-width: 70px;
+      max-width: 80px;
+      margin-bottom: 8px;
   }
   
   .conteudo-principal {
       flex: 1;
       padding: 10px;
+      overflow-y: auto;
   }
   
   .cabecalho {
-      display: none;
+      margin-bottom: 10px;
+  }
+  
+  .cabecalho h1 {
+      font-size: 1.3rem;
+  }
+  
+  .teclado-container {
+      height: 100%;
+      align-items: flex-start;
+      padding-top: 10px;
   }
   
   .teclado-principal {
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
       max-width: 100%;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
   }
   
   .tecla {
-      font-size: 1.4rem;
-      min-height: 60px;
+      font-size: 1.6rem;
+      min-height: 70px;
   }
   
   .rodape {
-      display: none;
+      display: none; /* Esconde rodapé no landscape para economizar espaço */
+  }
+  
+  /* Ajuste para landscape com altura muito baixa */
+  @media (max-height: 500px) {
+      .menu-superior {
+          padding: 5px;
+      }
+      
+      .botao-menu {
+          min-width: 60px;
+          max-width: 65px;
+          padding: 6px 3px;
+          margin-bottom: 5px;
+      }
+      
+      .botao-menu .icone {
+          font-size: 0.9rem;
+      }
+      
+      .botao-menu .texto {
+          font-size: 0.6rem;
+      }
+      
+      .cabecalho {
+          display: none;
+      }
+      
+      .teclado-principal {
+          gap: 5px;
+      }
+      
+      .tecla {
+          font-size: 1.4rem;
+          min-height: 60px;
+      }
+  }
+  
+  /* Ajuste para landscape com largura grande */
+  @media (min-width: 800px) and (orientation: landscape) {
+      .teclado-principal {
+          max-width: 700px;
+          gap: 12px;
+      }
+      
+      .tecla {
+          font-size: 1.8rem;
+          min-height: 80px;
+      }
+  }
+}
+
+/* ========== DISPOSITIVOS ESPECÍFICOS ========== */
+
+/* iPhone SE / 5 */
+@media (device-width: 320px) and (device-height: 568px) {
+  .teclado-principal {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      max-width: 300px;
+  }
+  
+  .tecla {
+      font-size: 1.5rem;
+  }
+  
+  .contador-item {
+      min-width: 120px;
+  }
+}
+
+/* iPhone 6.1" - 13/14 */
+@media (device-width: 390px) and (device-height: 844px) {
+  .teclado-principal {
+      max-width: 380px;
+      gap: 10px;
+  }
+  
+  .tecla {
+      font-size: 1.8rem;
+  }
+}
+
+/* Samsung Galaxy S23 (6.1") */
+@media (device-width: 360px) and (device-height: 780px) {
+  .teclado-principal {
+      max-width: 340px;
+      gap: 9px;
+  }
+  
+  .tecla {
+      font-size: 1.7rem;
+  }
+}
+
+/* Tablets pequenos */
+@media (min-width: 600px) and (max-width: 768px) {
+  .teclado-principal {
+      max-width: 550px;
+      gap: 12px;
+  }
+  
+  .tecla {
+      font-size: 2rem;
+  }
+}
+
+/* ========== AJUSTES DE TOQUE ========== */
+/* Prevenir toque duplo e melhorar resposta tátil */
+.tecla {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+}
+
+/* Melhor feedback tátil */
+.tecla:active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+}
+
+/* Prevenir seleção de texto */
+.tecla, .botao-menu {
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Remover efeito azul no toque no Android */
+.tecla, .botao-menu, input, button {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+/* ========== AJUSTES PARA iOS ========== */
+@supports (-webkit-touch-callout: none) {
+  body {
+      /* Prevenir bounce no iOS */
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+  }
+  
+  .tecla {
+      cursor: pointer;
+  }
+  
+  /* Melhorar performance no iOS */
+  .teclado-principal, .tecla {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+  }
+}
+
+/* ========== ANIMAÇÕES OTIMIZADAS ========== */
+/* Desabilitar animações para usuários que preferem reduzir movimento */
+@media (prefers-reduced-motion: reduce) {
+  .tecla, .botao-menu, .modal-container {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+  }
+  
+  .tecla:active {
+      transform: scale(0.98) !important;
   }
 }
 
@@ -413,19 +704,4 @@ body.modo-dia .contador-item {
 
 .indicador-audio, .ponto-vermelho, .circulo-piscando {
   display: none !important;
-}
-
-/* Ajuste para iOS */
-@supports (-webkit-touch-callout: none) {
-  .tecla {
-      -webkit-tap-highlight-color: transparent;
-  }
-  
-  body {
-      height: -webkit-fill-available;
-  }
-  
-  .layout-principal {
-      min-height: -webkit-fill-available;
-  }
 }
