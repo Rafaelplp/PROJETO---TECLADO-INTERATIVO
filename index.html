@@ -7,64 +7,50 @@
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&display=swap">
     <link rel="stylesheet" href="css/estilos.css">
-    <link rel="stylesheet" href="css/modais.css">
 </head>
 <body>
     <div class="layout-principal">
-        <aside class="menu-lateral">
-            <div class="logo">
-                <h2>🎹 Teclado Meme</h2>
-            </div>
+        <!-- Menu superior para mobile -->
+        <nav class="menu-superior">
+            <button id="botao-editar" class="botao-menu">
+                <span class="icone">✏️</span>
+                <span class="texto">Editar</span>
+            </button>
             
-            <div class="controles-laterais">
-                <button id="botao-editar" class="botao-menu">
-                    <span class="icone">✏️</span>
-                    <span class="texto">Editar</span>
-                </button>
-                
-                <button id="botao-cor-teclas" class="botao-menu">
-                    <span class="icone">🎨</span>
-                    <span class="texto">Cores</span>
-                </button>
-                
-                <button id="botao-cores-aleatorias" class="botao-menu">
-                    <span class="icone">🌈</span>
-                    <span class="texto">Aleatório</span>
-                </button>
-                
-                <button id="botao-modo" class="botao-menu">
-                    <span class="icone">🌙</span>
-                    <span class="texto">Noturno</span>
-                </button>
-                
-                <button id="botao-parar" class="botao-menu">
-                    <span class="icone">⏹️</span>
-                    <span class="texto">Parar</span>
-                </button>
-                
-                <button id="botao-reset" class="botao-menu">
-                    <span class="icone">🔄</span>
-                    <span class="texto">Resetar</span>
-                </button>
-            </div>
+            <button id="botao-cor-teclas" class="botao-menu">
+                <span class="icone">🎨</span>
+                <span class="texto">Cores</span>
+            </button>
             
-            <div class="info-sessao">
-                <div class="contador-sons">
-                    <span class="icone">🎵</span>
-                    <div class="info-texto">
-                        <span class="label">Sons Tocados</span>
-                        <span class="valor" id="contador-sons">0</span>
-                    </div>
-                </div>
-            </div>
-        </aside>
+            <button id="botao-cores-aleatorias" class="botao-menu">
+                <span class="icone">🌈</span>
+                <span class="texto">Aleatório</span>
+            </button>
+            
+            <button id="botao-modo" class="botao-menu">
+                <span class="icone">🌙</span>
+                <span class="texto">Noturno</span>
+            </button>
+            
+            <button id="botao-parar" class="botao-menu">
+                <span class="icone">⏹️</span>
+                <span class="texto">Parar</span>
+            </button>
+            
+            <button id="botao-reset" class="botao-menu">
+                <span class="icone">🔄</span>
+                <span class="texto">Resetar</span>
+            </button>
+        </nav>
 
+        <!-- Conteúdo principal -->
         <main class="conteudo-principal">
             <header class="cabecalho">
                 <h1>TECLADO MEME INTERATIVO</h1>
                 <p class="subtitulo">Clique nas teclas para tocar sons!</p>
             </header>
 
+            <!-- Teclado -->
             <section class="teclado-container">
                 <div class="teclado-principal">
                     <button class="tecla tecla_pom" data-som="pom">&#129300</button>
@@ -84,45 +70,46 @@
                 </div>
             </section>
         </main>
-    </div>
 
-    <footer class="rodape">
-        <div class="contador-visitas">
-            <div class="contador-item">
-                <span class="contador-icon">👥</span>
-                <div class="contador-info">
-                    <span class="contador-label">Online</span>
-                    <span class="contador-valor" id="contador-online">1</span>
+        <!-- Rodapé -->
+        <footer class="rodape">
+            <div class="contador-visitas">
+                <div class="contador-item">
+                    <span class="contador-icon">👥</span>
+                    <div class="contador-info">
+                        <span class="contador-label">Online</span>
+                        <span class="contador-valor" id="contador-online">1</span>
+                    </div>
+                </div>
+                
+                <div class="contador-item">
+                    <span class="contador-icon">🌐</span>
+                    <div class="contador-info">
+                        <span class="contador-label">Total</span>
+                        <span class="contador-valor" id="contador-total">1</span>
+                    </div>
+                </div>
+                
+                <div class="contador-item">
+                    <span class="contador-icon">⏰</span>
+                    <div class="contador-info">
+                        <span class="contador-label">Último</span>
+                        <span class="contador-valor" id="ultimo-acesso">Agora</span>
+                    </div>
+                </div>
+                
+                <div class="contador-item">
+                    <span class="contador-icon">📱</span>
+                    <div class="contador-info">
+                        <span class="contador-label">Versão</span>
+                        <span class="contador-valor" id="versao-app">3.2.0</span>
+                    </div>
                 </div>
             </div>
             
-            <div class="contador-item">
-                <span class="contador-icon">🌐</span>
-                <div class="contador-info">
-                    <span class="contador-label">Total</span>
-                    <span class="contador-valor" id="contador-total">1</span>
-                </div>
-            </div>
-            
-            <div class="contador-item">
-                <span class="contador-icon">⏰</span>
-                <div class="contador-info">
-                    <span class="contador-label">Último</span>
-                    <span class="contador-valor" id="ultimo-acesso">Agora</span>
-                </div>
-            </div>
-            
-            <div class="contador-item">
-                <span class="contador-icon">📱</span>
-                <div class="contador-info">
-                    <span class="contador-label">Versão</span>
-                    <span class="contador-valor" id="versao-app">3.1.0</span>
-                </div>
-            </div>
-        </div>
-        
-        <p class="creditos">Teclado Interativo &copy; 2024 - Desenvolvido com ❤️ por Rafael Lira.</p>
-    </footer>
+            <p class="creditos">Teclado Interativo &copy; 2024 - Desenvolvido com ❤️ por Rafael Lira.</p>
+        </footer>
+    </div>
 
     <!-- Áudios -->
     <audio src="sounds-memes/among-sound.mp3" id="som_tecla_pom"></audio>
@@ -142,24 +129,24 @@
     <script src="js/main.js"></script>
     <script src="js/contadorVisitas.js"></script>
     
-    <!-- CSS adicional inline para garantir -->
+    <!-- CSS de emergência -->
     <style>
-        /* Remover absolutamente tudo que pisca */
-        *[style*="animation"][style*="blink"],
-        *[style*="animation"][style*="flash"],
-        *[style*="red"][style*="pulse"],
-        .piscando, .flashing, .blinking {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
+        /* Garantir que não há elementos fora da tela */
+        html, body {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden !important;
         }
         
-        /* Garantir que não há elementos fora da tela */
-        body {
-            overflow: hidden !important;
-            position: fixed !important;
-            width: 100% !important;
-            height: 100% !important;
+        /* Remover scroll em elementos */
+        * {
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Prevenir zoom em iOS */
+        input, textarea {
+            font-size: 16px !important;
         }
     </style>
 </body>

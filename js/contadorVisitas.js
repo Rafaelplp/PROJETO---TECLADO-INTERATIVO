@@ -1,52 +1,51 @@
-// contadorVisitas.js - Versão Simplificada
+// contadorVisitas.js - Versão 2.0
 class ContadorVisitas {
     constructor() {
         this.contadorTotal = parseInt(localStorage.getItem('teclado_total_acessos')) || 0;
-        this.contadorOnline = 1; // Sempre mostra 1 online
         this.ultimoAcesso = new Date();
         this.inicializar();
     }
 
     inicializar() {
-        // Incrementar contador total
+        // Incrementar contador
         this.contadorTotal++;
-        localStorage.setItem('teclado_total_acessos', this.contadorTotal.toString());
+        localStorage.setItem('teclado_total_acessos', this.contadorTotal);
         
-        // Atualizar último acesso
+        // Salvar último acesso
         localStorage.setItem('teclado_ultimo_acesso', this.ultimoAcesso.toISOString());
         
         // Atualizar display
         this.atualizarDisplay();
         
-        // Atualizar periodicamente
+        // Atualizar a cada minuto
         setInterval(() => this.atualizarDisplay(), 60000);
     }
 
     atualizarDisplay() {
-        // Atualizar contador online (fixo em 1 para simplicidade)
+        // Online (fixo em 1 para simplicidade)
         const onlineEl = document.getElementById('contador-online');
-        if (onlineEl) onlineEl.textContent = this.contadorOnline;
+        if (onlineEl) onlineEl.textContent = '1';
         
-        // Atualizar contador total
+        // Total
         const totalEl = document.getElementById('contador-total');
-        if (totalEl) totalEl.textContent = this.contadorTotal.toLocaleString('pt-BR');
+        if (totalEl) totalEl.textContent = this.contadorTotal;
         
-        // Atualizar último acesso
+        // Último acesso
         const ultimoEl = document.getElementById('ultimo-acesso');
         if (ultimoEl) {
-            ultimoEl.textContent = this.formatarTempo(this.ultimoAcesso);
+            ultimoEl.textContent = this.formatarUltimoAcesso();
         }
     }
 
-    formatarTempo(data) {
+    formatarUltimoAcesso() {
         const agora = new Date();
-        const diferenca = agora - data;
+        const diferenca = agora - this.ultimoAcesso;
         const minutos = Math.floor(diferenca / 60000);
         
         if (minutos < 1) return 'Agora';
         if (minutos < 60) return `${minutos}m`;
         if (minutos < 1440) return `${Math.floor(minutos / 60)}h`;
-        return data.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        return `${Math.floor(minutos / 1440)}d`;
     }
 }
 

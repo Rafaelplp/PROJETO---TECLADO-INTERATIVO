@@ -3,24 +3,21 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
-html {
-  font-size: 16px;
+html, body {
+  width: 100%;
   height: 100%;
   overflow: hidden;
+  font-family: 'Montserrat', sans-serif;
 }
 
 body {
-  font-family: 'Montserrat', sans-serif;
   background-color: #1a1a2e;
   color: #fff;
-  min-height: 100vh;
-  height: 100vh;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
-  position: relative;
 }
 
 body.modo-dia {
@@ -28,62 +25,36 @@ body.modo-dia {
   color: #333;
 }
 
-/* ========== LAYOUT PRINCIPAL (90% DO ORIGINAL) ========== */
+/* ========== LAYOUT PRINCIPAL ========== */
 .layout-principal {
   display: flex;
+  flex-direction: column;
   height: 100vh;
-  max-height: 100vh;
+  max-height: -webkit-fill-available; /* Para iOS */
   overflow: hidden;
-  transform: scale(0.9);
-  transform-origin: center center;
-  margin: 0 auto;
-  width: 100%;
-  max-width: 100vw;
 }
 
-/* ========== MENU LATERAL ========== */
-.menu-lateral {
-  width: 250px;
-  background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
-  padding: 20px 15px;
+/* ========== MENU SUPERIOR (Mobile) ========== */
+.menu-superior {
   display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  flex-shrink: 0;
-  height: 100vh;
-}
-
-body.modo-dia .menu-lateral {
-  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
-  border-right: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.logo {
-  text-align: center;
-  padding: 10px 0 20px 0;
-  margin-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.logo h2 {
-  font-size: 1.3rem;
-  color: #00d4ff;
-  margin: 0;
-}
-
-/* Botões do menu */
-.controles-laterais {
-  display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 8px;
-  flex: 1;
+  padding: 12px;
+  background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+body.modo-dia .menu-superior {
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
+  border-bottom-color: rgba(0, 0, 0, 0.1);
 }
 
 .botao-menu {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 15px;
+  flex: 1;
+  min-width: 80px;
+  max-width: 100px;
+  padding: 10px 8px;
   border: none;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.08);
@@ -91,9 +62,12 @@ body.modo-dia .menu-lateral {
   font-family: 'Montserrat', sans-serif;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: left;
-  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  transition: all 0.2s;
 }
 
 body.modo-dia .botao-menu {
@@ -101,7 +75,7 @@ body.modo-dia .botao-menu {
   color: #333;
 }
 
-.botao-menu:hover {
+.botao-menu:hover, .botao-menu:active {
   background: rgba(255, 255, 255, 0.15);
 }
 
@@ -111,109 +85,80 @@ body.modo-dia .botao-menu {
 
 .botao-menu .icone {
   font-size: 1.2rem;
-  min-width: 24px;
 }
 
 .botao-menu .texto {
-  font-size: 0.85rem;
-}
-
-/* Info sessão */
-.info-sessao {
-  margin-top: auto;
-  padding-top: 15px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.contador-sons {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-}
-
-.contador-sons .icone {
-  font-size: 1.3rem;
-}
-
-.info-texto .label {
-  font-size: 0.75rem;
-  opacity: 0.8;
-}
-
-.info-texto .valor {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #00ff88;
+  font-size: 0.7rem;
+  line-height: 1;
 }
 
 /* ========== CONTEÚDO PRINCIPAL ========== */
 .conteudo-principal {
   flex: 1;
-  padding: 20px;
   display: flex;
   flex-direction: column;
+  padding: 15px;
   overflow: hidden;
-  height: 100vh;
+  min-height: 0;
 }
 
 .cabecalho {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   flex-shrink: 0;
 }
 
 .cabecalho h1 {
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   color: #00d4ff;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
+}
+
+body.modo-dia .cabecalho h1 {
+  color: #0077cc;
 }
 
 .subtitulo {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   opacity: 0.8;
 }
 
-/* ========== TECLADO ========== */
+/* ========== TECLADO OTIMIZADO ========== */
 .teclado-container {
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 0;
-  padding: 10px 0;
+  padding: 5px 0;
 }
 
 .teclado-principal {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 10px;
   width: 100%;
-  max-width: 600px;
+  max-width: 500px;
   margin: 0 auto;
 }
 
-/* Teclas 10% menores */
 .tecla {
   aspect-ratio: 1;
   border: none;
   border-radius: 15px;
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s ease;
+  transition: all 0.15s;
   background: linear-gradient(145deg, #2d2d44, #232337);
-  box-shadow: 5px 5px 10px #1a1a2e,
-              -5px -5px 10px #2a2a3e;
+  box-shadow: 4px 4px 8px #1a1a2e,
+              -4px -4px 8px #2a2a3e;
   color: white;
-  position: relative;
-  overflow: hidden;
   padding: 0;
   min-height: 0;
+  touch-action: manipulation;
 }
 
 .tecla:hover {
@@ -224,31 +169,44 @@ body.modo-dia .botao-menu {
   transform: scale(0.96);
 }
 
+.tecla.tocando {
+  animation: pulsarTecla 0.2s ease;
+}
+
+.tecla.modo-edicao {
+  border: 3px dashed #ff9900;
+  animation: pulsarEdicao 2s infinite;
+}
+
+@keyframes pulsarEdicao {
+  0%, 100% { border-color: #ff9900; }
+  50% { border-color: #ffcc00; }
+}
+
 body.modo-dia .tecla {
   background: linear-gradient(145deg, #ffffff, #e6e6e6);
-  box-shadow: 5px 5px 10px #d9d9d9,
-              -5px -5px 10px #ffffff;
+  box-shadow: 4px 4px 8px #d9d9d9,
+              -4px -4px 8px #ffffff;
   color: #333;
 }
 
 /* ========== RODAPÉ OTIMIZADO ========== */
 .rodape {
   background-color: rgba(0, 0, 0, 0.3);
-  padding: 12px 15px;
+  padding: 10px 12px;
   backdrop-filter: blur(10px);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
-  height: auto;
-  min-height: auto;
 }
 
 body.modo-dia .rodape {
   background-color: rgba(0, 0, 0, 0.05);
+  border-top-color: rgba(0, 0, 0, 0.1);
 }
 
 .contador-visitas {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
   margin-bottom: 8px;
 }
@@ -261,7 +219,6 @@ body.modo-dia .rodape {
   padding: 8px 10px;
   border-radius: 8px;
   min-width: 0;
-  overflow: hidden;
 }
 
 body.modo-dia .contador-item {
@@ -269,7 +226,7 @@ body.modo-dia .contador-item {
 }
 
 .contador-icon {
-  font-size: 1.1rem;
+  font-size: 1rem;
   flex-shrink: 0;
 }
 
@@ -316,190 +273,131 @@ body.modo-dia .contador-item {
 
 .creditos {
   text-align: center;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   opacity: 0.6;
   margin-top: 5px;
 }
 
-/* ========== RESPONSIVIDADE CELULAR 6.7" ========== */
-@media (max-width: 768px) {
-  html {
-      font-size: 14px;
-  }
-  
-  body {
-      height: 100vh;
-      max-height: 100vh;
-      overflow: hidden;
-  }
-  
-  .layout-principal {
-      flex-direction: column;
-      height: 100vh;
-      max-height: 100vh;
-      transform: scale(1);
-      transform-origin: top center;
-  }
-  
-  .menu-lateral {
-      width: 100%;
-      height: auto;
-      flex-direction: row;
+/* ========== RESPONSIVIDADE ESPECÍFICA 6.4" ========== */
+@media (max-height: 740px) and (max-width: 420px) {
+  /* Ajustes para telas menores */
+  .conteudo-principal {
       padding: 10px;
-      overflow-x: auto;
-      overflow-y: hidden;
-      flex-wrap: nowrap;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
   
-  .logo {
-      display: none;
+  .cabecalho h1 {
+      font-size: 1.2rem;
   }
   
-  .controles-laterais {
-      flex-direction: row;
-      flex: 1;
+  .subtitulo {
+      font-size: 0.7rem;
+  }
+  
+  .teclado-principal {
+      gap: 8px;
+      max-width: 400px;
+  }
+  
+  .tecla {
+      font-size: 1.6rem;
+      border-radius: 12px;
+  }
+  
+  .menu-superior {
+      padding: 10px 8px;
       gap: 6px;
-      overflow-x: auto;
-      padding-bottom: 5px;
   }
   
   .botao-menu {
       min-width: 70px;
-      max-width: 80px;
       padding: 8px 6px;
-      flex-direction: column;
-      gap: 4px;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      height: 60px;
-  }
-  
-  .botao-menu .texto {
       font-size: 0.7rem;
-      display: block;
-      line-height: 1;
   }
   
   .botao-menu .icone {
       font-size: 1rem;
   }
   
-  .info-sessao {
-      display: none;
-  }
-  
-  .conteudo-principal {
-      padding: 10px;
-      height: calc(100vh - 80px - 90px); /* altura total - menu - rodapé */
-      overflow-y: auto;
-  }
-  
-  .cabecalho {
-      margin-bottom: 15px;
-  }
-  
-  .cabecalho h1 {
-      font-size: 1.4rem;
-  }
-  
-  .subtitulo {
-      font-size: 0.8rem;
-  }
-  
-  .teclado-container {
-      height: 100%;
-      padding: 5px 0;
-  }
-  
-  .teclado-principal {
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      max-width: 100%;
-      padding: 0 5px;
-  }
-  
-  .tecla {
-      font-size: 1.8rem;
-      border-radius: 12px;
-      min-height: 70px;
-  }
-  
   .rodape {
       padding: 8px 10px;
-      height: auto;
-      min-height: 90px;
-  }
-  
-  .contador-visitas {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 6px;
-      margin-bottom: 6px;
   }
   
   .contador-item {
       padding: 6px 8px;
-      min-height: 45px;
-  }
-  
-  .contador-icon {
-      font-size: 1rem;
-  }
-  
-  .contador-label {
-      font-size: 0.6rem;
-  }
-  
-  .contador-valor {
-      font-size: 0.75rem;
-  }
-  
-  #ultimo-acesso {
-      font-size: 0.65rem;
   }
 }
 
-/* Ajuste para telas muito pequenas */
-@media (max-width: 360px) {
-  .teclado-principal {
-      grid-template-columns: repeat(3, 1fr);
+@media (max-height: 680px) {
+  /* Ajustes para altura muito baixa */
+  .cabecalho {
+      margin-bottom: 10px;
   }
   
-  .tecla {
-      font-size: 1.6rem;
-      min-height: 65px;
+  .cabecalho h1 {
+      font-size: 1.1rem;
   }
   
-  .contador-visitas {
-      grid-template-columns: 1fr;
-  }
-}
-
-/* Ajuste para modo paisagem */
-@media (max-height: 600px) and (orientation: landscape) {
-  .layout-principal {
-      flex-direction: row;
-  }
-  
-  .menu-lateral {
-      width: 200px;
-      height: 100vh;
-      flex-direction: column;
-      overflow-y: auto;
-  }
-  
-  .conteudo-principal {
-      height: 100vh;
+  .subtitulo {
+      display: none;
   }
   
   .teclado-principal {
-      grid-template-columns: repeat(4, 1fr);
       gap: 6px;
   }
   
   .tecla {
       font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 360px) {
+  /* Ajustes para largura muito pequena */
+  .teclado-principal {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+  }
+  
+  .contador-visitas {
+      grid-template-columns: 1fr;
+  }
+  
+  .menu-superior {
+      justify-content: center;
+  }
+  
+  .botao-menu {
+      min-width: 65px;
+      max-width: 75px;
+  }
+}
+
+/* Ajuste para modo paisagem */
+@media (orientation: landscape) and (max-height: 500px) {
+  .layout-principal {
+      flex-direction: row;
+  }
+  
+  .menu-superior {
+      display: none;
+  }
+  
+  .conteudo-principal {
+      flex: 1;
+      padding: 10px;
+  }
+  
+  .cabecalho {
+      display: none;
+  }
+  
+  .teclado-principal {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      max-width: 100%;
+  }
+  
+  .tecla {
+      font-size: 1.4rem;
       min-height: 60px;
   }
   
@@ -508,12 +406,26 @@ body.modo-dia .contador-item {
   }
 }
 
-/* Remover qualquer animação piscante */
+/* Remover elementos indesejados */
 [class*="piscar"], [class*="flash"], [class*="blink"] {
   display: none !important;
 }
 
-/* Remover pontos/círculos */
 .indicador-audio, .ponto-vermelho, .circulo-piscando {
   display: none !important;
+}
+
+/* Ajuste para iOS */
+@supports (-webkit-touch-callout: none) {
+  .tecla {
+      -webkit-tap-highlight-color: transparent;
+  }
+  
+  body {
+      height: -webkit-fill-available;
+  }
+  
+  .layout-principal {
+      min-height: -webkit-fill-available;
+  }
 }
