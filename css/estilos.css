@@ -275,16 +275,6 @@ body.modo-dia .tecla.ativa {
   animation: pulsar 2s infinite;
 }
 
-/* Teclas extras - estilo diferente */
-.tecla_extra1, .tecla_extra2, .tecla_extra3 {
-  font-size: 1.8em;
-  background: linear-gradient(145deg, #667eea, #764ba2) !important;
-}
-
-.tecla_extra1:hover, .tecla_extra2:hover, .tecla_extra3:hover {
-  background: linear-gradient(145deg, #764ba2, #667eea) !important;
-}
-
 /* Badge para indicar tecla editada */
 .tecla::after {
   content: '';

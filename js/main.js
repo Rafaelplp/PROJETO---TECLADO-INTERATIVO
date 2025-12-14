@@ -43,24 +43,24 @@ class TecladoInterativo {
             const somId = tecla.dataset.som;
             const idAudio = `#som_tecla_${somId}`;
             
-            // Configurar emoji editado
+            // Configurar emoji editado (APLICAR PARA TODAS as teclas)
             if (this.emojiEditados[tecla.className]) {
                 tecla.textContent = this.emojiEditados[tecla.className];
                 tecla.classList.add('editado');
             }
             
-            // Configurar cor personalizada
+            // Configurar cor personalizada (APLICAR PARA TODAS as teclas)
             if (this.coresTeclas[tecla.className]) {
                 tecla.style.background = this.coresTeclas[tecla.className];
                 tecla.classList.add('editado');
             }
             
-            // Salvar emoji original
+            // Salvar emoji original para TODAS as teclas
             if (!tecla.dataset.emojiOriginal) {
                 tecla.dataset.emojiOriginal = tecla.textContent;
             }
             
-            // Configurar eventos
+            // Configurar eventos (IGUAL para todas as teclas)
             tecla.onclick = () => {
                 if (this.modoEdicao) {
                     this.abrirModalEdicao(tecla);
@@ -68,7 +68,7 @@ class TecladoInterativo {
                     this.tocarSom(idAudio);
                 }
             };
-
+    
             tecla.onkeydown = (e) => {
                 if (e.code === 'Space' || e.code === 'Enter') {
                     tecla.classList.add('ativa');
@@ -78,7 +78,7 @@ class TecladoInterativo {
                     e.preventDefault();
                 }
             };
-
+    
             tecla.onkeyup = () => {
                 tecla.classList.remove('ativa');
             };

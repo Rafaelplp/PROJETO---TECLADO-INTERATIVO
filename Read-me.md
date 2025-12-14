@@ -1,6 +1,26 @@
 # 🎹 Teclado Interativo
 
 Um teclado virtual interativo desenvolvido com HTML, CSS e JavaScript.
+## 🆕 Teclas Extras
+
+As 3 teclas extras agora têm:
+
+- ✅ Mesma estrutura visual das outras teclas
+- ✅ Sistema de cores personalizáveis
+- ✅ Emojis editáveis
+- ✅ Sons personalizáveis
+- ✅ Efeitos visuais idênticos
+- ✅ Responsividade igual
+
+## 🎨 Personalização
+
+Todas as 12 teclas podem ser personalizadas individualmente:
+1. Clique em "Editar Teclado" no menu lateral
+2. Clique em qualquer tecla (incluindo as extras)
+3. Altere:
+   - Emoji/texto
+   - Cor da tecla
+   - Som associado
 
 ## ✨ Funcionalidades
 
