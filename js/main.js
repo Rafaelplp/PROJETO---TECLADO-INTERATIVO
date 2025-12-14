@@ -10,7 +10,7 @@ class TecladoInterativo {
         this.coresTeclas = JSON.parse(localStorage.getItem('coresTeclas')) || {};
         this.sonsEditados = JSON.parse(localStorage.getItem('sonsEditados')) || {};
         this.emojiEditados = JSON.parse(localStorage.getItem('emojiEditados')) || {};
-        
+
         // Controle de scroll
         this.scrollAtivo = false;
         this.scrollTimeout = null;
@@ -66,7 +66,9 @@ class TecladoInterativo {
             '💯': '&#128175',
             '❤️': '&#10084;&#65039'
         };
-        
+
+        // Otimizar layout para diferentes orientações
+        this.otimizarLayout();
         // Inicializar
         this.inicializar();
     }
@@ -1185,12 +1187,106 @@ class TecladoInterativo {
             }
         }, { passive: false });
     }
+     // Novo método para otimizar layout
+     otimizarLayout() {
+        // Função para ajustar layout baseado na orientação
+        const ajustarLayout = () => {
+            const isLandscape = window.innerWidth > window.innerHeight;
+            const appContainer = document.querySelector('.app-container');
+            const tecladoContainer = document.querySelector('.teclado-container');
+            const rodape = document.querySelector('.rodape');
+            
+            if (!appContainer || !tecladoContainer || !rodape) return;
+            
+            if (isLandscape) {
+                // Modo paisagem
+                document.body.style.overflowY = 'auto';
+                appContainer.style.minHeight = 'auto';
+                
+                // Calcular altura disponível
+                const alturaViewport = window.innerHeight;
+                const alturaMenu = document.querySelector('.menu-superior').offsetHeight;
+                const alturaCabecalho = document.querySelector('.cabecalho').offsetHeight;
+                const alturaRodape = rodape.offsetHeight;
+                const margens = 40;
+                
+                const alturaDisponivel = alturaViewport - alturaMenu - alturaCabecalho - alturaRodape - margens;
+                
+                // Ajustar teclado
+                tecladoContainer.style.maxHeight = `${Math.max(alturaDisponivel, 200)}px`;
+                tecladoContainer.style.overflowY = 'auto';
+                
+                // Garantir que rodapé esteja visível
+                rodape.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            } else {
+                // Modo retrato
+                document.body.style.overflowY = 'auto';
+                appContainer.style.minHeight = '100vh';
+                tecladoContainer.style.maxHeight = 'none';
+                tecladoContainer.style.overflowY = 'visible';
+            }
+            
+            // Garantir que o rodapé não tenha scroll horizontal
+            rodape.style.overflowX = 'hidden';
+            rodape.style.whiteSpace = 'normal';
+            
+            // Ajustar contador para caber sem scroll
+            const contadorVisitas = rodape.querySelector('.contador-visitas');
+            if (contadorVisitas) {
+                const larguraRodape = rodape.offsetWidth;
+                const larguraItens = Array.from(contadorVisitas.children).reduce((total, item) => {
+                    return total + item.offsetWidth;
+                }, 0);
+                
+                // Se não couber em uma linha, quebrar
+                if (larguraItens > larguraRodape * 0.9) {
+                    contadorVisitas.style.flexWrap = 'wrap';
+                    contadorVisitas.style.justifyContent = 'center';
+                } else {
+                    contadorVisitas.style.flexWrap = 'nowrap';
+                }
+            }
+        };
+        
+        // Executar ajustes inicialmente
+        setTimeout(ajustarLayout, 100);
+        
+        // Reajustar em eventos
+        window.addEventListener('resize', ajustarLayout);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(ajustarLayout, 300);
+        });
+        
+        // Ajustar quando conteúdo carregar
+        window.addEventListener('load', ajustarLayout);
+        
+        // Verificar periodicamente
+        setInterval(ajustarLayout, 2000);
+    }
 }
 
 // ========== INICIALIZAÇÃO ==========
 
 document.addEventListener('DOMContentLoaded', () => {
     window.tecladoInterativo = new TecladoInterativo();
+
+    // Garantir que a página tenha scroll vertical se necessário
+    const verificarScroll = () => {
+        const bodyHeight = document.body.scrollHeight;
+        const viewportHeight = window.innerHeight;
+        
+        if (bodyHeight > viewportHeight) {
+            document.body.style.overflowY = 'auto';
+            document.documentElement.style.overflowY = 'auto';
+        } else {
+            document.body.style.overflowY = 'hidden';
+            document.documentElement.style.overflowY = 'hidden';
+        }
+    };
+    
+    setTimeout(verificarScroll, 500);
+    window.addEventListener('resize', verificarScroll);
+
 });
 
 // Adicionar em main.js
