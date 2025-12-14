@@ -1,5 +1,6 @@
-// main.js - Teclado Interativo v4.0.0 - SEM CONTADOR DE SONS
-// Menu ajustado para mesmo tamanho do rodapé
+// main.js - Teclado Interativo v4.1.0
+// Menu 15% maior e rodapé horizontal
+// Suporte a códigos HTML de emoji
 
 class TecladoInterativo {
     constructor() {
@@ -16,6 +17,79 @@ class TecladoInterativo {
         this.toqueDelay = 300;
         this.touchAtivo = false;
         
+        // Dicionário de emojis HTML
+        this.emojiCodes = {
+            '😊': '&#128578',
+            '😂': '&#128514',
+            '🤣': '&#129315',
+            '😍': '&#128525',
+            '😎': '&#128526',
+            '😭': '&#128557',
+            '😘': '&#128536',
+            '🤔': '&#129300',
+            '😴': '&#128564',
+            '👍': '&#128077',
+            '👎': '&#128078',
+            '👏': '&#128079',
+            '🙏': '&#128591',
+            '🎮': '&#127918',
+            '🎵': '&#127925',
+            '✨': '&#10024',
+            '🔥': '&#128293',
+            '💀': '&#128128',
+            '💩': '&#128169',
+            '👻': '&#128123',
+            '👽': '&#128125',
+            '🤖': '&#129302',
+            '🎉': '&#127881',
+            '🎊': '&#127882',
+            '💯': '&#128175',
+            '❤️': '&#10084;&#65039',
+            '💔': '&#128148',
+            '💕': '&#128149',
+            '💖': '&#128150',
+            '💗': '&#128151',
+            '💘': '&#128152',
+            '💙': '&#128153',
+            '💚': '&#128154',
+            '💛': '&#128155',
+            '💜': '&#128156',
+            '🖤': '&#128420',
+            '🤍': '&#129293',
+            '🤎': '&#129294',
+            '💋': '&#128139',
+            '👁️': '&#128065;&#65039',
+            '🧠': '&#129504',
+            '🦴': '&#129460',
+            '🦷': '&#129463',
+            '👅': '&#128069',
+            '👄': '&#128068',
+            '👃': '&#128067',
+            '👂': '&#128066',
+            '👁': '&#128065',
+            '💪': '&#128170',
+            '🦵': '&#129461',
+            '🦶': '&#129462',
+            '👋': '&#128075',
+            '🤚': '&#129306',
+            '🖐️': '&#128400;&#65039',
+            '✋': '&#9995',
+            '🖖': '&#128406',
+            '👌': '&#128076',
+            '🤏': '&#129311',
+            '✌️': '&#9996;&#65039',
+            '🤞': '&#129310',
+            '🤟': '&#129311',
+            '🤘': '&#129304',
+            '🤙': '&#129305',
+            '👈': '&#128072',
+            '👉': '&#128073',
+            '👆': '&#128070',
+            '👇': '&#128071',
+            '🖕': '&#128405',
+            '☝️': '&#9757;&#65039'
+        };
+        
         // Inicializar
         this.inicializar();
     }
@@ -23,7 +97,7 @@ class TecladoInterativo {
     // ========== INICIALIZAÇÃO ==========
     
     inicializar() {
-        console.log('🎹 Teclado Interativo v4.0.0 - Iniciando...');
+        console.log('🎹 Teclado Interativo v4.1.0 - Iniciando...');
         
         // Configurar modo noturno
         this.configurarModoNoturno();
@@ -80,7 +154,8 @@ class TecladoInterativo {
     restaurarConfiguracoesTecla(tecla) {
         // Restaurar emoji
         if (this.emojiEditados[tecla.className]) {
-            tecla.textContent = this.emojiEditados[tecla.className];
+            const emojiEditado = this.emojiEditados[tecla.className];
+            tecla.innerHTML = this.decodificarEmoji(emojiEditado);
             tecla.classList.add('editado');
         }
         
@@ -145,7 +220,7 @@ class TecladoInterativo {
         }, { passive: false });
     }
 
-    // ========== SISTEMA DE SOM (FUNCIONAL) ==========
+    // ========== SISTEMA DE SOM ==========
     
     tocarSom(idElementoAudio) {
         const audioElement = document.querySelector(idElementoAudio);
@@ -245,7 +320,7 @@ class TecladoInterativo {
         this.mostrarFeedback('⏹️ Todos os sons parados', 1500);
     }
 
-    // ========== MODO EDIÇÃO (FUNCIONAL) ==========
+    // ========== MODO EDIÇÃO ==========
     
     toggleModoEdicao() {
         this.modoEdicao = !this.modoEdicao;
@@ -284,6 +359,22 @@ class TecladoInterativo {
             if (match) corAtual = match[0];
         }
         
+        // Preparar exemplos de emojis
+        const exemplosEmoji = `
+            <div class="emoji-exemplos">
+                <div class="emoji-exemplo" data-emoji="&#129300">&#129300</div>
+                <div class="emoji-exemplo" data-emoji="&#128578">&#128578</div>
+                <div class="emoji-exemplo" data-emoji="&#128565">&#128565</div>
+                <div class="emoji-exemplo" data-emoji="&#129315">&#129315</div>
+                <div class="emoji-exemplo" data-emoji="&#128525">&#128525</div>
+                <div class="emoji-exemplo" data-emoji="&#127918">&#127918</div>
+                <div class="emoji-exemplo" data-emoji="&#127925">&#127925</div>
+                <div class="emoji-exemplo" data-emoji="&#10024">&#10024</div>
+                <div class="emoji-exemplo" data-emoji="&#128514">&#128514</div>
+                <div class="emoji-exemplo" data-emoji="&#128557">&#128557</div>
+            </div>
+        `;
+        
         modal.innerHTML = `
             <div class="modal-container">
                 <div class="modal-header">
@@ -295,8 +386,9 @@ class TecladoInterativo {
                     <div class="grupo-form">
                         <label>Emoji/Texto:</label>
                         <input type="text" id="editar-emoji" class="input-emoji" 
-                               value="${tecla.textContent}" maxlength="2">
-                        <small>Máx. 2 caracteres</small>
+                               value="${tecla.textContent}" maxlength="15" placeholder="Digite emoji ou código HTML (ex: &#129300)">
+                        <small>Aceita emojis diretos ou códigos HTML (máx. 15 caracteres)</small>
+                        ${exemplosEmoji}
                     </div>
                     
                     <div class="grupo-form">
@@ -348,6 +440,8 @@ class TecladoInterativo {
         const inputCor = modal.querySelector('#editar-cor');
         const previewCor = modal.querySelector('.preview-cor');
         const coresRapidas = modal.querySelectorAll('.cor-rapida');
+        const inputEmoji = modal.querySelector('#editar-emoji');
+        const exemplosEmoji = modal.querySelectorAll('.emoji-exemplo');
         
         // Cores rápidas
         coresRapidas.forEach(corEl => {
@@ -358,9 +452,24 @@ class TecladoInterativo {
             });
         });
         
-        // Atualizar preview
+        // Atualizar preview da cor
         inputCor.addEventListener('input', () => {
             previewCor.style.background = inputCor.value;
+        });
+        
+        // Exemplos de emoji
+        exemplosEmoji.forEach(exemplo => {
+            exemplo.addEventListener('click', () => {
+                const emoji = exemplo.dataset.emoji;
+                inputEmoji.value = emoji;
+                // Feedback visual
+                exemplo.style.transform = 'scale(1.2)';
+                exemplo.style.background = 'rgba(0, 212, 255, 0.3)';
+                setTimeout(() => {
+                    exemplo.style.transform = '';
+                    exemplo.style.background = '';
+                }, 300);
+            });
         });
         
         // Testar som
@@ -389,145 +498,22 @@ class TecladoInterativo {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) fecharModal();
         });
-        
-        // CSS adicional para o modal
-        const style = document.createElement('style');
-        style.textContent = `
-            .modal-conteudo {
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .grupo-form {
-                display: flex;
-                flex-direction: column;
-                gap: 5px;
-            }
-            
-            .grupo-form label {
-                font-weight: 600;
-                color: #00d4ff;
-                font-size: 0.9rem;
-            }
-            
-            .input-emoji, .input-cor, .input-som {
-                padding: 8px 12px;
-                border-radius: 8px;
-                border: 2px solid rgba(255, 255, 255, 0.1);
-                background: rgba(255, 255, 255, 0.05);
-                color: white;
-                font-family: 'Montserrat', sans-serif;
-            }
-            
-            .seletor-cor-container {
-                display: flex;
-                gap: 10px;
-                align-items: center;
-            }
-            
-            .preview-cor {
-                width: 40px;
-                height: 40px;
-                border-radius: 8px;
-                border: 2px solid rgba(255, 255, 255, 0.2);
-            }
-            
-            .paleta-cores {
-                display: grid;
-                grid-template-columns: repeat(5, 1fr);
-                gap: 8px;
-                margin-top: 5px;
-            }
-            
-            .cor-rapida {
-                width: 30px;
-                height: 30px;
-                border-radius: 6px;
-                cursor: pointer;
-                border: 2px solid transparent;
-                transition: transform 0.2s;
-            }
-            
-            .cor-rapida:hover {
-                transform: scale(1.1);
-            }
-            
-            .btn-teste-som {
-                margin-top: 5px;
-                padding: 6px 12px;
-                background: rgba(255, 255, 255, 0.1);
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                border-radius: 6px;
-                color: white;
-                font-size: 0.8rem;
-                cursor: pointer;
-            }
-            
-            .modal-botoes {
-                display: flex;
-                gap: 10px;
-                margin-top: 15px;
-            }
-            
-            .btn-modal {
-                flex: 1;
-                padding: 10px;
-                border-radius: 8px;
-                border: none;
-                font-family: 'Montserrat', sans-serif;
-                font-weight: 600;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 5px;
-            }
-            
-            .btn-salvar {
-                background: linear-gradient(135deg, #00d4ff, #0077cc);
-                color: white;
-            }
-            
-            .btn-reset {
-                background: rgba(255, 255, 255, 0.1);
-                color: white;
-            }
-            
-            .btn-cancelar {
-                background: rgba(255, 107, 107, 0.2);
-                color: #ff6b6b;
-            }
-            
-            small {
-                font-size: 0.7rem;
-                opacity: 0.7;
-            }
-            
-            @media (max-width: 480px) {
-                .paleta-cores {
-                    grid-template-columns: repeat(3, 1fr);
-                }
-                
-                .modal-botoes {
-                    flex-direction: column;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-        
-        // Remover estilo quando modal fechar
-        modal.addEventListener('remove', () => style.remove());
     }
     
     salvarEdicaoTecla(tecla, modal) {
-        const novoEmoji = modal.querySelector('#editar-emoji').value.trim();
+        let novoEmoji = modal.querySelector('#editar-emoji').value.trim();
         const novaCor = modal.querySelector('#editar-cor').value;
         const arquivoSom = modal.querySelector('#editar-som').files[0];
         
-        // Salvar emoji
+        // Processar emoji
         if (novoEmoji) {
-            tecla.textContent = novoEmoji;
+            // Se for código HTML, converter para emoji
+            if (novoEmoji.includes('&#')) {
+                novoEmoji = this.decodificarEmoji(novoEmoji);
+            }
+            
+            // Salvar emoji
+            tecla.innerHTML = novoEmoji;
             this.emojiEditados[tecla.className] = novoEmoji;
             tecla.classList.add('editado');
         }
@@ -565,12 +551,37 @@ class TecladoInterativo {
         this.mostrarFeedback('✅ Tecla atualizada!', 1500);
     }
     
+    // ========== FUNÇÕES PARA TRATAR EMOJIS ==========
+    
+    decodificarEmoji(codigo) {
+        // Se já for um emoji direto, retorna
+        if (!codigo.includes('&#')) return codigo;
+        
+        // Converte código HTML para emoji
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = codigo;
+        return tempDiv.textContent || tempDiv.innerText || codigo;
+    }
+    
+    codificarParaHTML(emoji) {
+        // Tenta encontrar código HTML correspondente
+        for (const [key, value] of Object.entries(this.emojiCodes)) {
+            if (key === emoji) {
+                return value;
+            }
+        }
+        // Se não encontrar, retorna o emoji original
+        return emoji;
+    }
+
     resetarTeclaIndividual(tecla) {
         const className = tecla.className;
         const somId = tecla.dataset.som;
         
         // Resetar emoji
-        tecla.textContent = tecla.dataset.emojiOriginal;
+        if (tecla.dataset.emojiOriginal) {
+            tecla.innerHTML = this.decodificarEmoji(tecla.dataset.emojiOriginal);
+        }
         delete this.emojiEditados[className];
         
         // Resetar cor
@@ -749,7 +760,7 @@ class TecladoInterativo {
             // Resetar emojis
             document.querySelectorAll('.tecla').forEach(tecla => {
                 if (tecla.dataset.emojiOriginal) {
-                    tecla.textContent = tecla.dataset.emojiOriginal;
+                    tecla.innerHTML = this.decodificarEmoji(tecla.dataset.emojiOriginal);
                 }
                 tecla.classList.remove('editado');
             });
@@ -801,7 +812,7 @@ class TecladoInterativo {
     }
     
     exibirVersao() {
-        const versao = '4.0.0';
+        const versao = '4.1.0';
         const elemento = document.getElementById('versao-app');
         if (elemento) {
             elemento.textContent = versao;
