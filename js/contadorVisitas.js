@@ -1,4 +1,4 @@
-// contadorVisitas.js - Versão 2.0
+// contadorVisitas.js - Sistema de contagem simplificado
 class ContadorVisitas {
     constructor() {
         this.contadorTotal = parseInt(localStorage.getItem('teclado_total_acessos')) || 0;
@@ -9,7 +9,7 @@ class ContadorVisitas {
     inicializar() {
         // Incrementar contador
         this.contadorTotal++;
-        localStorage.setItem('teclado_total_acessos', this.contadorTotal);
+        localStorage.setItem('teclado_total_acessos', this.contadorTotal.toString());
         
         // Salvar último acesso
         localStorage.setItem('teclado_ultimo_acesso', this.ultimoAcesso.toISOString());
@@ -17,12 +17,12 @@ class ContadorVisitas {
         // Atualizar display
         this.atualizarDisplay();
         
-        // Atualizar a cada minuto
+        // Atualizar periodicamente
         setInterval(() => this.atualizarDisplay(), 60000);
     }
 
     atualizarDisplay() {
-        // Online (fixo em 1 para simplicidade)
+        // Online (simplificado - sempre 1)
         const onlineEl = document.getElementById('contador-online');
         if (onlineEl) onlineEl.textContent = '1';
         
@@ -51,5 +51,5 @@ class ContadorVisitas {
 
 // Inicializar
 document.addEventListener('DOMContentLoaded', () => {
-    window.contadorVisitas = new ContadorVisitas();
+    new ContadorVisitas();
 });

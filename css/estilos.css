@@ -1,8 +1,18 @@
-/* ========== RESET E BASE ========== */
+/* ========== VARIÁVEIS ========== */
+:root {
+  --cor-primaria: #1a1a2e;
+  --cor-secundaria: #16213e;
+  --cor-destaque: #00d4ff;
+  --cor-texto: #ffffff;
+  --cor-fundo-claro: #f0f2f5;
+  --cor-texto-claro: #333333;
+  --sombra: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --borda-radius: 12px;
+  --transicao: all 0.3s ease;
+}
+
+/* ========== BASE ========== */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -12,83 +22,82 @@ html, body {
   height: 100%;
   overflow: hidden;
   font-family: 'Montserrat', sans-serif;
-  position: fixed; /* Prevenir bounce no iOS */
 }
 
 body {
-  background-color: #1a1a2e;
-  color: #fff;
+  background-color: var(--cor-primaria);
+  color: var(--cor-texto);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  min-height: -webkit-fill-available; /* iOS fix */
 }
 
 body.modo-dia {
-  background-color: #f0f2f5;
-  color: #333;
+  background-color: var(--cor-fundo-claro);
+  color: var(--cor-texto-claro);
 }
 
-/* ========== LAYOUT PRINCIPAL ========== */
-.layout-principal {
+/* ========== LAYOUT GERAL ========== */
+.app-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  height: -webkit-fill-available; /* iOS fix */
-  overflow: hidden;
-  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px;
+  gap: 10px;
 }
 
-/* ========== MENU SUPERIOR CENTRALIZADO ========== */
+/* ========== MENU SUPERIOR (80% MENOR) ========== */
 .menu-superior {
   display: flex;
-  justify-content: center; /* Centralizado */
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 12px 10px;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 5px;
   background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  flex-wrap: wrap;
   flex-shrink: 0;
-  width: 100%;
+  transform: scale(0.8);
+  transform-origin: top center;
 }
 
 body.modo-dia .menu-superior {
   background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
-  border-bottom-color: rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* Botões do menu - centralizados e responsivos */
 .botao-menu {
-  min-width: 75px;
-  max-width: 90px;
-  padding: 10px 6px;
-  border: none;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.08);
+  min-width: 60px;
+  padding: 6px 4px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
   color: white;
   font-family: 'Montserrat', sans-serif;
+  font-size: 0.65rem;
   font-weight: 500;
-  cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  font-size: 0.75rem;
-  transition: all 0.2s;
+  gap: 3px;
+  cursor: pointer;
+  transition: var(--transicao);
   flex: 1;
-  user-select: none;
-  -webkit-user-select: none;
+  max-width: 70px;
 }
 
 body.modo-dia .botao-menu {
   background: rgba(0, 0, 0, 0.05);
-  color: #333;
+  color: var(--cor-texto-claro);
+}
+
+.botao-menu:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .botao-menu:active {
   transform: scale(0.95);
-  background: rgba(255, 255, 255, 0.15) !important;
 }
 
 .botao-menu.ativo {
@@ -96,36 +105,24 @@ body.modo-dia .botao-menu {
 }
 
 .botao-menu .icone {
-  font-size: 1.2rem;
-  pointer-events: none;
+  font-size: 0.9rem;
 }
 
 .botao-menu .texto {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   line-height: 1;
-  pointer-events: none;
 }
 
-/* ========== CONTEÚDO PRINCIPAL ========== */
-.conteudo-principal {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 15px;
-  overflow: hidden;
-  min-height: 0;
-  width: 100%;
-}
-
+/* ========== CABEÇALHO ========== */
 .cabecalho {
   text-align: center;
-  margin-bottom: 15px;
+  padding: 10px 0;
   flex-shrink: 0;
 }
 
 .cabecalho h1 {
-  font-size: 1.4rem;
-  color: #00d4ff;
+  font-size: 1.8rem;
+  color: var(--cor-destaque);
   margin-bottom: 5px;
   font-weight: 600;
 }
@@ -139,23 +136,22 @@ body.modo-dia .cabecalho h1 {
   opacity: 0.8;
 }
 
-/* ========== TECLADO OTIMIZADO (SEM TOQUE DUPLO) ========== */
+/* ========== TECLADO ========== */
 .teclado-container {
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 10px 0;
   min-height: 0;
-  padding: 5px 0;
-  width: 100%;
 }
 
 .teclado-principal {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 12px;
   width: 100%;
-  max-width: 500px;
+  max-width: 550px;
   margin: 0 auto;
 }
 
@@ -168,20 +164,17 @@ body.modo-dia .cabecalho h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s;
+  transition: transform 0.1s;
   background: linear-gradient(145deg, #2d2d44, #232337);
-  box-shadow: 4px 4px 8px #1a1a2e,
-              -4px -4px 8px #2a2a3e;
+  box-shadow: 5px 5px 10px #1a1a2e,
+              -5px -5px 10px #2a2a3e;
   color: white;
-  padding: 0;
-  min-height: 0;
   user-select: none;
   -webkit-user-select: none;
   position: relative;
   overflow: hidden;
 }
 
-/* PREVENIR TOQUE DUPLO */
 .tecla::after {
   content: '';
   position: absolute;
@@ -190,26 +183,24 @@ body.modo-dia .cabecalho h1 {
   right: 0;
   bottom: 0;
   background: transparent;
-  pointer-events: none;
 }
 
 .tecla:active {
-  transform: scale(0.96) !important;
-  transition: transform 0.1s !important;
+  transform: scale(0.95);
 }
 
 .tecla.tocando {
-  animation: pulsarTecla 0.3s ease;
+  animation: pulsarTecla 0.2s ease;
+}
+
+@keyframes pulsarTecla {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.95); }
 }
 
 .tecla.modo-edicao {
   border: 3px dashed #ff9900;
   animation: pulsarEdicao 2s infinite;
-}
-
-@keyframes pulsarTecla {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(0.96); }
 }
 
 @keyframes pulsarEdicao {
@@ -219,30 +210,29 @@ body.modo-dia .cabecalho h1 {
 
 body.modo-dia .tecla {
   background: linear-gradient(145deg, #ffffff, #e6e6e6);
-  box-shadow: 4px 4px 8px #d9d9d9,
-              -4px -4px 8px #ffffff;
-  color: #333;
+  box-shadow: 5px 5px 10px #d9d9d9,
+              -5px -5px 10px #ffffff;
+  color: var(--cor-texto-claro);
 }
 
-/* ========== RODAPÉ CENTRALIZADO E AJUSTADO ========== */
+/* ========== RODAPÉ ========== */
 .rodape {
   background-color: rgba(0, 0, 0, 0.3);
-  padding: 10px 15px;
+  padding: 10px 12px;
+  border-radius: 10px;
   backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
-  width: 100%;
 }
 
 body.modo-dia .rodape {
   background-color: rgba(0, 0, 0, 0.05);
-  border-top-color: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.1);
 }
 
 .contador-visitas {
-  display: flex;
-  justify-content: center; /* Centralizado */
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   margin-bottom: 8px;
 }
@@ -252,13 +242,8 @@ body.modo-dia .rodape {
   align-items: center;
   gap: 8px;
   background-color: rgba(255, 255, 255, 0.08);
-  padding: 8px 12px;
-  border-radius: 10px;
-  min-width: 0;
-  flex: 1;
-  min-width: 140px; /* Tamanho mínimo */
-  max-width: 180px; /* Tamanho máximo */
-  justify-content: center; /* Centraliza conteúdo */
+  padding: 8px 10px;
+  border-radius: 8px;
 }
 
 body.modo-dia .contador-item {
@@ -273,28 +258,17 @@ body.modo-dia .contador-item {
 .contador-info {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centralizado */
-  text-align: center;
   min-width: 0;
-  flex: 1;
 }
 
 .contador-label {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   opacity: 0.8;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
 }
 
 .contador-valor {
   font-weight: 600;
-  font-size: 0.9rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
+  font-size: 0.85rem;
 }
 
 #contador-online {
@@ -302,12 +276,12 @@ body.modo-dia .contador-item {
 }
 
 #contador-total {
-  color: #00d4ff;
+  color: var(--cor-destaque);
 }
 
 #ultimo-acesso {
   color: #ffaa00;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
 #versao-app {
@@ -322,36 +296,149 @@ body.modo-dia .contador-item {
   margin-top: 5px;
 }
 
-/* ========== RESPONSIVIDADE COMPLETA ========== */
+/* ========== MODAL ========== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+}
 
-/* Tablets e telas maiores */
-@media (min-width: 768px) {
+.modal-container {
+  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+  border-radius: 15px;
+  padding: 20px;
+  max-width: 400px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+body.modo-dia .modal-container {
+  background: linear-gradient(135deg, #ffffff, #f5f5f5);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.modo-dia .modal-header {
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: var(--cor-destaque);
+  font-size: 1.2rem;
+}
+
+body.modo-dia .modal-header h3 {
+  color: #0077cc;
+}
+
+.btn-fechar {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #ff6b6b;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========== RESPONSIVIDADE ========== */
+@media (max-width: 768px) {
+  .app-container {
+      padding: 8px;
+      gap: 8px;
+  }
+  
   .menu-superior {
-      justify-content: center;
-      gap: 12px;
-      padding: 15px;
+      gap: 4px;
+      padding: 6px 4px;
   }
   
   .botao-menu {
-      min-width: 90px;
-      max-width: 110px;
-      padding: 12px 8px;
+      min-width: 55px;
+      padding: 5px 3px;
+      font-size: 0.6rem;
   }
   
   .botao-menu .icone {
-      font-size: 1.4rem;
-  }
-  
-  .botao-menu .texto {
       font-size: 0.8rem;
   }
   
   .cabecalho h1 {
-      font-size: 1.8rem;
+      font-size: 1.4rem;
   }
   
   .subtitulo {
-      font-size: 0.9rem;
+      font-size: 0.7rem;
+  }
+  
+  .teclado-principal {
+      gap: 10px;
+      max-width: 450px;
+  }
+  
+  .tecla {
+      font-size: 1.6rem;
+      border-radius: 12px;
+  }
+  
+  .contador-visitas {
+      grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .teclado-principal {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      max-width: 320px;
+  }
+  
+  .tecla {
+      font-size: 1.4rem;
+  }
+  
+  .contador-visitas {
+      grid-template-columns: 1fr;
+  }
+  
+  .menu-superior {
+      transform: scale(0.7);
+  }
+}
+
+/* Desktop específico */
+@media (min-width: 769px) {
+  .app-container {
+      padding: 20px;
+      gap: 15px;
+  }
+  
+  .menu-superior {
+      transform: scale(0.9);
   }
   
   .teclado-principal {
@@ -360,348 +447,76 @@ body.modo-dia .contador-item {
   }
   
   .tecla {
-      font-size: 2.2rem;
-      border-radius: 18px;
-  }
-  
-  .contador-item {
-      min-width: 160px;
-      max-width: 200px;
-      padding: 10px 15px;
-  }
-  
-  .contador-label {
-      font-size: 0.8rem;
-  }
-  
-  .contador-valor {
-      font-size: 1rem;
-  }
-}
-
-/* Celulares pequenos (até 360px) */
-@media (max-width: 360px) {
-  .menu-superior {
-      gap: 6px;
-      padding: 10px 6px;
-  }
-  
-  .botao-menu {
-      min-width: 65px;
-      max-width: 75px;
-      padding: 8px 4px;
-  }
-  
-  .botao-menu .icone {
-      font-size: 1rem;
-  }
-  
-  .botao-menu .texto {
-      font-size: 0.65rem;
-  }
-  
-  .cabecalho h1 {
-      font-size: 1.2rem;
-  }
-  
-  .subtitulo {
-      font-size: 0.7rem;
-  }
-  
-  .teclado-principal {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-  }
-  
-  .tecla {
-      font-size: 1.6rem;
-  }
-  
-  .contador-visitas {
-      grid-template-columns: 1fr;
-  }
-  
-  .contador-item {
-      min-width: 100%;
-      max-width: 100%;
-  }
-}
-
-/* Telas muito altas */
-@media (min-height: 800px) {
-  .teclado-principal {
-      max-width: 550px;
-      gap: 12px;
-  }
-  
-  .tecla {
       font-size: 2rem;
   }
 }
 
-/* Telas muito baixas */
-@media (max-height: 600px) {
-  .cabecalho {
-      margin-bottom: 10px;
-  }
-  
-  .cabecalho h1 {
-      font-size: 1.2rem;
-  }
-  
-  .subtitulo {
-      display: none;
-  }
-  
-  .teclado-principal {
-      gap: 8px;
-  }
-  
-  .tecla {
-      font-size: 1.6rem;
-  }
-}
-
-/* ========== MODO PAISAGEM (LANDSCAPE) ========== */
-@media (orientation: landscape) {
-  .layout-principal {
+/* Modo paisagem */
+@media (orientation: landscape) and (max-height: 500px) {
+  .app-container {
       flex-direction: row;
-      height: 100vh;
+      flex-wrap: wrap;
   }
   
   .menu-superior {
-      flex-direction: column;
-      width: auto;
-      height: 100%;
-      padding: 10px;
-      justify-content: flex-start;
-      border-bottom: none;
-      border-right: 1px solid rgba(255, 255, 255, 0.1);
-      overflow-y: auto;
-  }
-  
-  body.modo-dia .menu-superior {
-      border-right-color: rgba(0, 0, 0, 0.1);
-  }
-  
-  .botao-menu {
-      min-width: 70px;
-      max-width: 80px;
-      margin-bottom: 8px;
-  }
-  
-  .conteudo-principal {
-      flex: 1;
-      padding: 10px;
-      overflow-y: auto;
+      order: 1;
+      width: 100%;
+      transform: scale(0.7);
   }
   
   .cabecalho {
-      margin-bottom: 10px;
-  }
-  
-  .cabecalho h1 {
-      font-size: 1.3rem;
+      order: 2;
+      display: none;
   }
   
   .teclado-container {
-      height: 100%;
-      align-items: flex-start;
-      padding-top: 10px;
+      order: 3;
+      flex: 1;
+      min-width: 0;
   }
   
   .teclado-principal {
-      max-width: 100%;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
+      gap: 6px;
   }
   
   .tecla {
-      font-size: 1.6rem;
+      font-size: 1.4rem;
       min-height: 70px;
   }
   
   .rodape {
-      display: none; /* Esconde rodapé no landscape para economizar espaço */
-  }
-  
-  /* Ajuste para landscape com altura muito baixa */
-  @media (max-height: 500px) {
-      .menu-superior {
-          padding: 5px;
-      }
-      
-      .botao-menu {
-          min-width: 60px;
-          max-width: 65px;
-          padding: 6px 3px;
-          margin-bottom: 5px;
-      }
-      
-      .botao-menu .icone {
-          font-size: 0.9rem;
-      }
-      
-      .botao-menu .texto {
-          font-size: 0.6rem;
-      }
-      
-      .cabecalho {
-          display: none;
-      }
-      
-      .teclado-principal {
-          gap: 5px;
-      }
-      
-      .tecla {
-          font-size: 1.4rem;
-          min-height: 60px;
-      }
-  }
-  
-  /* Ajuste para landscape com largura grande */
-  @media (min-width: 800px) and (orientation: landscape) {
-      .teclado-principal {
-          max-width: 700px;
-          gap: 12px;
-      }
-      
-      .tecla {
-          font-size: 1.8rem;
-          min-height: 80px;
-      }
+      order: 4;
+      display: none;
   }
 }
 
-/* ========== DISPOSITIVOS ESPECÍFICOS ========== */
-
-/* iPhone SE / 5 */
-@media (device-width: 320px) and (device-height: 568px) {
-  .teclado-principal {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      max-width: 300px;
-  }
-  
-  .tecla {
-      font-size: 1.5rem;
-  }
-  
-  .contador-item {
-      min-width: 120px;
-  }
+/* ========== FEEDBACK ========== */
+.feedback-rapido {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 10000;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+  animation: feedbackEntrada 0.3s ease;
 }
 
-/* iPhone 6.1" - 13/14 */
-@media (device-width: 390px) and (device-height: 844px) {
-  .teclado-principal {
-      max-width: 380px;
-      gap: 10px;
+@keyframes feedbackEntrada {
+  from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(20px);
   }
-  
-  .tecla {
-      font-size: 1.8rem;
+  to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
   }
-}
-
-/* Samsung Galaxy S23 (6.1") */
-@media (device-width: 360px) and (device-height: 780px) {
-  .teclado-principal {
-      max-width: 340px;
-      gap: 9px;
-  }
-  
-  .tecla {
-      font-size: 1.7rem;
-  }
-}
-
-/* Tablets pequenos */
-@media (min-width: 600px) and (max-width: 768px) {
-  .teclado-principal {
-      max-width: 550px;
-      gap: 12px;
-  }
-  
-  .tecla {
-      font-size: 2rem;
-  }
-}
-
-/* ========== AJUSTES DE TOQUE ========== */
-/* Prevenir toque duplo e melhorar resposta tátil */
-.tecla {
-  -webkit-touch-callout: none;
-  -webkit-user-drag: none;
-}
-
-/* Melhor feedback tátil */
-.tecla:active::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
-}
-
-/* Prevenir seleção de texto */
-.tecla, .botao-menu {
-  user-select: none;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-}
-
-/* Remover efeito azul no toque no Android */
-.tecla, .botao-menu, input, button {
-  -webkit-tap-highlight-color: transparent;
-  outline: none;
-}
-
-/* ========== AJUSTES PARA iOS ========== */
-@supports (-webkit-touch-callout: none) {
-  body {
-      /* Prevenir bounce no iOS */
-      overflow: hidden;
-      position: fixed;
-      width: 100%;
-      height: 100%;
-  }
-  
-  .tecla {
-      cursor: pointer;
-  }
-  
-  /* Melhorar performance no iOS */
-  .teclado-principal, .tecla {
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
-  }
-}
-
-/* ========== ANIMAÇÕES OTIMIZADAS ========== */
-/* Desabilitar animações para usuários que preferem reduzir movimento */
-@media (prefers-reduced-motion: reduce) {
-  .tecla, .botao-menu, .modal-container {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-  }
-  
-  .tecla:active {
-      transform: scale(0.98) !important;
-  }
-}
-
-/* Remover elementos indesejados */
-[class*="piscar"], [class*="flash"], [class*="blink"] {
-  display: none !important;
-}
-
-.indicador-audio, .ponto-vermelho, .circulo-piscando {
-  display: none !important;
 }

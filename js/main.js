@@ -1,49 +1,61 @@
-// main.js - Teclado Interativo v3.3.0
-// Correções: Toque duplo, otimização mobile
+// main.js - Teclado Interativo v4.0.0 - SEM CONTADOR DE SONS
+// Menu ajustado para mesmo tamanho do rodapé
 
 class TecladoInterativo {
     constructor() {
+        // Estado do aplicativo
         this.audioAtual = null;
         this.modoEdicao = false;
         this.modoNoturno = localStorage.getItem('modoNoturno') === 'true';
-        this.contadorSons = parseInt(localStorage.getItem('contadorSons')) || 0;
         this.coresTeclas = JSON.parse(localStorage.getItem('coresTeclas')) || {};
         this.sonsEditados = JSON.parse(localStorage.getItem('sonsEditados')) || {};
         this.emojiEditados = JSON.parse(localStorage.getItem('emojiEditados')) || {};
-        this.ultimoToque = 0; // Para prevenir toque duplo
-        this.toqueDelay = 300; // Delay mínimo entre toques (ms)
         
+        // Controle de toque
+        this.ultimoToque = 0;
+        this.toqueDelay = 300;
+        this.touchAtivo = false;
+        
+        // Inicializar
         this.inicializar();
     }
 
+    // ========== INICIALIZAÇÃO ==========
+    
     inicializar() {
-        console.log('🎹 Teclado Interativo v3.3.0');
+        console.log('🎹 Teclado Interativo v4.0.0 - Iniciando...');
         
+        // Configurar modo noturno
         this.configurarModoNoturno();
+        
+        // Configurar elementos
         this.configurarTeclas();
         this.configurarControles();
         this.restaurarConfiguracoes();
-        this.atualizarContadorSons();
         this.configurarEventosGlobais();
         this.exibirVersao();
         
-        // Configurar viewport para mobile
-        this.configurarViewport();
+        // Inicializar áudio
+        this.inicializarAudio();
+        
+        console.log('✅ Teclado pronto para uso!');
     }
-
-    // ========== CONFIGURAÇÃO DO VIEWPORT ==========
     
-    configurarViewport() {
-        // Ajustar viewport para iOS
-        if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-            const viewport = document.querySelector('meta[name="viewport"]');
-            if (viewport) {
-                viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
-            }
-        }
+    inicializarAudio() {
+        // Garantir que todos os áudios estão carregados
+        document.querySelectorAll('audio').forEach(audio => {
+            audio.preload = 'auto';
+            audio.load();
+            
+            // Adicionar tratamento de erro
+            audio.addEventListener('error', (e) => {
+                console.error(`❌ Erro no áudio ${audio.id}:`, e);
+                this.mostrarFeedback(`❌ Erro no som ${audio.id.replace('som_tecla_', '')}`, 3000);
+            });
+        });
     }
 
-    // ========== CONFIGURAÇÃO DAS TECLAS (SEM TOQUE DUPLO) ==========
+    // ========== CONFIGURAÇÃO DAS TECLAS ==========
     
     configurarTeclas() {
         const teclas = document.querySelectorAll('.tecla');
@@ -52,7 +64,7 @@ class TecladoInterativo {
             const somId = tecla.dataset.som;
             const idAudio = `#som_tecla_${somId}`;
             
-            // Restaurar configurações
+            // Restaurar configurações salvas
             this.restaurarConfiguracoesTecla(tecla);
             
             // Salvar emoji original
@@ -60,93 +72,90 @@ class TecladoInterativo {
                 tecla.dataset.emojiOriginal = tecla.textContent;
             }
             
-            // Configurar evento de clique (PREVENIR DUPLO)
-            tecla.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const agora = Date.now();
-                if (agora - this.ultimoToque < this.toqueDelay) {
-                    return; // Ignorar toque muito rápido
-                }
-                this.ultimoToque = agora;
-                
-                if (this.modoEdicao) {
-                    this.abrirModalEdicao(tecla);
-                } else {
-                    this.tocarSom(idAudio);
-                }
-            }, { passive: false });
-            
-            // Configurar touch para mobile (PREVENIR DUPLO)
-            let touchIniciado = false;
-            
-            tecla.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                if (touchIniciado) return;
-                touchIniciado = true;
-                
-                const agora = Date.now();
-                if (agora - this.ultimoToque < this.toqueDelay) {
-                    touchIniciado = false;
-                    return;
-                }
-                this.ultimoToque = agora;
-                
-                tecla.classList.add('ativa');
-                
-                if (!this.modoEdicao) {
-                    this.tocarSom(idAudio);
-                } else {
-                    this.abrirModalEdicao(tecla);
-                }
-                
-                // Resetar após delay
-                setTimeout(() => {
-                    touchIniciado = false;
-                    tecla.classList.remove('ativa');
-                }, this.toqueDelay);
-                
-            }, { passive: false });
-            
-            tecla.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                tecla.classList.remove('ativa');
-            }, { passive: false });
-            
-            tecla.addEventListener('touchcancel', () => {
-                touchIniciado = false;
-                tecla.classList.remove('ativa');
-            });
+            // Configurar eventos
+            this.configurarEventosTecla(tecla, idAudio);
         });
     }
     
     restaurarConfiguracoesTecla(tecla) {
+        // Restaurar emoji
         if (this.emojiEditados[tecla.className]) {
             tecla.textContent = this.emojiEditados[tecla.className];
             tecla.classList.add('editado');
         }
         
+        // Restaurar cor
         if (this.coresTeclas[tecla.className]) {
             tecla.style.background = this.coresTeclas[tecla.className];
             tecla.classList.add('editado');
         }
     }
     
-    // ========== SISTEMA DE SOM ==========
+    configurarEventosTecla(tecla, idAudio) {
+        // Evento de clique (desktop)
+        tecla.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const agora = Date.now();
+            if (agora - this.ultimoToque < this.toqueDelay) return;
+            this.ultimoToque = agora;
+            
+            if (this.modoEdicao) {
+                this.abrirModalEdicao(tecla);
+            } else {
+                this.tocarSom(idAudio);
+            }
+        });
+        
+        // Eventos de touch (mobile)
+        tecla.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (this.touchAtivo) return;
+            this.touchAtivo = true;
+            
+            const agora = Date.now();
+            if (agora - this.ultimoToque < this.toqueDelay) {
+                this.touchAtivo = false;
+                return;
+            }
+            this.ultimoToque = agora;
+            
+            tecla.classList.add('ativa');
+            
+            if (this.modoEdicao) {
+                this.abrirModalEdicao(tecla);
+            } else {
+                this.tocarSom(idAudio);
+            }
+            
+            setTimeout(() => {
+                this.touchAtivo = false;
+                tecla.classList.remove('ativa');
+            }, this.toqueDelay);
+            
+        }, { passive: false });
+        
+        tecla.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            tecla.classList.remove('ativa');
+        }, { passive: false });
+    }
+
+    // ========== SISTEMA DE SOM (FUNCIONAL) ==========
     
     tocarSom(idElementoAudio) {
         const audioElement = document.querySelector(idElementoAudio);
         
         if (!audioElement) {
-            console.error(`Áudio não encontrado: ${idElementoAudio}`);
+            console.error(`❌ Áudio não encontrado: ${idElementoAudio}`);
             return;
         }
         
-        // Parar som atual
+        // Parar som atual se estiver tocando
         if (this.audioAtual && this.audioAtual !== audioElement) {
             this.audioAtual.pause();
             this.audioAtual.currentTime = 0;
@@ -159,32 +168,61 @@ class TecladoInterativo {
         const playPromise = audioElement.play();
         
         if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.log('Tentando tocar novamente...');
-                setTimeout(() => {
-                    audioElement.play().catch(e => {
-                        console.error('Falha ao reproduzir áudio:', e);
-                    });
-                }, 50);
-            }).then(() => {
+            playPromise.then(() => {
+                // Sucesso
                 this.onSomTocadoSucesso(audioElement);
+            }).catch(error => {
+                console.log('❌ Erro ao tocar, tentando desbloquear...', error);
+                
+                // Tentar desbloquear áudio
+                this.desbloquearAudioMobile();
+                
+                // Tentar novamente após delay
+                setTimeout(() => {
+                    audioElement.play().then(() => {
+                        this.onSomTocadoSucesso(audioElement);
+                    }).catch(e => {
+                        console.error('❌ Falha definitiva:', e);
+                        this.mostrarFeedback('🔊 Toque novamente para ativar sons', 3000);
+                    });
+                }, 100);
             });
         }
     }
     
+    desbloquearAudioMobile() {
+        // Criar contexto de áudio para desbloquear
+        if (window.AudioContext || window.webkitAudioContext) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const audioContext = new AudioContext();
+            
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            
+            // Tocar som silencioso
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 1; // Frequência muito baixa
+            gainNode.gain.value = 0.001; // Quase inaudível
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.001);
+        }
+    }
+    
     onSomTocadoSucesso(audioElement) {
+        // Feedback visual
         const somId = audioElement.id.replace('som_tecla_', '');
         const tecla = document.querySelector(`[data-som="${somId}"]`);
         
         if (tecla) {
             tecla.classList.add('tocando');
             setTimeout(() => tecla.classList.remove('tocando'), 300);
-        }
-        
-        if (!this.modoEdicao) {
-            this.contadorSons++;
-            localStorage.setItem('contadorSons', this.contadorSons.toString());
-            this.atualizarContadorSons();
         }
     }
     
@@ -204,10 +242,10 @@ class TecladoInterativo {
             tecla.classList.remove('tocando', 'ativa');
         });
         
-        this.mostrarFeedback('⏹️ Sons parados', 1500);
+        this.mostrarFeedback('⏹️ Todos os sons parados', 1500);
     }
-    
-    // ========== MODO EDIÇÃO ==========
+
+    // ========== MODO EDIÇÃO (FUNCIONAL) ==========
     
     toggleModoEdicao() {
         this.modoEdicao = !this.modoEdicao;
@@ -225,15 +263,336 @@ class TecladoInterativo {
         
         if (botao) {
             botao.classList.toggle('ativo', this.modoEdicao);
-            this.mostrarFeedback(this.modoEdicao ? '✏️ Modo edição' : '✅ Modo normal', 1500);
+            this.mostrarFeedback(this.modoEdicao ? '✏️ Modo edição ativo' : '✅ Modo normal', 1500);
         }
     }
     
     abrirModalEdicao(tecla) {
-        // Código do modal (mantido do anterior)
-        // ... (mesmo código do modal)
+        // Fechar modal existente
+        const modalExistente = document.querySelector('.modal-overlay');
+        if (modalExistente) modalExistente.remove();
+        
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        
+        // Extrair cor atual
+        let corAtual = '#667eea';
+        const estilo = window.getComputedStyle(tecla);
+        const background = estilo.backgroundImage || estilo.backgroundColor;
+        if (background) {
+            const match = background.match(/#[0-9A-Fa-f]{6}/i);
+            if (match) corAtual = match[0];
+        }
+        
+        modal.innerHTML = `
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h3>✏️ Editar Tecla</h3>
+                    <button class="btn-fechar">×</button>
+                </div>
+                
+                <div class="modal-conteudo">
+                    <div class="grupo-form">
+                        <label>Emoji/Texto:</label>
+                        <input type="text" id="editar-emoji" class="input-emoji" 
+                               value="${tecla.textContent}" maxlength="2">
+                        <small>Máx. 2 caracteres</small>
+                    </div>
+                    
+                    <div class="grupo-form">
+                        <label>Cor da tecla:</label>
+                        <div class="seletor-cor-container">
+                            <input type="color" id="editar-cor" value="${corAtual}" class="input-cor">
+                            <div class="preview-cor" style="background: ${corAtual}"></div>
+                        </div>
+                        
+                        <div class="paleta-cores">
+                            ${['#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#118AB2',
+                               '#7209B7', '#3A86FF', '#FB5607', '#8338EC', '#FF006E'].map(cor => `
+                                <div class="cor-rapida" style="background: ${cor}" data-cor="${cor}"></div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="grupo-form">
+                        <label>Alterar som (opcional):</label>
+                        <input type="file" id="editar-som" accept="audio/*" class="input-som">
+                        <small>MP3, máximo 5MB</small>
+                        <button class="btn-teste-som" data-som="${tecla.dataset.som}">
+                            🔊 Testar som atual
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="modal-botoes">
+                    <button class="btn-modal btn-salvar">💾 Salvar</button>
+                    <button class="btn-modal btn-reset">↩️ Resetar</button>
+                    <button class="btn-modal btn-cancelar">❌ Cancelar</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Configurar eventos do modal
+        this.configurarModalEdicao(tecla, modal);
     }
     
+    configurarModalEdicao(tecla, modal) {
+        // Elementos do modal
+        const btnFechar = modal.querySelector('.btn-fechar');
+        const btnCancelar = modal.querySelector('.btn-cancelar');
+        const btnSalvar = modal.querySelector('.btn-salvar');
+        const btnReset = modal.querySelector('.btn-reset');
+        const btnTesteSom = modal.querySelector('.btn-teste-som');
+        const inputCor = modal.querySelector('#editar-cor');
+        const previewCor = modal.querySelector('.preview-cor');
+        const coresRapidas = modal.querySelectorAll('.cor-rapida');
+        
+        // Cores rápidas
+        coresRapidas.forEach(corEl => {
+            corEl.addEventListener('click', () => {
+                const cor = corEl.dataset.cor;
+                inputCor.value = cor;
+                previewCor.style.background = cor;
+            });
+        });
+        
+        // Atualizar preview
+        inputCor.addEventListener('input', () => {
+            previewCor.style.background = inputCor.value;
+        });
+        
+        // Testar som
+        btnTesteSom.addEventListener('click', () => {
+            const somId = btnTesteSom.dataset.som;
+            this.tocarSom(`#som_tecla_${somId}`);
+        });
+        
+        // Salvar
+        btnSalvar.addEventListener('click', () => {
+            this.salvarEdicaoTecla(tecla, modal);
+        });
+        
+        // Resetar
+        btnReset.addEventListener('click', () => {
+            if (confirm('Resetar esta tecla para o padrão?')) {
+                this.resetarTeclaIndividual(tecla);
+                modal.remove();
+            }
+        });
+        
+        // Fechar
+        const fecharModal = () => modal.remove();
+        btnFechar.addEventListener('click', fecharModal);
+        btnCancelar.addEventListener('click', fecharModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) fecharModal();
+        });
+        
+        // CSS adicional para o modal
+        const style = document.createElement('style');
+        style.textContent = `
+            .modal-conteudo {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .grupo-form {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .grupo-form label {
+                font-weight: 600;
+                color: #00d4ff;
+                font-size: 0.9rem;
+            }
+            
+            .input-emoji, .input-cor, .input-som {
+                padding: 8px 12px;
+                border-radius: 8px;
+                border: 2px solid rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.05);
+                color: white;
+                font-family: 'Montserrat', sans-serif;
+            }
+            
+            .seletor-cor-container {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+            }
+            
+            .preview-cor {
+                width: 40px;
+                height: 40px;
+                border-radius: 8px;
+                border: 2px solid rgba(255, 255, 255, 0.2);
+            }
+            
+            .paleta-cores {
+                display: grid;
+                grid-template-columns: repeat(5, 1fr);
+                gap: 8px;
+                margin-top: 5px;
+            }
+            
+            .cor-rapida {
+                width: 30px;
+                height: 30px;
+                border-radius: 6px;
+                cursor: pointer;
+                border: 2px solid transparent;
+                transition: transform 0.2s;
+            }
+            
+            .cor-rapida:hover {
+                transform: scale(1.1);
+            }
+            
+            .btn-teste-som {
+                margin-top: 5px;
+                padding: 6px 12px;
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 6px;
+                color: white;
+                font-size: 0.8rem;
+                cursor: pointer;
+            }
+            
+            .modal-botoes {
+                display: flex;
+                gap: 10px;
+                margin-top: 15px;
+            }
+            
+            .btn-modal {
+                flex: 1;
+                padding: 10px;
+                border-radius: 8px;
+                border: none;
+                font-family: 'Montserrat', sans-serif;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 5px;
+            }
+            
+            .btn-salvar {
+                background: linear-gradient(135deg, #00d4ff, #0077cc);
+                color: white;
+            }
+            
+            .btn-reset {
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+            }
+            
+            .btn-cancelar {
+                background: rgba(255, 107, 107, 0.2);
+                color: #ff6b6b;
+            }
+            
+            small {
+                font-size: 0.7rem;
+                opacity: 0.7;
+            }
+            
+            @media (max-width: 480px) {
+                .paleta-cores {
+                    grid-template-columns: repeat(3, 1fr);
+                }
+                
+                .modal-botoes {
+                    flex-direction: column;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Remover estilo quando modal fechar
+        modal.addEventListener('remove', () => style.remove());
+    }
+    
+    salvarEdicaoTecla(tecla, modal) {
+        const novoEmoji = modal.querySelector('#editar-emoji').value.trim();
+        const novaCor = modal.querySelector('#editar-cor').value;
+        const arquivoSom = modal.querySelector('#editar-som').files[0];
+        
+        // Salvar emoji
+        if (novoEmoji) {
+            tecla.textContent = novoEmoji;
+            this.emojiEditados[tecla.className] = novoEmoji;
+            tecla.classList.add('editado');
+        }
+        
+        // Salvar cor
+        if (novaCor) {
+            const gradiente = `linear-gradient(145deg, ${novaCor}40, ${novaCor}80)`;
+            tecla.style.background = gradiente;
+            this.coresTeclas[tecla.className] = gradiente;
+            tecla.classList.add('editado');
+        }
+        
+        // Salvar som
+        if (arquivoSom && arquivoSom.size <= 5 * 1024 * 1024) {
+            const url = URL.createObjectURL(arquivoSom);
+            const somId = tecla.dataset.som;
+            const audioElement = document.querySelector(`#som_tecla_${somId}`);
+            
+            if (audioElement) {
+                // Salvar original
+                if (!audioElement.dataset.srcOriginal) {
+                    audioElement.dataset.srcOriginal = audioElement.src;
+                }
+                
+                audioElement.src = url;
+                this.sonsEditados[somId] = url;
+                tecla.classList.add('editado');
+            }
+        }
+        
+        // Salvar no localStorage
+        this.salvarConfiguracoes();
+        
+        modal.remove();
+        this.mostrarFeedback('✅ Tecla atualizada!', 1500);
+    }
+    
+    resetarTeclaIndividual(tecla) {
+        const className = tecla.className;
+        const somId = tecla.dataset.som;
+        
+        // Resetar emoji
+        tecla.textContent = tecla.dataset.emojiOriginal;
+        delete this.emojiEditados[className];
+        
+        // Resetar cor
+        tecla.style.background = '';
+        delete this.coresTeclas[className];
+        
+        // Resetar som
+        const audioElement = document.querySelector(`#som_tecla_${somId}`);
+        if (audioElement && audioElement.dataset.srcOriginal) {
+            audioElement.src = audioElement.dataset.srcOriginal;
+            delete this.sonsEditados[somId];
+        }
+        
+        // Remover marca
+        tecla.classList.remove('editado');
+        
+        // Salvar
+        this.salvarConfiguracoes();
+        
+        this.mostrarFeedback('↩️ Tecla resetada', 1500);
+    }
+
     // ========== SISTEMA DE CORES ==========
     
     aplicarCoresAleatorias() {
@@ -252,14 +611,105 @@ class TecladoInterativo {
         });
         
         localStorage.setItem('coresTeclas', JSON.stringify(this.coresTeclas));
-        this.mostrarFeedback('🌈 Cores aleatórias', 1500);
+        this.mostrarFeedback('🌈 Cores aleatórias aplicadas', 1500);
     }
     
     abrirSeletorCores() {
-        // Código do seletor de cores (mantido)
-        // ... (mesmo código do seletor)
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        
+        modal.innerHTML = `
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h3>🎨 Personalizar Cores</h3>
+                    <button class="btn-fechar">×</button>
+                </div>
+                
+                <div class="modal-conteudo">
+                    <div class="grupo-form">
+                        <label>Aplicar cor única:</label>
+                        <input type="color" id="cor-unica" value="#667eea" style="width: 100%; height: 40px;">
+                    </div>
+                    
+                    <div class="grupo-form">
+                        <label>Cores pré-definidas:</label>
+                        <div class="paleta-grande">
+                            ${[
+                                '#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#118AB2',
+                                '#7209B7', '#3A86FF', '#FB5607', '#8338EC', '#FF006E'
+                            ].map(cor => `
+                                <div class="cor-rapida-grande" style="background: ${cor}" data-cor="${cor}"></div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-botoes">
+                    <button class="btn-modal btn-aplicar">🎨 Aplicar Cor</button>
+                    <button class="btn-modal btn-aleatorias">🎲 Aleatórias</button>
+                    <button class="btn-modal btn-reset-cores">↩️ Resetar</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Configurar eventos
+        const fecharModal = () => modal.remove();
+        modal.querySelector('.btn-fechar').onclick = fecharModal;
+        modal.onclick = (e) => e.target === modal && fecharModal();
+        
+        // Cores pré-definidas
+        modal.querySelectorAll('.cor-rapida-grande').forEach(cor => {
+            cor.onclick = () => {
+                modal.querySelector('#cor-unica').value = cor.dataset.cor;
+            };
+        });
+        
+        // Botões
+        modal.querySelector('.btn-aplicar').onclick = () => {
+            const cor = modal.querySelector('#cor-unica').value;
+            this.aplicarCorUnica(cor);
+            fecharModal();
+        };
+        
+        modal.querySelector('.btn-aleatorias').onclick = () => {
+            this.aplicarCoresAleatorias();
+            fecharModal();
+        };
+        
+        modal.querySelector('.btn-reset-cores').onclick = () => {
+            this.resetarTodasCores();
+            fecharModal();
+        };
     }
     
+    aplicarCorUnica(cor) {
+        const gradiente = `linear-gradient(145deg, ${cor}40, ${cor}80)`;
+        
+        document.querySelectorAll('.tecla').forEach(tecla => {
+            tecla.style.background = gradiente;
+            this.coresTeclas[tecla.className] = gradiente;
+            tecla.classList.add('editado');
+        });
+        
+        localStorage.setItem('coresTeclas', JSON.stringify(this.coresTeclas));
+        this.mostrarFeedback('🎨 Cor aplicada a todas', 1500);
+    }
+    
+    resetarTodasCores() {
+        if (confirm('Resetar cores de TODAS as teclas?')) {
+            document.querySelectorAll('.tecla').forEach(tecla => {
+                tecla.style.background = '';
+                tecla.classList.remove('editado');
+                delete this.coresTeclas[tecla.className];
+            });
+            
+            localStorage.removeItem('coresTeclas');
+            this.mostrarFeedback('↩️ Cores resetadas', 1500);
+        }
+    }
+
     // ========== MODO NOTURNO ==========
     
     configurarModoNoturno() {
@@ -288,41 +738,61 @@ class TecladoInterativo {
             }
         }
     }
+
+    // ========== RESET GERAL ==========
     
-    // ========== CONTADORES E FEEDBACK ==========
-    
-    atualizarContadorSons() {
-        const elemento = document.getElementById('contador-sons');
-        if (elemento) {
-            elemento.textContent = this.contadorSons;
+    resetarTudo() {
+        if (confirm('Resetar TODAS as configurações?\n\n• Cores personalizadas\n• Emojis editados\n• Sons customizados')) {
+            // Resetar cores
+            this.resetarTodasCores();
+            
+            // Resetar emojis
+            document.querySelectorAll('.tecla').forEach(tecla => {
+                if (tecla.dataset.emojiOriginal) {
+                    tecla.textContent = tecla.dataset.emojiOriginal;
+                }
+                tecla.classList.remove('editado');
+            });
+            localStorage.removeItem('emojiEditados');
+            
+            // Resetar sons
+            document.querySelectorAll('audio').forEach(audio => {
+                if (audio.dataset.srcOriginal) {
+                    audio.src = audio.dataset.srcOriginal;
+                }
+            });
+            localStorage.removeItem('sonsEditados');
+            
+            // Sair do modo edição
+            if (this.modoEdicao) {
+                this.toggleModoEdicao();
+            }
+            
+            this.mostrarFeedback('🔄 Tudo resetado', 2000);
         }
+    }
+
+    // ========== FUNÇÕES AUXILIARES ==========
+    
+    salvarConfiguracoes() {
+        localStorage.setItem('emojiEditados', JSON.stringify(this.emojiEditados));
+        localStorage.setItem('coresTeclas', JSON.stringify(this.coresTeclas));
+        localStorage.setItem('sonsEditados', JSON.stringify(this.sonsEditados));
     }
     
     mostrarFeedback(mensagem, duracao = 1500) {
+        // Remover anterior
+        const anterior = document.querySelector('.feedback-rapido');
+        if (anterior) anterior.remove();
+        
+        // Criar novo
         const feedback = document.createElement('div');
         feedback.className = 'feedback-rapido';
         feedback.textContent = mensagem;
-        feedback.style.cssText = `
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.85);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            font-size: 14px;
-            z-index: 10000;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            white-space: nowrap;
-            pointer-events: none;
-            user-select: none;
-        `;
         
         document.body.appendChild(feedback);
+        
+        // Remover após duração
         setTimeout(() => {
             feedback.style.opacity = '0';
             feedback.style.transition = 'opacity 0.3s';
@@ -331,16 +801,16 @@ class TecladoInterativo {
     }
     
     exibirVersao() {
-        const versao = '3.3.0';
+        const versao = '4.0.0';
         const elemento = document.getElementById('versao-app');
         if (elemento) {
             elemento.textContent = versao;
         }
+        localStorage.setItem('app_version', versao);
     }
     
-    // ========== CONFIGURAÇÕES ==========
-    
     restaurarConfiguracoes() {
+        // Restaurar sons editados
         Object.entries(this.sonsEditados).forEach(([somId, url]) => {
             const audioElement = document.querySelector(`#som_tecla_${somId}`);
             if (audioElement && !audioElement.dataset.srcOriginal) {
@@ -352,143 +822,79 @@ class TecladoInterativo {
     
     configurarControles() {
         const controles = {
-            'botao-parar': () => this.pararTodosSons(),
             'botao-editar': () => this.toggleModoEdicao(),
-            'botao-reset': () => this.resetarTudo(),
-            'botao-modo': () => this.toggleModoNoturno(),
             'botao-cor-teclas': () => this.abrirSeletorCores(),
-            'botao-cores-aleatorias': () => this.aplicarCoresAleatorias()
+            'botao-cores-aleatorias': () => this.aplicarCoresAleatorias(),
+            'botao-modo': () => this.toggleModoNoturno(),
+            'botao-parar': () => this.pararTodosSons(),
+            'botao-reset': () => this.resetarTudo()
         };
         
         Object.entries(controles).forEach(([id, funcao]) => {
             const botao = document.getElementById(id);
             if (botao) {
-                // Prevenir múltiplos cliques
-                let cliqueAtivo = false;
-                
-                botao.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if (cliqueAtivo) return;
-                    cliqueAtivo = true;
-                    
-                    funcao();
-                    
-                    setTimeout(() => {
-                        cliqueAtivo = false;
-                    }, 500);
-                });
-                
+                botao.addEventListener('click', funcao);
                 botao.addEventListener('touchstart', (e) => {
                     e.preventDefault();
-                    if (cliqueAtivo) return;
-                    cliqueAtivo = true;
-                    
                     funcao();
-                    
-                    setTimeout(() => {
-                        cliqueAtivo = false;
-                    }, 500);
                 }, { passive: false });
             }
         });
     }
     
     configurarEventosGlobais() {
+        // ESC para parar sons
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') this.pararTodosSons();
         });
         
-        // Prevenir scroll em toque
-        document.addEventListener('touchmove', (e) => {
-            if (e.target.classList.contains('tecla') || 
-                e.target.classList.contains('botao-menu')) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        
-        // Detectar orientação
-        window.addEventListener('orientationchange', () => {
-            setTimeout(() => {
-                this.ajustarLayoutOrientacao();
-            }, 100);
-        });
-    }
-    
-    ajustarLayoutOrientacao() {
-        // Forçar redimensionamento
-        document.body.style.height = window.innerHeight + 'px';
-        
-        // Ajustar teclado se necessário
-        const teclado = document.querySelector('.teclado-principal');
-        if (teclado && window.innerHeight < 500) {
-            // Modo paisagem muito baixo
-            teclado.style.gap = '5px';
-            const teclas = document.querySelectorAll('.tecla');
-            teclas.forEach(tecla => {
-                tecla.style.fontSize = '1.4rem';
-            });
-        }
-    }
-    
-    resetarTudo() {
-        if (confirm('Resetar TODAS as configurações?')) {
-            // Resetar cores
-            document.querySelectorAll('.tecla').forEach(tecla => {
-                tecla.style.background = '';
-                tecla.classList.remove('editado');
-                delete this.coresTeclas[tecla.className];
-            });
-            localStorage.removeItem('coresTeclas');
-            
-            // Resetar emojis
-            document.querySelectorAll('.tecla').forEach(tecla => {
-                if (tecla.dataset.emojiOriginal) {
-                    tecla.textContent = tecla.dataset.emojiOriginal;
+        // Desbloquear áudio em interação
+        document.addEventListener('click', () => {
+            if (window.AudioContext || window.webkitAudioContext) {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
                 }
-            });
-            localStorage.removeItem('emojiEditados');
-            
-            // Resetar contador
-            this.contadorSons = 0;
-            localStorage.setItem('contadorSons', '0');
-            this.atualizarContadorSons();
-            
-            this.mostrarFeedback('🔄 Tudo resetado', 2000);
-        }
+            }
+        }, { once: true });
     }
 }
 
-// Inicializar
-window.tecladoInterativo = new TecladoInterativo();
+// ========== INICIALIZAÇÃO ==========
 
-// Adicionar CSS dinâmico para feedback
-const estilo = document.createElement('style');
-estilo.textContent = `
-    @keyframes feedbackEntrada {
-        from {
-            opacity: 0;
-            transform: translateX(-50%) translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-    }
+// Inicializar quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', () => {
+    window.tecladoInterativo = new TecladoInterativo();
+});
+
+// Adicionar em main.js
+const temas = {
+    'neon': { primaria: '#0a0a0a', secundaria: '#1a1a1a', destaque: '#00ff88' },
+    'pastel': { primaria: '#f8f9fa', secundaria: '#e9ecef', destaque: '#ff6b8b' },
+    'retro': { primaria: '#2d3047', secundaria: '#419d78', destaque: '#e0a458' }
+  };
+
+  // Adicionar suporte a atalhos de teclado
+document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT') return;
     
-    .feedback-rapido {
-        animation: feedbackEntrada 0.3s ease;
-    }
+    const keyMap = {
+      '1': '.tecla_pom',
+      '2': '.tecla_clap',
+      '3': '.tecla_tim',
+      '4': '.tecla_extra1',
+      'q': '.tecla_puff',
+      'w': '.tecla_splash',
+      'e': '.tecla_toim',
+      'r': '.tecla_extra2',
+      'a': '.tecla_psh',
+      's': '.tecla_tic',
+      'd': '.tecla_tom',
+      'f': '.tecla_extra3'
+    };
     
-    /* Melhorar performance */
-    .tecla, .botao-menu {
-        will-change: transform;
+    if (keyMap[e.key]) {
+      const tecla = document.querySelector(keyMap[e.key]);
+      if (tecla) tecla.click();
     }
-    
-    /* Otimizar para mobile */
-    @media (max-width: 768px) {
-        .tecla {
-            -webkit-tap-highlight-color: transparent;
-        }
-    }
-`;
-document.head.appendChild(estilo);
+  });
