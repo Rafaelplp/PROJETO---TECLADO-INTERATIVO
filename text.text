@@ -1,0 +1,13 @@
+teclado-interativo/
+├── index.html
+├── css/
+│   ├── reset.css
+│   ├── estilos.css
+│   └── modais.css
+├── js/
+│   ├── contadorVisitas.js
+│   └── main.js
+└── sounds-memes/
+    ├── among-sound.mp3
+    ├── downer-noise.mp3
+    └── ... (todos os sons)

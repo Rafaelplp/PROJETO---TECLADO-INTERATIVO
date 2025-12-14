@@ -4,47 +4,149 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>TECLADO INTERATIVO</title>
-
+    <title>TECLADO MEME INTERATIVO &#128540</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&display=swap" rel="stylesheet">
-
-    <link rel="icon" type="image/png" href="images/bateria.png">
+    <link rel="icon" type="image/png" href="images/emoji-png-0017.png">
+    
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/estilos.css">
-
-    
-
+    <link rel="stylesheet" href="css/modais.css">
 </head>
 <body>
+    <div class="layout-principal">
+        <!-- Menu lateral esquerdo -->
+        <aside class="menu-lateral">
+            <div class="logo">
+                <h2>🎹 Teclado Meme</h2>
+            </div>
+            
+            <div class="controles-laterais">
+                <button id="botao-editar" class="botao-menu">
+                    <span class="icone">✏️</span>
+                    <span class="texto">Editar Teclado</span>
+                </button>
+                
+                <button id="botao-cor-teclas" class="botao-menu">
+                    <span class="icone">🎨</span>
+                    <span class="texto">Cores Teclas</span>
+                </button>
+                
+                <button id="botao-cores-aleatorias" class="botao-menu">
+                    <span class="icone">🌈</span>
+                    <span class="texto">Cores Aleatórias</span>
+                </button>
+                
+                <button id="botao-modo" class="botao-menu">
+                    <span class="icone">🌙</span>
+                    <span class="texto">Modo Noturno</span>
+                </button>
+                
+                <button id="botao-parar" class="botao-menu">
+                    <span class="icone">⏹️</span>
+                    <span class="texto">Parar Som</span>
+                </button>
+                
+                <button id="botao-reset" class="botao-menu">
+                    <span class="icone">🔄</span>
+                    <span class="texto">Resetar Tudo</span>
+                </button>
+            </div>
+            
+            <div class="info-sessao">
+                <div class="contador-sons">
+                    <span class="icone">🎵</span>
+                    <div class="info-texto">
+                        <span class="label">Sons Tocados</span>
+                        <span class="valor" id="contador-sons">0</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
 
-    <h1>TECLADO MEME &#128540</h1>
-    <section class="teclado">
-        <button class="tecla tecla_pom">&#129300</button>
-        <button class="tecla tecla_clap">&#129396</button>
-        <button class="tecla tecla_tim">&#128578</button>
+        <!-- Conteúdo principal -->
+        <main class="conteudo-principal">
+            <header class="cabecalho">
+                <h1>TECLADO MEME INTERATIVO &#128540</h1>
+                <p class="subtitulo">Clique nas teclas para tocar sons! Use o menu à esquerda para personalizar.</p>
+            </header>
 
-        <button class="tecla tecla_puff">&#128565</button>
-        <button class="tecla tecla_splash">&#128571</button>
-        <button class="tecla tecla_toim">&#128572</button>
+            <!-- Teclado principal -->
+            <section class="teclado-container">
+                <div class="teclado-principal">
+                    <!-- Primeira linha -->
+                    <button class="tecla tecla_pom" data-som="pom">&#129300</button>
+                    <button class="tecla tecla_clap" data-som="clap">&#129396</button>
+                    <button class="tecla tecla_tim" data-som="tim">&#128578</button>
+                    
+                    <!-- Segunda linha -->
+                    <button class="tecla tecla_puff" data-som="puff">&#128565</button>
+                    <button class="tecla tecla_splash" data-som="splash">&#128571</button>
+                    <button class="tecla tecla_toim" data-som="toim">&#128572</button>
+                    
+                    <!-- Terceira linha -->
+                    <button class="tecla tecla_psh" data-som="psh">&#129303</button>
+                    <button class="tecla tecla_tic" data-som="tic">&#129321</button>
+                    <button class="tecla tecla_tom" data-som="tom">&#128520</button>
+                    
+                    <!-- Teclas extras (agrupadas) -->
+                    <button class="tecla tecla_extra1" data-som="extra1">&#128051</button>
+                    <button class="tecla tecla_extra2" data-som="extra2">&#127863</button>
+                    <button class="tecla tecla_extra3" data-som="extra3">&#128009</button>
+                </div>
+            </section>
+        </main>
+    </div>
 
-        <button class="tecla tecla_psh">&#129303</button>
-        <button class="tecla tecla_tic">&#129321</button>
-        <button class="tecla tecla_tom">&#128520</button>
-    </section>
-    <audio  src="sounds-memes/among-sound.mp3" id="som_tecla_pom"></audio>
-    <audio  src="sounds-memes/downer-noise.mp3" id="som_tecla_clap"></audio>
-    <audio  src="sounds-memes/creditos-finales.mp3" id="som_tecla_tim"></audio>
-    <audio  src="sounds-memes/error_sound.mp3" id="som_tecla_puff"></audio>
-    <audio  src="sounds-memes/anime-sound.mp3" id="som_tecla_splash"></audio>
-    <audio  src="sounds-memes/m-e-o-w.mp3" id="som_tecla_toim"></audio>
-    <audio  src="sounds-memes/yippee.mp3" id="som_tecla_psh"></audio>
-    <audio  src="sounds-memes/pedro-song.mp3" id="som_tecla_tic"></audio>
-    <audio  src="sounds-memes/para-tira-que-eu-vou-cagar.mp3" id="som_tecla_tom"></audio>
+    <!-- Rodape com contadores -->
+    <footer class="rodape">
+        <div class="contador-visitas">
+            <div class="contador-item">
+                <span class="contador-icon">👥</span>
+                <div class="contador-info">
+                    <span class="contador-label">Visitantes Online</span>
+                    <span class="contador-valor" id="contador-online">1</span>
+                </div>
+            </div>
+            
+            <div class="contador-item">
+                <span class="contador-icon">🌐</span>
+                <div class="contador-info">
+                    <span class="contador-label">Total de Acessos</span>
+                    <span class="contador-valor" id="contador-total">1</span>
+                </div>
+            </div>
+            
+            <div class="contador-item">
+                <span class="contador-icon">⏰</span>
+                <div class="contador-info">
+                    <span class="contador-label">Último acesso</span>
+                    <span class="contador-valor" id="ultimo-acesso">Agora</span>
+                </div>
+            </div>
+        </div>
+        
+        <p class="creditos">Teclado Interativo &copy; 2024 - Desenvolvido com ❤️ por Rafael Lira.</p>
+    </footer>
 
-    <script src="main.js"></script>
-    
+    <!-- Elementos de Áudio -->
+    <audio src="sounds-memes/among-sound.mp3" id="som_tecla_pom"></audio>
+    <audio src="sounds-memes/downer-noise.mp3" id="som_tecla_clap"></audio>
+    <audio src="sounds-memes/creditos-finales.mp3" id="som_tecla_tim"></audio>
+    <audio src="sounds-memes/error_sound.mp3" id="som_tecla_puff"></audio>
+    <audio src="sounds-memes/anime-sound.mp3" id="som_tecla_splash"></audio>
+    <audio src="sounds-memes/m-e-o-w.mp3" id="som_tecla_toim"></audio>
+    <audio src="sounds-memes/yippee.mp3" id="som_tecla_psh"></audio>
+    <audio src="sounds-memes/pedro-song.mp3" id="som_tecla_tic"></audio>
+    <audio src="sounds-memes/para-tira-que-eu-vou-cagar.mp3" id="som_tecla_tom"></audio>
+    <audio id="som_tecla_extra1" src="sounds-memes/extra1.mp3"></audio>
+    <audio id="som_tecla_extra2" src="sounds-memes/extra2.mp3"></audio>
+    <audio id="som_tecla_extra3" src="sounds-memes/extra3.mp3"></audio>
+
+    <!-- Scripts -->
+    <script src="js/contadorVisitas.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>

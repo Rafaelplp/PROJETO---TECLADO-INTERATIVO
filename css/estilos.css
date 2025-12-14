@@ -1,67 +1,506 @@
-:root {
-  --cinza: #aaa;
-  --vermelha: #e93d50;
-  --vermelha-escura: #af303f;
-  --branca: #fff;
-  --luz: rgb(229, 255, 0);
+/* Reset básico já aplicado pelo reset.css */
+* {
+  box-sizing: border-box;
 }
 
 body {
+  font-family: 'Montserrat', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #1a1a2e;
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.5s ease;
+}
+
+body.modo-dia {
+  background-color: #f0f2f5;
+  color: #333;
+}
+
+/* Layout principal */
+.layout-principal {
+  display: flex;
+  flex: 1;
+  min-height: calc(100vh - 120px); /* Considera altura do rodapé */
+}
+
+/* Menu lateral esquerdo */
+.menu-lateral {
+  width: 280px;
+  background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  border-right: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+}
+
+body.modo-dia .menu-lateral {
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
+  border-right: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  text-align: center;
+  padding: 20px 0;
+  margin-bottom: 30px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+body.modo-dia .logo {
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+.logo h2 {
+  margin: 0;
+  font-size: 1.5em;
+  color: #00d4ff;
+  display: flex;
   align-items: center;
-  background: linear-gradient(45deg, #2aa9ad 0%,#2609aa 100%);
+  justify-content: center;
+  gap: 10px;
+}
+
+body.modo-dia .logo h2 {
+  color: #0077cc;
+}
+
+/* Botões do menu lateral */
+.controles-laterais {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.botao-menu {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  backdrop-filter: blur(10px);
+}
+
+body.modo-dia .botao-menu {
+  background: rgba(0, 0, 0, 0.05);
+  color: #333;
+}
+
+.botao-menu:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(5px);
+}
+
+body.modo-dia .botao-menu:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.botao-menu.ativo {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.botao-menu .icone {
+  font-size: 1.5em;
+  min-width: 30px;
+  text-align: center;
+}
+
+.botao-menu .texto {
+  font-size: 0.95em;
+}
+
+/* Informações da sessão */
+.info-sessao {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+body.modo-dia .info-sessao {
+  border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+.contador-sons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+body.modo-dia .contador-sons {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.contador-sons:hover {
+  transform: translateY(-3px);
+}
+
+.contador-sons .icone {
+  font-size: 1.8em;
+}
+
+.info-texto {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-texto .label {
+  font-size: 0.8em;
+  opacity: 0.8;
+}
+
+.info-texto .valor {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #00ff88;
+}
+
+/* Conteúdo principal */
+.conteudo-principal {
+  flex: 1;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.cabecalho {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.cabecalho h1 {
+  margin: 0 0 15px 0;
+  font-size: 2.8em;
+  color: #00d4ff;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+body.modo-dia .cabecalho h1 {
+  color: #0077cc;
+  text-shadow: 0 2px 4px rgba(0, 119, 204, 0.3);
+}
+
+.subtitulo {
+  font-size: 1.1em;
+  opacity: 0.8;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Teclado */
+.teclado-container {
   display: flex;
   justify-content: center;
-  flex-direction: column;
-  font-family: 'Montserrat', sans-serif;
-  min-height: 100vh;
+  align-items: center;
+  flex: 1;
 }
 
-h1 {
-  color: var(--branca);
-  margin-bottom: 20px;
-  font-size: 2rem;
-}
-
-.teclado {
-  background: linear-gradient(to bottom, #eeeeee 0%,#cccccc 100%);
-  box-shadow: 6px 8px 0 6px #666, 10px 10px 10px #000;
-  border-radius: 30px;
+.teclado-principal {
   display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(3, 1fr);
-  padding: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  max-width: 800px;
+  width: 100%;
 }
 
+/* Teclas */
 .tecla {
-  background-color: var(--branca);
-  border-radius: 30px;
-  box-shadow: 3px 3px 0 var(--cinza);
-  color: var(--vermelha);
+  aspect-ratio: 1/1;
+  border: none;
+  border-radius: 20px;
+  font-size: 2.5em;
   cursor: pointer;
-  height: 120px;
-  font-size: 1.75em;
-  font-weight: bold;
-  line-height: 120px;
-  text-align: center;
-  width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  background: linear-gradient(145deg, #2d2d44, #232337);
+  box-shadow: 8px 8px 16px #1a1a2e,
+              -8px -8px 16px #2a2a3e;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
 }
 
-.tecla.ativa,
+.tecla:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
 .tecla:active {
-  background-color: var(--vermelha);
-  border: 4px solid  var(--vermelha);
-  box-shadow: 3px 3px 0 var(--vermelha-escura) inset;
-  color: var(--branca);
-  outline: none;
+  transform: translateY(0);
 }
 
-.tecla.focus,
-.tecla:focus {
-  outline: none;
-  box-shadow: 1px 1px 10px var(--luz);
+.tecla.ativa {
+  transform: scale(0.95);
+  box-shadow: inset 8px 8px 16px #1a1a2e,
+              inset -8px -8px 16px #2a2a3e;
 }
 
-.tecla.active:focus,
-.tecla:active:focus {
-  box-shadow: 3px 3px 0 var(--vermelha-escura) inset, 1px 1px 10px var(--luz);
+body.modo-dia .tecla {
+  background: linear-gradient(145deg, #ffffff, #e6e6e6);
+  box-shadow: 8px 8px 16px #d9d9d9,
+              -8px -8px 16px #ffffff;
+  color: #333;
+}
+
+body.modo-dia .tecla.ativa {
+  box-shadow: inset 8px 8px 16px #d9d9d9,
+              inset -8px -8px 16px #ffffff;
+}
+
+.tecla.modo-edicao {
+  border: 3px dashed #ff9900;
+  background-color: #fff8e1 !important;
+  animation: pulsar 2s infinite;
+}
+
+/* Teclas extras - estilo diferente */
+.tecla_extra1, .tecla_extra2, .tecla_extra3 {
+  font-size: 1.8em;
+  background: linear-gradient(145deg, #667eea, #764ba2) !important;
+}
+
+.tecla_extra1:hover, .tecla_extra2:hover, .tecla_extra3:hover {
+  background: linear-gradient(145deg, #764ba2, #667eea) !important;
+}
+
+/* Badge para indicar tecla editada */
+.tecla::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: transparent;
+  transition: background-color 0.3s;
+}
+
+.tecla.editado::after {
+  background-color: #00ff88;
+}
+
+/* Rodape */
+.rodape {
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
+  margin-top: auto;
+}
+
+body.modo-dia .rodape {
+  background-color: rgba(0, 0, 0, 0.08);
+  border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+.contador-visitas {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-bottom: 15px;
+}
+
+.contador-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 15px 25px;
+  border-radius: 15px;
+  min-width: 220px;
+  transition: transform 0.3s ease;
+}
+
+body.modo-dia .contador-item {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.contador-item:hover {
+  transform: translateY(-3px);
+}
+
+.contador-icon {
+  font-size: 2em;
+}
+
+.contador-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.contador-label {
+  font-size: 0.8em;
+  opacity: 0.8;
+}
+
+.contador-valor {
+  font-weight: 700;
+  font-size: 1.3em;
+}
+
+#contador-online {
+  color: #00ff88;
+}
+
+#contador-total {
+  color: #00d4ff;
+}
+
+#ultimo-acesso {
+  color: #ffaa00;
+}
+
+.creditos {
+  text-align: center;
+  margin: 10px 0 0 0;
+  opacity: 0.7;
+  font-size: 0.9em;
+}
+
+/* Animações */
+@keyframes pulsar {
+  0% { 
+      box-shadow: 0 0 5px #ff9900, 
+                  inset 0 0 5px #ff9900,
+                  8px 8px 16px #1a1a2e,
+                  -8px -8px 16px #2a2a3e; 
+  }
+  50% { 
+      box-shadow: 0 0 20px #ff9900, 
+                  inset 0 0 10px #ff9900,
+                  8px 8px 16px #1a1a2e,
+                  -8px -8px 16px #2a2a3e; 
+  }
+  100% { 
+      box-shadow: 0 0 5px #ff9900, 
+                  inset 0 0 5px #ff9900,
+                  8px 8px 16px #1a1a2e,
+                  -8px -8px 16px #2a2a3e; 
+  }
+}
+
+@keyframes aparecer {
+  from { 
+      opacity: 0; 
+      transform: translateY(20px); 
+  }
+  to { 
+      opacity: 1; 
+      transform: translateY(0); 
+  }
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  .layout-principal {
+      flex-direction: column;
+  }
+  
+  .menu-lateral {
+      width: 100%;
+      flex-direction: row;
+      padding: 15px;
+      border-right: none;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .logo {
+      display: none;
+  }
+  
+  .controles-laterais {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      flex: 1;
+  }
+  
+  .botao-menu {
+      flex: 1;
+      min-width: 150px;
+      justify-content: center;
+  }
+  
+  .botao-menu .texto {
+      display: none;
+  }
+  
+  .info-sessao {
+      display: none;
+  }
+  
+  .teclado-principal {
+      grid-template-columns: repeat(3, 1fr);
+      max-width: 600px;
+  }
+}
+
+@media (max-width: 768px) {
+  .cabecalho h1 {
+      font-size: 2em;
+  }
+  
+  .teclado-principal {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+  }
+  
+  .tecla {
+      font-size: 2em;
+  }
+  
+  .contador-visitas {
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+  }
+  
+  .contador-item {
+      width: 100%;
+      max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .conteudo-principal {
+      padding: 15px;
+  }
+  
+  .teclado-principal {
+      grid-template-columns: 1fr;
+      max-width: 300px;
+  }
+  
+  .botao-menu {
+      min-width: 60px;
+      padding: 12px;
+  }
+  
+  .botao-menu .icone {
+      font-size: 1.2em;
+  }
 }
