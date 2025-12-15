@@ -1,5 +1,5 @@
-// main.js - Teclado Interativo v4.4.1
-// Rodapé completo + Adaptação responsiva completa
+// main.js - Teclado Interativo v4.5.1
+// Menu e rodapé aumentados 15% + Sons funcionando + Paisagem otimizado
 
 class TecladoInterativo {
     constructor() {
@@ -20,6 +20,9 @@ class TecladoInterativo {
         this.isScrolling = false;
         this.resizeTimeout = null;
         this.ultimaOrientacao = window.orientation;
+        
+        // Controle de áudio - SIMPLIFICADO
+        this.audioContext = null;
         
         // Formatos de áudio suportados
         this.formatosSuportados = [
@@ -71,6 +74,8 @@ class TecladoInterativo {
 
         // Otimizar layout para diferentes orientações
         this.otimizarLayout();
+        this.configurarDetecaoPaisagem();
+        
         // Inicializar
         this.inicializar();
     }
@@ -78,7 +83,7 @@ class TecladoInterativo {
     // ========== INICIALIZAÇÃO ==========
     
     inicializar() {
-        console.log('🎹 Teclado Interativo v4.4.1 - Iniciando...');
+        console.log('🎹 Teclado Interativo v4.5.1 - Iniciando...');
         
         // Configurar modo noturno
         this.configurarModoNoturno();
@@ -91,24 +96,153 @@ class TecladoInterativo {
         this.configurarEventosScroll();
         this.exibirVersao();
         
-        // Ajustar menu para caber na tela
-        this.ajustarMenuParaTela();
-        
         // Ajustar layout dinamicamente
         setTimeout(() => this.ajustarLayoutDinamico(), 100);
         
-        // Inicializar áudio
-        this.inicializarAudio();
+        // Carregar todos os áudios
+        this.carregarAudios();
         
         console.log('✅ Teclado pronto para uso!');
     }
     
+    // ========== SISTEMA DE ÁUDIO SIMPLIFICADO ==========
+    
+    carregarAudios() {
+        // Garantir que todos os áudios estão carregados
+        document.querySelectorAll('audio').forEach(audio => {
+            audio.preload = 'auto';
+            
+            // Configurar eventos de erro
+            audio.addEventListener('error', (e) => {
+                console.warn(`⚠️ Áudio ${audio.id} não carregou:`, e);
+            });
+            
+            audio.addEventListener('canplaythrough', () => {
+                console.log(`✅ Áudio ${audio.id} carregado e pronto`);
+            });
+        });
+    }
+    
+    tocarSom(idElementoAudio) {
+        if (this.isScrolling || this.scrollAtivo) return;
+        
+        const audioElement = document.querySelector(idElementoAudio);
+        
+        if (!audioElement) {
+            console.error(`❌ Áudio não encontrado: ${idElementoAudio}`);
+            return;
+        }
+        
+        // Parar som atual se estiver tocando
+        if (this.audioAtual && this.audioAtual !== audioElement) {
+            this.audioAtual.pause();
+            this.audioAtual.currentTime = 0;
+        }
+        
+        // Resetar e tocar
+        audioElement.currentTime = 0;
+        this.audioAtual = audioElement;
+        
+        // Tentar tocar - método SIMPLES
+        const playAudio = () => {
+            try {
+                const playPromise = audioElement.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => {
+                            // Sucesso
+                            this.onSomTocadoSucesso(audioElement);
+                        })
+                        .catch(error => {
+                            console.log('❌ Erro ao tocar (tentativa 1):', error.message);
+                            
+                            // Tentativa 2: Usar contexto de áudio
+                            this.tentarComContextoDeAudio(audioElement);
+                        });
+                }
+            } catch (error) {
+                console.log('❌ Erro ao tocar (catch):', error);
+            }
+        };
+        
+        // Executar imediatamente
+        playAudio();
+    }
+    
+    tentarComContextoDeAudio(audioElement) {
+        // Tentar usar Web Audio API como fallback
+        if (window.AudioContext || window.webkitAudioContext) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            
+            if (!this.audioContext) {
+                this.audioContext = new AudioContext();
+            }
+            
+            // Garantir que o contexto esteja ativo
+            if (this.audioContext.state === 'suspended') {
+                this.audioContext.resume().then(() => {
+                    console.log('✅ Contexto de áudio ativado');
+                    
+                    // Tentar tocar novamente
+                    setTimeout(() => {
+                        audioElement.currentTime = 0;
+                        const playPromise = audioElement.play();
+                        
+                        if (playPromise !== undefined) {
+                            playPromise
+                                .then(() => {
+                                    this.onSomTocadoSucesso(audioElement);
+                                })
+                                .catch(e => {
+                                    console.log('❌ Falha mesmo com contexto:', e.message);
+                                    this.mostrarFeedback('🔊 Toque novamente', 1500);
+                                });
+                        }
+                    }, 50);
+                });
+            }
+        } else {
+            // Navegador não suporta Web Audio API
+            this.mostrarFeedback('🔊 Toque novamente', 1500);
+        }
+    }
+    
+    onSomTocadoSucesso(audioElement) {
+        // Feedback visual
+        const somId = audioElement.id.replace('som_tecla_', '');
+        const tecla = document.querySelector(`[data-som="${somId}"]`);
+        
+        if (tecla && !tecla.classList.contains('scrolling')) {
+            tecla.classList.add('tocando');
+            setTimeout(() => tecla.classList.remove('tocando'), 300);
+        }
+    }
+    
+    pararTodosSons() {
+        if (this.audioAtual) {
+            this.audioAtual.pause();
+            this.audioAtual.currentTime = 0;
+            this.audioAtual = null;
+        }
+        
+        document.querySelectorAll('audio').forEach(audio => {
+            audio.pause();
+            audio.currentTime = 0;
+        });
+        
+        document.querySelectorAll('.tecla').forEach(tecla => {
+            tecla.classList.remove('tocando', 'ativa');
+        });
+        
+        this.mostrarFeedback('⏹️ Todos os sons parados', 1500);
+    }
+
     // ========== AJUSTE DINÂMICO DE LAYOUT ==========
     
     ajustarLayoutDinamico() {
         const isLandscape = window.innerWidth > window.innerHeight;
         const larguraTela = window.innerWidth;
-        const alturaTela = window.innerHeight;
         
         // Elementos
         const menu = document.querySelector('.menu-superior');
@@ -141,55 +275,23 @@ class TecladoInterativo {
         // Se não couber, reduzir escala do rodapé
         if (larguraTotalItens > larguraDisponivel && larguraDisponivel > 0) {
             const fatorReducao = larguraDisponivel / larguraTotalItens;
-            const escala = Math.min(fatorReducao * 0.9, 0.65);
+            const escala = Math.min(fatorReducao * 0.9, isLandscape ? 0.75 : 0.85);
             rodape.style.transform = `scale(${escala})`;
             
             // Ajustar também o contador
             contadorVisitas.style.gap = `${Math.max(gap * 0.7, 4)}px`;
         } else {
-            rodape.style.transform = isLandscape ? 'scale(0.6)' : 'scale(0.75)';
+            rodape.style.transform = isLandscape ? 'scale(0.75)' : 'scale(0.85)';
             contadorVisitas.style.gap = '8px';
         }
         
         rodape.style.transformOrigin = 'center';
         
-        // 3. Ajustar teclado em paisagem
-        if (isLandscape) {
-            const tecladoContainer = document.querySelector('.teclado-container');
-            if (tecladoContainer) {
-                const alturaMenu = menu.offsetHeight || 50;
-                const alturaRodape = rodape.offsetHeight || 50;
-                const alturaDisponivel = alturaTela - alturaMenu - alturaRodape - 100;
-                tecladoContainer.style.maxHeight = `${Math.max(alturaDisponivel, 200)}px`;
-                tecladoContainer.style.overflowY = 'auto';
-            }
-            
-            // Reduzir cabeçalho em paisagem
-            const cabecalho = document.querySelector('.cabecalho');
-            if (cabecalho && alturaTela < 500) {
-                cabecalho.style.display = 'none';
-            } else if (cabecalho) {
-                cabecalho.style.display = 'flex';
-            }
-        } else {
-            // Restaurar modo retrato
-            const tecladoContainer = document.querySelector('.teclado-container');
-            if (tecladoContainer) {
-                tecladoContainer.style.maxHeight = 'none';
-                tecladoContainer.style.overflowY = 'visible';
-            }
-            
-            const cabecalho = document.querySelector('.cabecalho');
-            if (cabecalho) {
-                cabecalho.style.display = 'flex';
-            }
-        }
-        
-        // 4. Garantir que não haja scroll horizontal no rodapé
+        // 3. Garantir que não haja scroll horizontal no rodapé
         rodape.style.overflowX = 'hidden';
         rodape.style.overflowY = 'hidden';
         
-        // Forçar quebra de linha se necessário (último recurso)
+        // 4. Forçar quebra de linha se necessário (último recurso)
         if (larguraTotalItens > larguraDisponivel * 1.5) {
             contadorVisitas.style.flexWrap = 'wrap';
             contadorVisitas.style.justifyContent = 'center';
@@ -215,7 +317,7 @@ class TecladoInterativo {
         
         // Adicionar gap
         const estiloMenu = window.getComputedStyle(menu);
-        const gap = parseInt(estiloMenu.gap) || 12;
+        const gap = parseInt(estiloMenu.gap) || 14;
         larguraTotal += gap * (botoes.length - 1);
         
         // Adicionar padding
@@ -224,32 +326,84 @@ class TecladoInterativo {
         // Calcular fator de escala
         const isLandscape = window.innerWidth > window.innerHeight;
         const larguraMaxima = window.innerWidth * (isLandscape ? 0.95 : 0.9);
-        const larguraAlvo = Math.min(larguraMaxima, 650);
+        const larguraAlvo = Math.min(larguraMaxima, 700);
         
         if (larguraTotal > larguraAlvo && larguraAlvo > 0) {
             const fatorEscala = larguraAlvo / larguraTotal;
-            menu.style.transform = `scale(${Math.min(fatorEscala * 0.95, 0.75)})`;
+            menu.style.transform = `scale(${Math.min(fatorEscala * 0.95, isLandscape ? 0.75 : 0.85)})`;
         } else {
-            menu.style.transform = isLandscape ? 'scale(0.6)' : 'scale(0.75)';
+            menu.style.transform = isLandscape ? 'scale(0.75)' : 'scale(0.85)';
         }
         
         menu.style.transformOrigin = 'center';
     }
     
-    inicializarAudio() {
-        // Garantir que todos os áudios estão carregados
-        document.querySelectorAll('audio').forEach(audio => {
-            audio.preload = 'auto';
-            audio.load();
+    // ========== DETECÇÃO E CORREÇÃO DE PAISAGEM ==========
+    
+    configurarDetecaoPaisagem() {
+        const verificarPaisagem = () => {
+            const isLandscape = window.innerWidth > window.innerHeight;
+            const appContainer = document.querySelector('.app-container');
             
-            // Adicionar tratamento de erro
-            audio.addEventListener('error', (e) => {
-                console.error(`❌ Erro no áudio ${audio.id}:`, e);
-                this.mostrarFeedback(`❌ Erro no som ${audio.id.replace('som_tecla_', '')}`, 3000);
-            });
+            if (!appContainer) return;
+            
+            if (isLandscape && window.innerHeight < 600) {
+                // Modo paisagem ativo
+                appContainer.style.flexDirection = 'column';
+                appContainer.style.flexWrap = 'nowrap';
+                
+                // Garantir que todos os elementos sejam visíveis
+                const elementos = [
+                    '.menu-superior',
+                    '.cabecalho', 
+                    '.teclado-container',
+                    '.rodape'
+                ];
+                
+                elementos.forEach(seletor => {
+                    const elemento = document.querySelector(seletor);
+                    if (elemento) {
+                        elemento.style.display = 'flex';
+                        elemento.style.visibility = 'visible';
+                        elemento.style.opacity = '1';
+                    }
+                });
+                
+                // Ajustar teclado para scroll vertical se necessário
+                const tecladoContainer = document.querySelector('.teclado-container');
+                if (tecladoContainer) {
+                    const alturaDisponivel = window.innerHeight - 200;
+                    tecladoContainer.style.maxHeight = `${alturaDisponivel}px`;
+                    tecladoContainer.style.overflowY = 'auto';
+                }
+                
+                console.log('📱 Modo paisagem ativado');
+            } else {
+                // Modo retrato
+                appContainer.style.flexDirection = 'column';
+                
+                // Restaurar estilos
+                const tecladoContainer = document.querySelector('.teclado-container');
+                if (tecladoContainer) {
+                    tecladoContainer.style.maxHeight = 'none';
+                    tecladoContainer.style.overflowY = 'visible';
+                }
+            }
+            
+            // Reajustar layout dinâmico
+            this.ajustarLayoutDinamico();
+        };
+        
+        // Verificar inicialmente
+        setTimeout(verificarPaisagem, 100);
+        
+        // Verificar em eventos
+        window.addEventListener('resize', verificarPaisagem);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(verificarPaisagem, 300);
         });
     }
-
+    
     // ========== SISTEMA DE SCROLL SEGURO ==========
     
     configurarEventosScroll() {
@@ -422,108 +576,6 @@ class TecladoInterativo {
         });
     }
 
-    // ========== SISTEMA DE SOM ==========
-    
-    tocarSom(idElementoAudio) {
-        if (this.isScrolling || this.scrollAtivo) return;
-        
-        const audioElement = document.querySelector(idElementoAudio);
-        
-        if (!audioElement) {
-            console.error(`❌ Áudio não encontrado: ${idElementoAudio}`);
-            return;
-        }
-        
-        // Parar som atual se estiver tocando
-        if (this.audioAtual && this.audioAtual !== audioElement) {
-            this.audioAtual.pause();
-            this.audioAtual.currentTime = 0;
-        }
-        
-        // Tocar novo som
-        this.audioAtual = audioElement;
-        audioElement.currentTime = 0;
-        
-        const playPromise = audioElement.play();
-        
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                // Sucesso
-                this.onSomTocadoSucesso(audioElement);
-            }).catch(error => {
-                console.log('❌ Erro ao tocar, tentando desbloquear...', error);
-                
-                // Tentar desbloquear áudio
-                this.desbloquearAudioMobile();
-                
-                // Tentar novamente após delay
-                setTimeout(() => {
-                    audioElement.play().then(() => {
-                        this.onSomTocadoSucesso(audioElement);
-                    }).catch(e => {
-                        console.error('❌ Falha definitiva:', e);
-                        this.mostrarFeedback('🔊 Toque novamente para ativar sons', 3000);
-                    });
-                }, 100);
-            });
-        }
-    }
-    
-    desbloquearAudioMobile() {
-        // Criar contexto de áudio para desbloquear
-        if (window.AudioContext || window.webkitAudioContext) {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            const audioContext = new AudioContext();
-            
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
-            
-            // Tocar som silencioso
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.value = 1;
-            gainNode.gain.value = 0.001;
-            
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.001);
-        }
-    }
-    
-    onSomTocadoSucesso(audioElement) {
-        // Feedback visual
-        const somId = audioElement.id.replace('som_tecla_', '');
-        const tecla = document.querySelector(`[data-som="${somId}"]`);
-        
-        if (tecla && !tecla.classList.contains('scrolling')) {
-            tecla.classList.add('tocando');
-            setTimeout(() => tecla.classList.remove('tocando'), 300);
-        }
-    }
-    
-    pararTodosSons() {
-        if (this.audioAtual) {
-            this.audioAtual.pause();
-            this.audioAtual.currentTime = 0;
-            this.audioAtual = null;
-        }
-        
-        document.querySelectorAll('audio').forEach(audio => {
-            audio.pause();
-            audio.currentTime = 0;
-        });
-        
-        document.querySelectorAll('.tecla').forEach(tecla => {
-            tecla.classList.remove('tocando', 'ativa');
-        });
-        
-        this.mostrarFeedback('⏹️ Todos os sons parados', 1500);
-    }
-
     // ========== MODO EDIÇÃO ==========
     
     toggleModoEdicao() {
@@ -691,20 +743,6 @@ class TecladoInterativo {
         const exemplosEmoji = modal.querySelectorAll('.emoji-exemplo');
         const inputSom = modal.querySelector('#editar-som');
         
-        // Prevenir interação durante scroll no modal
-        const elementosInterativos = [btnFechar, btnCancelar, btnSalvar, btnReset, btnTesteSom, inputCor, inputEmoji, inputSom];
-        
-        elementosInterativos.forEach(elemento => {
-            if (elemento) {
-                elemento.addEventListener('touchstart', (e) => {
-                    if (this.isScrolling) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-                }, { passive: false });
-            }
-        });
-        
         // Cores rápidas
         coresRapidas.forEach(corEl => {
             corEl.addEventListener('click', () => {
@@ -713,13 +751,6 @@ class TecladoInterativo {
                 inputCor.value = cor;
                 previewCor.style.background = cor;
             });
-            
-            corEl.addEventListener('touchstart', (e) => {
-                if (this.isScrolling) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            }, { passive: false });
         });
         
         // Atualizar preview da cor
@@ -742,13 +773,6 @@ class TecladoInterativo {
                     exemplo.style.background = '';
                 }, 300);
             });
-            
-            exemplo.addEventListener('touchstart', (e) => {
-                if (this.isScrolling) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            }, { passive: false });
         });
         
         // Validação do arquivo de som
@@ -1090,7 +1114,7 @@ class TecladoInterativo {
     }
     
     exibirVersao() {
-        const versao = '4.4.1';
+        const versao = '4.5.1';
         const elemento = document.getElementById('versao-app');
         if (elemento) {
             elemento.textContent = versao;
@@ -1163,12 +1187,6 @@ class TecladoInterativo {
                 }, { passive: false });
             }
         });
-        
-        // Remover botão de cores se existir
-        const botaoCores = document.getElementById('botao-cor-teclas');
-        if (botaoCores) {
-            botaoCores.style.display = 'none';
-        }
     }
     
     configurarEventosGlobais() {
@@ -1176,39 +1194,6 @@ class TecladoInterativo {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') this.pararTodosSons();
         });
-        
-        // Desbloquear áudio em interação
-        document.addEventListener('click', () => {
-            if (window.AudioContext || window.webkitAudioContext) {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                if (audioContext.state === 'suspended') {
-                    audioContext.resume();
-                }
-            }
-        }, { once: true });
-        
-        // Prevenir comportamento padrão de arrastar
-        document.addEventListener('dragover', (e) => {
-            e.preventDefault();
-        });
-        
-        document.addEventListener('drop', (e) => {
-            e.preventDefault();
-        });
-        
-        // Prevenir zoom com dois dedos
-        document.addEventListener('touchstart', (e) => {
-            if (e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        
-        // Melhorar performance de scroll
-        document.addEventListener('touchmove', (e) => {
-            if (e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
         
         // Ajustar layout ao redimensionar
         window.addEventListener('resize', () => {
@@ -1233,12 +1218,6 @@ class TecladoInterativo {
             if (isLandscape) {
                 // Modo paisagem
                 document.body.style.overflowY = 'auto';
-                
-                // Garantir que rodapé esteja visível
-                const rodape = document.querySelector('.rodape');
-                if (rodape) {
-                    rodape.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                }
             } else {
                 // Modo retrato
                 document.body.style.overflowY = 'auto';
@@ -1280,7 +1259,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     setTimeout(verificarScroll, 500);
     window.addEventListener('resize', verificarScroll);
-
 });
 
 // Função global para forçar ajustes
@@ -1357,4 +1335,4 @@ document.addEventListener('keydown', (e) => {
       const tecla = document.querySelector(keyMap[e.key]);
       if (tecla) tecla.click();
     }
-  });
+});

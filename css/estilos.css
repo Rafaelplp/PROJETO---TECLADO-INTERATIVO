@@ -55,7 +55,7 @@ body.modo-dia {
   overscroll-behavior: none;
 }
 
-/* ========== MENU SUPERIOR (CENTRALIZADO E SEMPRE HORIZONTAL) ========== */
+/* ========== MENU SUPERIOR (AUMENTADO 15%) ========== */
 .menu-superior {
   display: flex !important;
   justify-content: center !important;
@@ -63,20 +63,20 @@ body.modo-dia {
   flex-wrap: nowrap !important;
   overflow-x: visible !important;
   overflow-y: hidden !important;
-  gap: 12px;
-  padding: 12px 20px;
+  gap: 14px;
+  padding: 14px 24px;
   background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
   border-radius: var(--borda-radius);
   flex-shrink: 0;
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(8px);
   width: 100%;
-  max-width: 650px;
+  max-width: 700px;
   margin: 0 auto;
   box-sizing: border-box;
-  transform: scale(0.75);
+  transform: scale(0.85);
   transform-origin: center;
-  min-height: 65px;
+  min-height: 75px;
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -91,23 +91,23 @@ body.modo-dia .menu-superior {
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* BOTÕES DO MENU */
+/* BOTÕES DO MENU (AUMENTADOS 15%) */
 .botao-menu {
   flex: 1 0 auto;
-  min-width: 60px;
-  max-width: 80px;
-  padding: 10px 8px;
-  border-radius: 10px;
+  min-width: 70px;
+  max-width: 92px;
+  padding: 12px 10px;
+  border-radius: 12px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
   color: white;
   font-family: 'Montserrat', sans-serif;
-  font-size: 0.72rem;
+  font-size: 0.83rem;
   font-weight: 600;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 6px;
   cursor: pointer;
   transition: var(--transicao);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -150,13 +150,13 @@ body.modo-dia .botao-menu:hover:not(.scrolling) {
 }
 
 .botao-menu .icone {
-  font-size: 1rem;
+  font-size: 1.15rem;
   line-height: 1;
   pointer-events: none;
 }
 
 .botao-menu .texto {
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   line-height: 1.1;
   font-weight: 600;
   text-transform: uppercase;
@@ -197,7 +197,7 @@ body.modo-dia .cabecalho h1 {
   margin: 0;
 }
 
-/* ========== TECLADO PRINCIPAL (COM SCROLL SEGURO) ========== */
+/* ========== TECLADO PRINCIPAL ========== */
 .teclado-container {
   flex: 1;
   display: flex;
@@ -287,22 +287,22 @@ body.modo-dia .tecla {
   color: var(--cor-texto-claro);
 }
 
-/* ========== RODAPÉ (SEM SCROLL HORIZONTAL) ========== */
+/* ========== RODAPÉ (AUMENTADO 15%) ========== */
 .rodape {
   background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
-  padding: 12px 15px;
+  padding: 14px 18px;
   border-radius: var(--borda-radius);
   border: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
   width: 100%;
-  max-width: 650px;
+  max-width: 700px;
   margin: 0 auto;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transform: scale(0.75);
+  transform: scale(0.85);
   transform-origin: center;
   box-sizing: border-box;
   overflow: hidden;
-  min-height: 65px;
+  min-height: 75px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -328,13 +328,13 @@ body.modo-dia .rodape {
 .contador-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
-  padding: 6px 8px;
-  border-radius: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
   flex: 1;
   min-width: 0;
-  max-width: 140px;
+  max-width: 160px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-sizing: border-box;
   touch-action: manipulation;
@@ -348,9 +348,9 @@ body.modo-dia .contador-item {
 }
 
 .contador-icon {
-  font-size: 0.9rem;
+  font-size: 1.05rem;
   flex-shrink: 0;
-  min-width: 24px;
+  min-width: 28px;
   text-align: center;
 }
 
@@ -365,7 +365,7 @@ body.modo-dia .contador-item {
 }
 
 .contador-label {
-  font-size: 0.55rem !important;
+  font-size: 0.65rem !important;
   opacity: 0.8;
   text-transform: uppercase;
   letter-spacing: 0.2px;
@@ -381,7 +381,7 @@ body.modo-dia .contador-item {
 
 .contador-valor {
   font-weight: 700;
-  font-size: 0.7rem !important;
+  font-size: 0.82rem !important;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -410,9 +410,9 @@ body.modo-dia .contador-item {
 
 .creditos {
   text-align: center;
-  font-size: 0.7rem !important;
+  font-size: 0.82rem !important;
   opacity: 0.6;
-  margin: 3px 0 0 0;
+  margin: 5px 0 0 0;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -510,20 +510,21 @@ body.modo-dia .modal-header h3 {
   }
   
   .menu-superior {
-      gap: 8px;
-      padding: 10px 12px;
-      transform: scale(0.7) !important;
-      min-height: 60px;
+      gap: 10px;
+      padding: 12px 16px;
+      transform: scale(0.8) !important;
+      min-height: 70px;
   }
   
   .botao-menu {
       min-width: 65px;
-      padding: 7px 5px;
-      font-size: 0.65rem !important;
+      max-width: 85px;
+      padding: 10px 8px;
+      font-size: 0.78rem !important;
   }
   
   .botao-menu .icone {
-      font-size: 0.9rem;
+      font-size: 1rem;
   }
   
   .cabecalho {
@@ -550,9 +551,9 @@ body.modo-dia .modal-header h3 {
   }
   
   .rodape {
-      padding: 10px 12px;
-      transform: scale(0.7) !important;
-      min-height: 60px;
+      padding: 12px 15px;
+      transform: scale(0.8) !important;
+      min-height: 70px;
   }
   
   .contador-visitas {
@@ -560,36 +561,37 @@ body.modo-dia .modal-header h3 {
   }
   
   .contador-item {
-      padding: 5px 7px;
-      min-width: 110px;
-      max-width: 130px;
+      padding: 6px 10px;
+      min-width: 130px;
+      max-width: 150px;
   }
   
   .contador-label {
-      font-size: 0.5rem !important;
+      font-size: 0.6rem !important;
   }
   
   .contador-valor {
-      font-size: 0.65rem !important;
+      font-size: 0.75rem !important;
   }
 }
 
 @media (max-width: 480px) {
   .menu-superior {
-      gap: 6px;
-      padding: 8px 10px;
-      transform: scale(0.65) !important;
-      min-height: 55px;
+      gap: 8px;
+      padding: 10px 12px;
+      transform: scale(0.75) !important;
+      min-height: 65px;
   }
   
   .botao-menu {
-      min-width: 55px;
-      padding: 6px 4px;
-      font-size: 0.6rem !important;
+      min-width: 60px;
+      max-width: 75px;
+      padding: 8px 6px;
+      font-size: 0.72rem !important;
   }
   
   .botao-menu .icone {
-      font-size: 0.8rem;
+      font-size: 0.95rem;
   }
   
   .cabecalho {
@@ -618,57 +620,58 @@ body.modo-dia .modal-header h3 {
   }
   
   .rodape {
-      padding: 8px 10px;
-      transform: scale(0.65) !important;
-      min-height: 55px;
+      padding: 10px 12px;
+      transform: scale(0.75) !important;
+      min-height: 65px;
   }
   
   .contador-item {
-      min-width: 90px;
-      max-width: 110px;
-      padding: 4px 6px;
+      min-width: 110px;
+      max-width: 130px;
+      padding: 6px 8px;
   }
   
   .creditos {
-      font-size: 0.65rem !important;
-      margin-top: 3px;
+      font-size: 0.75rem !important;
+      margin-top: 4px;
   }
 }
 
 /* TELAS MUITO PEQUENAS */
 @media (max-width: 350px) {
   .menu-superior {
-      transform: scale(0.65) !important;
-      gap: 4px;
-      padding: 6px 8px;
+      gap: 6px;
+      padding: 8px 10px;
+      transform: scale(0.7) !important;
   }
   
   .botao-menu {
       min-width: 55px;
-      max-width: 60px;
-      padding: 4px 2px;
-      font-size: 0.55rem !important;
+      max-width: 65px;
+      padding: 6px 4px;
+      font-size: 0.65rem !important;
   }
   
   .botao-menu .icone {
-      font-size: 0.8rem !important;
+      font-size: 0.85rem;
   }
   
   .rodape {
-      transform: scale(0.65) !important;
+      transform: scale(0.7) !important;
   }
   
   .contador-item {
-      min-width: 90px;
-      padding: 4px 5px;
+      min-width: 100px;
+      max-width: 115px;
+      padding: 5px 6px;
   }
   
   .contador-label {
-      font-size: 0.5rem !important;
+      font-size: 0.55rem !important;
   }
   
   .contador-valor {
-      font-size: 0.65rem !important;
+      font-size: 0.7rem !important;
   }
   
   .teclado-principal {
@@ -687,8 +690,8 @@ body.modo-dia .modal-header h3 {
   }
   
   .menu-superior {
-      max-width: 700px;
-      transform: scale(0.8) !important;
+      max-width: 750px;
+      transform: scale(0.9) !important;
   }
   
   .teclado-principal {
@@ -701,131 +704,155 @@ body.modo-dia .modal-header h3 {
   }
   
   .rodape {
-      max-width: 700px;
-      transform: scale(0.8) !important;
+      max-width: 750px;
+      transform: scale(0.9) !important;
   }
 }
 
-/* ========== PAISAGEM (HORIZONTAL) - AJUSTES CRÍTICOS ========== */
+/* ========== PAISAGEM (HORIZONTAL) - CORREÇÕES ========== */
 @media (orientation: landscape) and (max-height: 600px) {
   .app-container {
-      flex-direction: row;
-      flex-wrap: wrap;
-      padding: 5px;
-      gap: 5px;
-      overflow-y: auto;
-      height: 100vh;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    padding: 8px;
+    gap: 8px;
+    height: 100vh;
+    overflow-y: auto;
   }
   
   .menu-superior {
-      order: 1;
-      width: 100%;
-      max-width: 95%;
-      transform: scale(0.6) !important;
-      min-height: 50px;
-      margin: 0 auto;
+    order: 1;
+    width: 100%;
+    max-width: 95%;
+    transform: scale(0.75) !important;
+    min-height: 60px;
+    margin: 0 auto;
   }
   
   .cabecalho {
-      order: 2;
-      width: 100%;
-      min-height: 40px;
-      padding: 2px 0;
+    order: 2;
+    width: 100%;
+    min-height: 50px;
+    padding: 5px 0;
+    display: flex !important;
   }
   
   .cabecalho h1 {
-      font-size: 1.1rem !important;
-      margin-bottom: 2px;
+    font-size: 1.3rem !important;
+    margin-bottom: 3px;
   }
   
   .subtitulo {
-      font-size: 0.65rem !important;
+    font-size: 0.8rem !important;
   }
   
   .teclado-container {
-      order: 3;
-      flex: 1;
-      min-width: 0;
-      height: calc(100vh - 200px);
-      overflow-y: auto;
-      padding: 0 5px;
+    order: 3;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 5px 0;
+    width: 100%;
   }
   
   .teclado-principal {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 5px;
-      max-width: 100%;
-      padding: 5px;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 8px;
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 5px;
   }
   
   .tecla {
-      font-size: 1.3rem;
-      min-height: 60px;
-      border-radius: 10px;
+    font-size: 1.5rem;
+    min-height: 70px;
+    border-radius: 12px;
+    aspect-ratio: 1;
   }
   
   .rodape {
-      order: 4;
-      width: 100%;
-      max-width: 95%;
-      transform: scale(0.6) !important;
-      min-height: 50px;
-      margin: 0 auto;
-      padding: 8px 10px;
-  }
-  
-  .contador-item {
-      padding: 4px 6px;
-      max-width: 120px;
-  }
-  
-  .contador-label {
-      font-size: 0.5rem !important;
-  }
-  
-  .contador-valor {
-      font-size: 0.65rem !important;
-  }
-  
-  .creditos {
-      font-size: 0.65rem !important;
-  }
-}
-
-/* AJUSTE PARA CELULARES PEQUENOS EM PAISAGEM */
-@media (orientation: landscape) and (max-height: 400px) {
-  .menu-superior {
-      transform: scale(0.5) !important;
-      min-height: 40px;
-  }
-  
-  .cabecalho {
-      min-height: 30px;
-      display: none;
-  }
-  
-  .teclado-principal {
-      grid-template-columns: repeat(4, 1fr);
-      gap: 4px;
-  }
-  
-  .tecla {
-      font-size: 1.2rem;
-      min-height: 50px;
-  }
-  
-  .rodape {
-      transform: scale(0.5) !important;
-      min-height: 40px;
+    order: 4;
+    width: 100%;
+    max-width: 95%;
+    transform: scale(0.75) !important;
+    min-height: 60px;
+    margin: 5px auto 0 auto;
+    padding: 10px 15px;
   }
   
   .contador-visitas {
-      gap: 4px;
+    gap: 6px;
   }
   
   .contador-item {
-      padding: 3px 4px;
-      max-width: 100px;
+    padding: 6px 8px;
+    max-width: 140px;
+  }
+  
+  .contador-label {
+    font-size: 0.6rem !important;
+  }
+  
+  .contador-valor {
+    font-size: 0.75rem !important;
+  }
+  
+  .creditos {
+    font-size: 0.75rem !important;
+    margin-top: 4px;
+  }
+}
+
+/* AJUSTE PARA TELAS MUITO BAIXAS EM PAISAGEM */
+@media (orientation: landscape) and (max-height: 400px) {
+  .menu-superior {
+    transform: scale(0.65) !important;
+    min-height: 50px;
+    padding: 8px 12px;
+  }
+  
+  .botao-menu {
+    min-width: 60px;
+    max-width: 80px;
+    padding: 6px 4px;
+    font-size: 0.7rem !important;
+  }
+  
+  .cabecalho {
+    min-height: 40px;
+    padding: 3px 0;
+  }
+  
+  .cabecalho h1 {
+    font-size: 1.1rem !important;
+  }
+  
+  .subtitulo {
+    font-size: 0.7rem !important;
+  }
+  
+  .teclado-principal {
+    gap: 6px;
+  }
+  
+  .tecla {
+    font-size: 1.3rem;
+    min-height: 60px;
+  }
+  
+  .rodape {
+    transform: scale(0.65) !important;
+    min-height: 50px;
+    padding: 8px 12px;
+  }
+  
+  .contador-visitas {
+    gap: 5px;
+  }
+  
+  .contador-item {
+    padding: 5px 6px;
+    max-width: 120px;
   }
 }
 
@@ -1104,9 +1131,9 @@ small {
   }
   
   .menu-superior {
-      min-height: 60px;
-      padding: 6px 10px;
-      transform: scale(0.7) !important;
+      min-height: 70px;
+      padding: 10px 15px;
+      transform: scale(0.8) !important;
   }
   
   .cabecalho {
@@ -1123,9 +1150,9 @@ small {
   }
   
   .rodape {
-      min-height: 60px;
-      padding: 6px 10px;
-      transform: scale(0.7) !important;
+      min-height: 70px;
+      padding: 10px 15px;
+      transform: scale(0.8) !important;
   }
 }
 
