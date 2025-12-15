@@ -1,55 +1,66 @@
-// contadorVisitas.js - Sistema de contagem simplificado
-class ContadorVisitas {
-    constructor() {
-        this.contadorTotal = parseInt(localStorage.getItem('teclado_total_acessos')) || 0;
-        this.ultimoAcesso = new Date();
-        this.inicializar();
-    }
-
-    inicializar() {
-        // Incrementar contador
-        this.contadorTotal++;
-        localStorage.setItem('teclado_total_acessos', this.contadorTotal.toString());
+// contadorVisitas.js - Sistema otimizado
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        // Elementos
+        const contadorOnline = document.getElementById('contador-online');
+        const contadorTotal = document.getElementById('contador-total');
+        const ultimoAcesso = document.getElementById('ultimo-acesso');
         
-        // Salvar último acesso
-        localStorage.setItem('teclado_ultimo_acesso', this.ultimoAcesso.toISOString());
+        // Inicializar ou recuperar valores
+        let total = parseInt(localStorage.getItem('visitasTotal')) || 0;
+        let online = parseInt(localStorage.getItem('visitasOnline')) || 0;
+        let ultimo = localStorage.getItem('ultimoAcesso');
         
-        // Atualizar display
-        this.atualizarDisplay();
+        // Incrementar visitas
+        total++;
+        online++;
         
-        // Atualizar periodicamente
-        setInterval(() => this.atualizarDisplay(), 60000);
-    }
-
-    atualizarDisplay() {
-        // Online (simplificado - sempre 1)
-        const onlineEl = document.getElementById('contador-online');
-        if (onlineEl) onlineEl.textContent = '1';
+        // Salvar
+        localStorage.setItem('visitasTotal', total.toString());
+        localStorage.setItem('visitasOnline', online.toString());
         
-        // Total
-        const totalEl = document.getElementById('contador-total');
-        if (totalEl) totalEl.textContent = this.contadorTotal;
-        
-        // Último acesso
-        const ultimoEl = document.getElementById('ultimo-acesso');
-        if (ultimoEl) {
-            ultimoEl.textContent = this.formatarUltimoAcesso();
-        }
-    }
-
-    formatarUltimoAcesso() {
+        // Atualizar data/hora
         const agora = new Date();
-        const diferenca = agora - this.ultimoAcesso;
-        const minutos = Math.floor(diferenca / 60000);
+        const formatoData = agora.toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: '2-digit'
+        });
+        const formatoHora = agora.toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        const dataFormatada = `${formatoData} ${formatoHora}`;
         
-        if (minutos < 1) return 'Agora';
-        if (minutos < 60) return `${minutos}m`;
-        if (minutos < 1440) return `${Math.floor(minutos / 60)}h`;
-        return `${Math.floor(minutos / 1440)}d`;
+        localStorage.setItem('ultimoAcesso', dataFormatada);
+        
+        // Atualizar elementos
+        if (contadorTotal) contadorTotal.textContent = total.toLocaleString();
+        if (contadorOnline) contadorOnline.textContent = online.toLocaleString();
+        if (ultimoAcesso) ultimoAcesso.textContent = dataFormatada;
+        
+        // Simular usuários online (variar entre +-1)
+        setInterval(() => {
+            try {
+                const onlineAtual = parseInt(localStorage.getItem('visitasOnline')) || online;
+                const variacao = Math.random() > 0.5 ? 1 : -1;
+                const novoOnline = Math.max(1, onlineAtual + variacao);
+                
+                localStorage.setItem('visitasOnline', novoOnline.toString());
+                if (contadorOnline) contadorOnline.textContent = novoOnline.toLocaleString();
+            } catch (e) {
+                // Ignorar erros no intervalo
+            }
+        }, 30000);
+        
+    } catch (error) {
+        console.log('Contador de visitas: usando valores padrão');
+        // Valores padrão em caso de erro
+        const elementos = ['contador-online', 'contador-total', 'ultimo-acesso'];
+        elementos.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = id.includes('online') ? '1' : 
+                               id.includes('total') ? '1' : 'Agora';
+        });
     }
-}
-
-// Inicializar
-document.addEventListener('DOMContentLoaded', () => {
-    new ContadorVisitas();
 });

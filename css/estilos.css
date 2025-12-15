@@ -22,6 +22,8 @@ html, body {
   height: 100%;
   overflow: hidden;
   font-family: 'Montserrat', sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -34,6 +36,9 @@ body {
   padding: 0;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 
 body.modo-dia {
@@ -48,38 +53,40 @@ body.modo-dia {
   height: 100vh;
   max-width: 1000px;
   margin: 0 auto;
-  padding: 10px;
-  gap: 10px;
+  padding: 8px;
+  gap: 8px;
   overflow: hidden;
   box-sizing: border-box;
   overscroll-behavior: none;
+  position: relative;
+  width: 100%;
 }
 
-/* ========== MENU SUPERIOR (AUMENTADO 15% + 5%) ========== */
+/* ========== MENU SUPERIOR (CORRIGIDO - SEM CORTES) ========== */
 .menu-superior {
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
   flex-wrap: nowrap !important;
-  overflow-x: visible !important;
-  overflow-y: hidden !important;
-  gap: 14px;
-  padding: 14px 24px;
+  overflow: visible !important;
+  gap: 10px;
+  padding: 10px 15px;
   background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
   border-radius: var(--borda-radius);
   flex-shrink: 0;
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(8px);
   width: 100%;
-  max-width: 700px;
+  max-width: 680px;
   margin: 0 auto;
   box-sizing: border-box;
-  transform: scale(0.90);
-  transform-origin: center;
-  min-height: 75px;
+  min-height: 70px;
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  transform-origin: center;
+  position: relative;
+  z-index: 2;
 }
 
 .menu-superior::-webkit-scrollbar {
@@ -91,35 +98,36 @@ body.modo-dia .menu-superior {
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* BOTÕES DO MENU (AUMENTADOS 15%) */
+/* BOTÕES DO MENU (AJUSTADOS PARA NÃO CORTAR) */
 .botao-menu {
   flex: 1 0 auto;
-  min-width: 70px;
-  max-width: 92px;
-  padding: 12px 10px;
+  min-width: 60px;
+  max-width: 85px;
+  padding: 10px 8px;
   border-radius: 12px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
   color: white;
   font-family: 'Montserrat', sans-serif;
-  font-size: 0.83rem;
+  font-size: 0.78rem;
   font-weight: 600;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
   cursor: pointer;
   transition: var(--transicao);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
   white-space: nowrap;
-  overflow: hidden;
+  overflow: visible;
   text-overflow: ellipsis;
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
   position: relative;
-  z-index: 1;
+  z-index: 3;
+  margin: 0;
 }
 
 body.modo-dia .botao-menu {
@@ -150,13 +158,13 @@ body.modo-dia .botao-menu:hover:not(.scrolling) {
 }
 
 .botao-menu .icone {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   line-height: 1;
   pointer-events: none;
 }
 
 .botao-menu .texto {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   line-height: 1.1;
   font-weight: 600;
   text-transform: uppercase;
@@ -167,22 +175,27 @@ body.modo-dia .botao-menu:hover:not(.scrolling) {
 /* ========== CABEÇALHO ========== */
 .cabecalho {
   text-align: center;
-  padding: 8px 0;
+  padding: 6px 0;
   flex-shrink: 0;
-  min-height: 70px;
+  min-height: 60px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   box-sizing: border-box;
+  width: 100%;
 }
 
 .cabecalho h1 {
-  font-size: 1.9rem;
+  font-size: 1.4rem;
   color: var(--cor-destaque);
-  margin: 0 0 5px 0;
+  margin: 0 0 4px 0;
   font-weight: 700;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   line-height: 1.2;
+  padding: 0 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 body.modo-dia .cabecalho h1 {
@@ -191,10 +204,14 @@ body.modo-dia .cabecalho h1 {
 }
 
 .subtitulo {
-  font-size: 0.95rem;
+  font-size: 0.75rem;
   opacity: 0.9;
   font-weight: 500;
   margin: 0;
+  padding: 0 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ========== TECLADO PRINCIPAL ========== */
@@ -211,14 +228,15 @@ body.modo-dia .cabecalho h1 {
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
   width: 100%;
+  position: relative;
 }
 
 .teclado-principal {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  max-width: 550px;
+  max-width: 500px;
   margin: 0 auto;
   padding: 5px;
   box-sizing: border-box;
@@ -227,8 +245,8 @@ body.modo-dia .cabecalho h1 {
 .tecla {
   aspect-ratio: 1;
   border: none;
-  border-radius: 15px;
-  font-size: 1.8rem;
+  border-radius: 12px;
+  font-size: 1.6rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -244,6 +262,7 @@ body.modo-dia .cabecalho h1 {
   overflow: hidden;
   box-sizing: border-box;
   touch-action: manipulation;
+  min-height: 70px;
 }
 
 .tecla::before {
@@ -287,25 +306,25 @@ body.modo-dia .tecla {
   color: var(--cor-texto-claro);
 }
 
-/* ========== RODAPÉ (AUMENTADO 15% + 5%) ========== */
+/* ========== RODAPÉ (CORRIGIDO - SEM CORTES) ========== */
 .rodape {
   background: linear-gradient(180deg, #0f3460 0%, #16213e 100%);
-  padding: 14px 18px;
+  padding: 10px 15px;
   border-radius: var(--borda-radius);
   border: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
   width: 100%;
-  max-width: 700px;
+  max-width: 680px;
   margin: 0 auto;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transform: scale(0.90);
-  transform-origin: center;
   box-sizing: border-box;
-  overflow: hidden;
-  min-height: 75px;
+  overflow: visible;
+  min-height: 70px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  position: relative;
+  z-index: 2;
 }
 
 body.modo-dia .rodape {
@@ -317,7 +336,7 @@ body.modo-dia .rodape {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 5px;
   flex-wrap: nowrap !important;
   overflow: visible;
@@ -329,13 +348,13 @@ body.modo-dia .rodape {
 .contador-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: 10px;
   flex: 1;
   min-width: 0;
-  max-width: 160px;
+  max-width: 140px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-sizing: border-box;
   touch-action: manipulation;
@@ -343,6 +362,8 @@ body.modo-dia .rodape {
   -webkit-user-select: none;
   flex-shrink: 0;
   white-space: nowrap;
+  overflow: visible;
+  position: relative;
 }
 
 body.modo-dia .contador-item {
@@ -351,9 +372,9 @@ body.modo-dia .contador-item {
 }
 
 .contador-icon {
-  font-size: 1.05rem;
+  font-size: 1rem;
   flex-shrink: 0;
-  min-width: 28px;
+  min-width: 24px;
   text-align: center;
 }
 
@@ -368,7 +389,7 @@ body.modo-dia .contador-item {
 }
 
 .contador-label {
-  font-size: 0.65rem !important;
+  font-size: 0.6rem !important;
   opacity: 0.8;
   text-transform: uppercase;
   letter-spacing: 0.2px;
@@ -384,7 +405,7 @@ body.modo-dia .contador-item {
 
 .contador-valor {
   font-weight: 700;
-  font-size: 0.82rem !important;
+  font-size: 0.75rem !important;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -403,7 +424,7 @@ body.modo-dia .contador-item {
 
 #ultimo-acesso {
   color: #ffaa00;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
 }
 
 #versao-app {
@@ -413,7 +434,7 @@ body.modo-dia .contador-item {
 
 .creditos {
   text-align: center;
-  font-size: 0.82rem !important;
+  font-size: 0.75rem !important;
   opacity: 0.6;
   margin: 5px 0 0 0;
   font-weight: 500;
@@ -421,6 +442,7 @@ body.modo-dia .contador-item {
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+  padding: 0 5px;
 }
 
 /* ========== MODAL ========== */
@@ -507,23 +529,22 @@ body.modo-dia .modal-header h3 {
 /* ========== RESPONSIVIDADE ========== */
 @media (max-width: 768px) {
   .app-container {
-      padding: 8px;
-      gap: 8px;
+      padding: 6px;
+      gap: 6px;
       max-width: 100%;
   }
   
   .menu-superior {
-      gap: 10px;
-      padding: 12px 16px;
-      transform: scale(0.85) !important;
-      min-height: 70px;
+      gap: 8px;
+      padding: 8px 12px;
+      min-height: 65px;
   }
   
   .botao-menu {
-      min-width: 65px;
-      max-width: 85px;
-      padding: 10px 8px;
-      font-size: 0.78rem !important;
+      min-width: 55px;
+      max-width: 75px;
+      padding: 8px 6px;
+      font-size: 0.72rem !important;
   }
   
   .botao-menu .icone {
@@ -531,80 +552,12 @@ body.modo-dia .modal-header h3 {
   }
   
   .cabecalho {
-      padding: 6px 0;
-      min-height: 60px;
-  }
-  
-  .cabecalho h1 {
-      font-size: 1.4rem;
-  }
-  
-  .subtitulo {
-      font-size: 0.75rem;
-  }
-  
-  .teclado-principal {
-      gap: 8px;
-      max-width: 480px;
-  }
-  
-  .tecla {
-      font-size: 1.6rem;
-      border-radius: 12px;
-  }
-  
-  .rodape {
-      padding: 12px 15px;
-      transform: scale(0.85) !important;
-      min-height: 70px;
-  }
-  
-  .contador-visitas {
-      gap: 8px;
-  }
-  
-  .contador-item {
-      padding: 6px 10px;
-      min-width: 120px;
-      max-width: 140px;
-  }
-  
-  .contador-label {
-      font-size: 0.6rem !important;
-  }
-  
-  .contador-valor {
-      font-size: 0.75rem !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .menu-superior {
-      gap: 8px;
-      padding: 10px 12px;
-      transform: scale(0.80) !important;
-      min-height: 65px;
-  }
-  
-  .botao-menu {
-      min-width: 60px;
-      max-width: 75px;
-      padding: 8px 6px;
-      font-size: 0.72rem !important;
-  }
-  
-  .botao-menu .icone {
-      font-size: 0.95rem;
-  }
-  
-  .cabecalho {
-      min-height: 50px;
       padding: 4px 0;
+      min-height: 55px;
   }
   
   .cabecalho h1 {
       font-size: 1.2rem;
-      margin-bottom: 3px;
   }
   
   .subtitulo {
@@ -612,65 +565,29 @@ body.modo-dia .modal-header h3 {
   }
   
   .teclado-principal {
-      grid-template-columns: repeat(3, 1fr);
       gap: 6px;
-      max-width: 320px;
+      max-width: 450px;
   }
   
   .tecla {
       font-size: 1.4rem;
       border-radius: 10px;
-  }
-  
-  .rodape {
-      padding: 10px 12px;
-      transform: scale(0.80) !important;
       min-height: 65px;
   }
   
-  .contador-item {
-      min-width: 100px;
-      max-width: 120px;
-      padding: 6px 8px;
-  }
-  
-  .creditos {
-      font-size: 0.75rem !important;
-      margin-top: 4px;
+  .rodape {
+      padding: 8px 12px;
+      min-height: 65px;
   }
   
   .contador-visitas {
-    gap: 4px;
-  }
-}
-
-/* TELAS MUITO PEQUENAS */
-@media (max-width: 350px) {
-  .menu-superior {
-      gap: 6px;
-      padding: 8px 10px;
-      transform: scale(0.75) !important;
-  }
-  
-  .botao-menu {
-      min-width: 55px;
-      max-width: 65px;
-      padding: 6px 4px;
-      font-size: 0.65rem !important;
-  }
-  
-  .botao-menu .icone {
-      font-size: 0.85rem;
-  }
-  
-  .rodape {
-      transform: scale(0.75) !important;
+      gap: 5px;
   }
   
   .contador-item {
-      min-width: 90px;
-      max-width: 100px;
-      padding: 5px 6px;
+      padding: 5px 8px;
+      min-width: 100px;
+      max-width: 120px;
   }
   
   .contador-label {
@@ -680,13 +597,124 @@ body.modo-dia .modal-header h3 {
   .contador-valor {
       font-size: 0.7rem !important;
   }
+}
+
+@media (max-width: 480px) {
+  .app-container {
+      padding: 4px;
+      gap: 4px;
+  }
+  
+  .menu-superior {
+      gap: 6px;
+      padding: 6px 10px;
+      min-height: 60px;
+  }
+  
+  .botao-menu {
+      min-width: 50px;
+      max-width: 65px;
+      padding: 6px 4px;
+      font-size: 0.65rem !important;
+  }
+  
+  .botao-menu .icone {
+      font-size: 0.9rem;
+  }
+  
+  .cabecalho {
+      min-height: 50px;
+      padding: 3px 0;
+  }
+  
+  .cabecalho h1 {
+      font-size: 1rem;
+      margin-bottom: 2px;
+  }
+  
+  .subtitulo {
+      font-size: 0.65rem;
+  }
+  
+  .teclado-principal {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      max-width: 320px;
+  }
+  
+  .tecla {
+      font-size: 1.3rem;
+      border-radius: 8px;
+      min-height: 60px;
+  }
+  
+  .rodape {
+      padding: 6px 10px;
+      min-height: 60px;
+  }
+  
+  .contador-item {
+      min-width: 85px;
+      max-width: 100px;
+      padding: 5px 6px;
+      gap: 4px;
+  }
+  
+  .creditos {
+      font-size: 0.7rem !important;
+      margin-top: 3px;
+  }
+  
+  .contador-visitas {
+    gap: 3px;
+  }
+}
+
+/* TELAS MUITO PEQUENAS */
+@media (max-width: 350px) {
+  .menu-superior {
+      gap: 4px;
+      padding: 5px 8px;
+      min-height: 55px;
+  }
+  
+  .botao-menu {
+      min-width: 45px;
+      max-width: 55px;
+      padding: 5px 3px;
+      font-size: 0.6rem !important;
+  }
+  
+  .botao-menu .icone {
+      font-size: 0.8rem;
+  }
+  
+  .rodape {
+      padding: 5px 8px;
+      min-height: 55px;
+  }
+  
+  .contador-item {
+      min-width: 75px;
+      max-width: 85px;
+      padding: 4px 5px;
+  }
+  
+  .contador-label {
+      font-size: 0.5rem !important;
+  }
+  
+  .contador-valor {
+      font-size: 0.65rem !important;
+  }
   
   .teclado-principal {
       gap: 4px;
   }
   
   .tecla {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
+      min-height: 55px;
   }
   
   .contador-visitas {
@@ -698,11 +726,13 @@ body.modo-dia .modal-header h3 {
 @media (min-width: 1200px) {
   .app-container {
       max-width: 1100px;
+      padding: 10px;
+      gap: 10px;
   }
   
   .menu-superior {
       max-width: 750px;
-      transform: scale(0.95) !important;
+      padding: 12px 20px;
   }
   
   .teclado-principal {
@@ -711,12 +741,13 @@ body.modo-dia .modal-header h3 {
   }
   
   .tecla {
-      font-size: 2rem;
+      font-size: 1.8rem;
+      min-height: 80px;
   }
   
   .rodape {
       max-width: 750px;
-      transform: scale(0.95) !important;
+      padding: 12px 20px;
   }
 }
 
@@ -725,8 +756,8 @@ body.modo-dia .modal-header h3 {
   .app-container {
     flex-direction: column !important;
     flex-wrap: nowrap !important;
-    padding: 8px;
-    gap: 8px;
+    padding: 6px;
+    gap: 6px;
     height: 100vh;
     overflow-y: auto;
   }
@@ -735,26 +766,25 @@ body.modo-dia .modal-header h3 {
     order: 1;
     width: 100%;
     max-width: 95%;
-    transform: scale(0.75) !important;
-    min-height: 60px;
+    min-height: 55px;
     margin: 0 auto;
   }
   
   .cabecalho {
     order: 2;
     width: 100%;
-    min-height: 50px;
-    padding: 5px 0;
+    min-height: 45px;
+    padding: 4px 0;
     display: flex !important;
   }
   
   .cabecalho h1 {
-    font-size: 1.3rem !important;
-    margin-bottom: 3px;
+    font-size: 1.1rem !important;
+    margin-bottom: 2px;
   }
   
   .subtitulo {
-    font-size: 0.8rem !important;
+    font-size: 0.7rem !important;
   }
   
   .teclado-container {
@@ -768,16 +798,16 @@ body.modo-dia .modal-header h3 {
   
   .teclado-principal {
     grid-template-columns: repeat(4, 1fr) !important;
-    gap: 8px;
+    gap: 6px;
     max-width: 95%;
     margin: 0 auto;
     padding: 5px;
   }
   
   .tecla {
-    font-size: 1.5rem;
-    min-height: 70px;
-    border-radius: 12px;
+    font-size: 1.3rem;
+    min-height: 60px;
+    border-radius: 10px;
     aspect-ratio: 1;
   }
   
@@ -785,85 +815,82 @@ body.modo-dia .modal-header h3 {
     order: 4;
     width: 100%;
     max-width: 95%;
-    transform: scale(0.75) !important;
-    min-height: 60px;
+    min-height: 55px;
     margin: 5px auto 0 auto;
-    padding: 10px 15px;
+    padding: 8px 12px;
   }
   
   .contador-visitas {
-    gap: 6px;
+    gap: 4px;
   }
   
   .contador-item {
-    padding: 6px 8px;
-    max-width: 140px;
+    padding: 5px 6px;
+    max-width: 110px;
   }
   
   .contador-label {
-    font-size: 0.6rem !important;
+    font-size: 0.55rem !important;
   }
   
   .contador-valor {
-    font-size: 0.75rem !important;
+    font-size: 0.65rem !important;
   }
   
   .creditos {
-    font-size: 0.75rem !important;
-    margin-top: 4px;
+    font-size: 0.7rem !important;
+    margin-top: 3px;
   }
 }
 
 /* AJUSTE PARA TELAS MUITO BAIXAS EM PAISAGEM */
 @media (orientation: landscape) and (max-height: 400px) {
   .menu-superior {
-    transform: scale(0.65) !important;
     min-height: 50px;
-    padding: 8px 12px;
+    padding: 5px 10px;
   }
   
   .botao-menu {
-    min-width: 60px;
-    max-width: 80px;
-    padding: 6px 4px;
-    font-size: 0.7rem !important;
+    min-width: 50px;
+    max-width: 65px;
+    padding: 5px 3px;
+    font-size: 0.6rem !important;
   }
   
   .cabecalho {
     min-height: 40px;
-    padding: 3px 0;
+    padding: 2px 0;
   }
   
   .cabecalho h1 {
-    font-size: 1.1rem !important;
+    font-size: 1rem !important;
   }
   
   .subtitulo {
-    font-size: 0.7rem !important;
+    font-size: 0.6rem !important;
   }
   
   .teclado-principal {
-    gap: 6px;
+    gap: 4px;
   }
   
   .tecla {
-    font-size: 1.3rem;
-    min-height: 60px;
+    font-size: 1.2rem;
+    min-height: 50px;
   }
   
   .rodape {
-    transform: scale(0.65) !important;
     min-height: 50px;
-    padding: 8px 12px;
+    padding: 6px 10px;
   }
   
   .contador-visitas {
-    gap: 5px;
+    gap: 3px;
   }
   
   .contador-item {
-    padding: 5px 6px;
-    max-width: 120px;
+    padding: 4px 5px;
+    max-width: 100px;
   }
 }
 
@@ -1138,42 +1165,40 @@ small {
 /* ========== AJUSTES DE ALTURA ========== */
 @media (max-height: 700px) {
   .app-container {
-      gap: 5px;
+      gap: 4px;
   }
   
   .menu-superior {
-      min-height: 70px;
-      padding: 10px 15px;
-      transform: scale(0.85) !important;
+      min-height: 65px;
+      padding: 8px 12px;
   }
   
   .cabecalho {
       min-height: 50px;
-      padding: 4px 0;
+      padding: 3px 0;
   }
   
   .teclado-principal {
-      gap: 6px;
+      gap: 5px;
   }
   
   .tecla {
-      font-size: 1.6rem;
+      font-size: 1.4rem;
   }
   
   .rodape {
-      min-height: 70px;
-      padding: 10px 15px;
-      transform: scale(0.85) !important;
+      min-height: 65px;
+      padding: 8px 12px;
   }
 }
 
 @media (max-height: 600px) {
   .cabecalho h1 {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
   }
   
   .subtitulo {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
   }
   
   .teclado-principal {
@@ -1181,6 +1206,46 @@ small {
   }
   
   .tecla {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
+  }
+}
+
+/* Garantir que todo o conteúdo caiba na tela */
+@media (max-height: 500px) {
+  .app-container {
+    gap: 3px;
+  }
+  
+  .menu-superior {
+    min-height: 55px;
+    padding: 6px 10px;
+  }
+  
+  .cabecalho {
+    min-height: 40px;
+    padding: 2px 0;
+  }
+  
+  .cabecalho h1 {
+    font-size: 1rem;
+  }
+  
+  .subtitulo {
+    font-size: 0.6rem;
+  }
+  
+  .teclado-principal {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+  }
+  
+  .tecla {
+    font-size: 1.2rem;
+    min-height: 50px;
+  }
+  
+  .rodape {
+    min-height: 55px;
+    padding: 6px 10px;
   }
 }

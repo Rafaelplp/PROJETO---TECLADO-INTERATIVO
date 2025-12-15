@@ -2,14 +2,14 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Teclado Meme Interativo</title>
     
     <!-- Fontes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="images/emoji-png-0017.png">
+    <link rel="icon" type="image/png" href="images/emoji-png-0017.png"> 
 
     <!-- Estilos -->
     <link rel="stylesheet" href="css/reset.css">
@@ -19,10 +19,14 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a1a2e">
+    
+    <!-- Android meta tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1a1a2e">
 </head>
 <body>
     <div class="app-container">
-        <!-- Menu Superior (Aumentado 15% + 5%) -->
+        <!-- Menu Superior -->
         <nav class="menu-superior">
             <button id="botao-editar" class="botao-menu">
                 <span class="icone">✏️</span>
@@ -76,7 +80,7 @@
             </div>
         </main>
 
-        <!-- Rodapé (Aumentado 15% + 5%) -->
+        <!-- Rodapé -->
         <footer class="rodape">
             <div class="contador-visitas">
                 <div class="contador-item">
@@ -107,7 +111,7 @@
                     <span class="contador-icon">📱</span>
                     <div class="contador-info">
                         <span class="contador-label">Versão</span>
-                        <span class="contador-valor" id="versao-app">4.5.1</span>
+                        <span class="contador-valor" id="versao-app">5.0</span>
                     </div>
                 </div>
             </div>
@@ -116,7 +120,7 @@
         </footer>
     </div>
 
-    <!-- Áudios -->
+    <!-- Áudios originais (fallback) -->
     <audio id="som_tecla_pom" preload="auto">
         <source src="sons/pom.mp3" type="audio/mpeg">
     </audio>
@@ -158,28 +162,20 @@
     <script src="js/contadorVisitas.js"></script>
     <script src="js/main.js"></script>
     
-    <!-- Script de inicialização adaptativa -->
+    <!-- Inicialização otimizada para mobile -->
     <script>
-        // Garantir adaptação imediata
-        document.addEventListener('DOMContentLoaded', function() {
-            // Forçar redimensionamento inicial
-            setTimeout(function() {
-                window.dispatchEvent(new Event('resize'));
-            }, 100);
-            
-            // Prevenir zoom com dois dedos, mas permitir scroll
-            document.addEventListener('touchstart', function(e) {
-                if (e.touches.length > 1) {
-                    e.preventDefault();
-                }
-            }, { passive: false });
-            
-            // Permitir scroll na página toda
-            document.body.style.overflowY = 'auto';
-            document.documentElement.style.overflowY = 'auto';
+        // Prevenir comportamentos padrão problemáticos
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
         });
         
-        // Ajustar para iOS
+        // Ajustar viewport para iOS
         if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
             document.documentElement.style.height = '100%';
             document.body.style.height = '100%';
@@ -188,9 +184,23 @@
                 setTimeout(function() {
                     document.documentElement.style.height = window.innerHeight + 'px';
                     document.body.style.height = window.innerHeight + 'px';
+                    
+                    // Forçar ajuste de layout
+                    if (window.ajustarLayoutApp) {
+                        ajustarLayoutApp();
+                    }
                 }, 100);
             });
         }
+        
+        // Inicializar após carregamento
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                if (window.ajustarLayoutApp) {
+                    ajustarLayoutApp();
+                }
+            }, 300);
+        });
     </script>
 </body>
 </html>
