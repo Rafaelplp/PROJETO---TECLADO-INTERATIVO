@@ -1,5 +1,5 @@
 // main.js - Teclado Interativo v4.5.1
-// Menu e rodapé aumentados 15% + Sons funcionando + Paisagem otimizado
+// Menu e rodapé aumentados 15% + 5% lateral + Sons funcionando + Rodapé corrigido
 
 class TecladoInterativo {
     constructor() {
@@ -85,6 +85,9 @@ class TecladoInterativo {
     inicializar() {
         console.log('🎹 Teclado Interativo v4.5.1 - Iniciando...');
         
+        // SOLUÇÃO: Ativar contexto de áudio imediatamente
+        this.ativarContextoAudio();
+        
         // Configurar modo noturno
         this.configurarModoNoturno();
         
@@ -103,6 +106,23 @@ class TecladoInterativo {
         this.carregarAudios();
         
         console.log('✅ Teclado pronto para uso!');
+    }
+    
+    ativarContextoAudio() {
+        // Ativar contexto de áudio no início para evitar problemas
+        if (window.AudioContext || window.webkitAudioContext) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.audioContext = new AudioContext();
+            
+            // Tocar um som silencioso para "destravar" o áudio
+            window.addEventListener('click', () => {
+                if (this.audioContext.state === 'suspended') {
+                    this.audioContext.resume().then(() => {
+                        console.log('✅ Contexto de áudio ativado');
+                    });
+                }
+            }, { once: true });
+        }
     }
     
     // ========== SISTEMA DE ÁUDIO SIMPLIFICADO ==========
@@ -133,78 +153,83 @@ class TecladoInterativo {
             return;
         }
         
-        // Parar som atual se estiver tocando
-        if (this.audioAtual && this.audioAtual !== audioElement) {
-            this.audioAtual.pause();
-            this.audioAtual.currentTime = 0;
-        }
-        
-        // Resetar e tocar
-        audioElement.currentTime = 0;
-        this.audioAtual = audioElement;
-        
-        // Tentar tocar - método SIMPLES
-        const playAudio = () => {
-            try {
-                const playPromise = audioElement.play();
-                
-                if (playPromise !== undefined) {
-                    playPromise
-                        .then(() => {
-                            // Sucesso
-                            this.onSomTocadoSucesso(audioElement);
-                        })
-                        .catch(error => {
-                            console.log('❌ Erro ao tocar (tentativa 1):', error.message);
-                            
-                            // Tentativa 2: Usar contexto de áudio
-                            this.tentarComContextoDeAudio(audioElement);
-                        });
-                }
-            } catch (error) {
-                console.log('❌ Erro ao tocar (catch):', error);
+        // SOLUÇÃO: Sempre parar e reiniciar o áudio
+        try {
+            // Parar todos os sons primeiro
+            document.querySelectorAll('audio').forEach(audio => {
+                audio.pause();
+                audio.currentTime = 0;
+            });
+            
+            // Resetar o áudio atual
+            audioElement.currentTime = 0;
+            
+            // Tocar o áudio - método direto
+            const playPromise = audioElement.play();
+            
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        console.log(`✅ Som tocando: ${idElementoAudio}`);
+                        this.onSomTocadoSucesso(audioElement);
+                    })
+                    .catch(error => {
+                        console.log('❌ Erro ao tocar (tentativa 1):', error.message);
+                        
+                        // Tentativa 2: Interação do usuário necessária
+                        if (error.name === 'NotAllowedError') {
+                            this.mostrarFeedback('🔊 Clique novamente para ativar sons', 2000);
+                            return;
+                        }
+                        
+                        // Tentativa 3: Usar Web Audio API como fallback
+                        this.tocarSomFallback(audioElement);
+                    });
             }
-        };
-        
-        // Executar imediatamente
-        playAudio();
+        } catch (error) {
+            console.log('❌ Erro ao tocar:', error);
+            this.mostrarFeedback('🔊 Toque novamente', 1500);
+        }
     }
     
-    tentarComContextoDeAudio(audioElement) {
-        // Tentar usar Web Audio API como fallback
-        if (window.AudioContext || window.webkitAudioContext) {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
+    tocarSomFallback(audioElement) {
+        // Tentar criar um clone do áudio e tocar
+        try {
+            const clone = audioElement.cloneNode(true);
+            clone.currentTime = 0;
             
-            if (!this.audioContext) {
-                this.audioContext = new AudioContext();
-            }
+            // Adicionar temporariamente ao DOM
+            document.body.appendChild(clone);
             
-            // Garantir que o contexto esteja ativo
-            if (this.audioContext.state === 'suspended') {
-                this.audioContext.resume().then(() => {
-                    console.log('✅ Contexto de áudio ativado');
-                    
-                    // Tentar tocar novamente
-                    setTimeout(() => {
-                        audioElement.currentTime = 0;
-                        const playPromise = audioElement.play();
+            const playPromise = clone.play();
+            
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        console.log('✅ Som tocando via clone');
                         
-                        if (playPromise !== undefined) {
-                            playPromise
-                                .then(() => {
-                                    this.onSomTocadoSucesso(audioElement);
-                                })
-                                .catch(e => {
-                                    console.log('❌ Falha mesmo com contexto:', e.message);
-                                    this.mostrarFeedback('🔊 Toque novamente', 1500);
-                                });
-                        }
-                    }, 50);
-                });
+                        // Remover após terminar
+                        clone.addEventListener('ended', () => {
+                            clone.remove();
+                        });
+                        
+                        setTimeout(() => {
+                            if (!clone.paused) {
+                                clone.pause();
+                                clone.remove();
+                            }
+                        }, 5000);
+                        
+                        this.onSomTocadoSucesso(audioElement);
+                    })
+                    .catch(e => {
+                        console.log('❌ Falha com clone:', e.message);
+                        clone.remove();
+                        this.mostrarFeedback('🔊 Ative os sons nas configurações', 2000);
+                    });
             }
-        } else {
-            // Navegador não suporta Web Audio API
-            this.mostrarFeedback('🔊 Toque novamente', 1500);
+        } catch (error) {
+            console.log('❌ Falha no fallback:', error);
         }
     }
     
@@ -247,24 +272,27 @@ class TecladoInterativo {
         // Elementos
         const menu = document.querySelector('.menu-superior');
         const rodape = document.querySelector('.rodape');
-        const contadorVisitas = document.querySelector('.contador-visitas');
-        const itensContador = document.querySelectorAll('.contador-item');
+        const contadorVisitas = rodape?.querySelector('.contador-visitas');
+        const itensContador = rodape?.querySelectorAll('.contador-item');
         
         if (!menu || !rodape || !contadorVisitas) return;
         
         // 1. Ajustar Menu
         this.ajustarMenuParaTela();
         
-        // 2. Ajustar Rodapé para caber SEM scroll
+        // 2. FORÇAR: Garantir que contador NÃO quebre linha
+        contadorVisitas.style.flexWrap = 'nowrap';
+        contadorVisitas.style.whiteSpace = 'nowrap';
+        
+        // 3. Reduzir escala do rodapé se necessário, mas manter na mesma linha
         const larguraRodape = rodape.offsetWidth || larguraTela * 0.9;
-        const larguraDisponivel = larguraRodape * 0.9;
+        const larguraDisponivel = larguraRodape * 0.95; // 95% do rodapé
         
         // Calcular largura total dos itens
         let larguraTotalItens = 0;
         itensContador.forEach(item => {
             const estilo = window.getComputedStyle(item);
-            const margem = parseInt(estilo.marginLeft) + parseInt(estilo.marginRight);
-            larguraTotalItens += item.offsetWidth + margem;
+            larguraTotalItens += item.offsetWidth + 8; // Margem aproximada
         });
         
         // Adicionar gap
@@ -272,32 +300,35 @@ class TecladoInterativo {
         const gap = parseInt(estiloContador.gap) || 8;
         larguraTotalItens += gap * (itensContador.length - 1);
         
-        // Se não couber, reduzir escala do rodapé
+        // Se não couber, reduzir ainda mais os itens
         if (larguraTotalItens > larguraDisponivel && larguraDisponivel > 0) {
-            const fatorReducao = larguraDisponivel / larguraTotalItens;
-            const escala = Math.min(fatorReducao * 0.9, isLandscape ? 0.75 : 0.85);
-            rodape.style.transform = `scale(${escala})`;
+            // Reduzir gap primeiro
+            contadorVisitas.style.gap = '4px';
             
-            // Ajustar também o contador
-            contadorVisitas.style.gap = `${Math.max(gap * 0.7, 4)}px`;
+            // Reduzir padding dos itens
+            itensContador.forEach(item => {
+                item.style.padding = '6px 8px';
+            });
+            
+            // Se ainda não couber, reduzir escala do rodapé
+            if (larguraTotalItens * 0.9 > larguraDisponivel) {
+                const escala = isLandscape ? 0.70 : 0.80;
+                rodape.style.transform = `scale(${escala})`;
+            }
         } else {
-            rodape.style.transform = isLandscape ? 'scale(0.75)' : 'scale(0.85)';
-            contadorVisitas.style.gap = '8px';
+            rodape.style.transform = isLandscape ? 'scale(0.75)' : 'scale(0.90)';
         }
         
         rodape.style.transformOrigin = 'center';
         
-        // 3. Garantir que não haja scroll horizontal no rodapé
+        // 4. IMPORTANTE: Garantir que não haja scroll horizontal
         rodape.style.overflowX = 'hidden';
         rodape.style.overflowY = 'hidden';
+        rodape.style.width = '100%';
         
-        // 4. Forçar quebra de linha se necessário (último recurso)
-        if (larguraTotalItens > larguraDisponivel * 1.5) {
-            contadorVisitas.style.flexWrap = 'wrap';
-            contadorVisitas.style.justifyContent = 'center';
-        } else {
-            contadorVisitas.style.flexWrap = 'nowrap';
-        }
+        // 5. Prevenir quebra de linha a qualquer custo
+        contadorVisitas.style.flexWrap = 'nowrap';
+        contadorVisitas.style.flexShrink = '0';
     }
     
     ajustarMenuParaTela() {
