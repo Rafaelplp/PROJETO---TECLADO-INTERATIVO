@@ -5,6 +5,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const contadorOnline = document.getElementById('contador-online');
         const contadorTotal = document.getElementById('contador-total');
         const ultimoAcesso = document.getElementById('ultimo-acesso');
+        const versaoApp = document.getElementById('versao-app');
+        
+        // Definir versão
+        if (versaoApp) {
+            versaoApp.textContent = '5.1';
+        }
         
         // Inicializar ou recuperar valores
         let total = parseInt(localStorage.getItem('visitasTotal')) || 0;

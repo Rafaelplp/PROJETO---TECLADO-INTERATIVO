@@ -57,26 +57,26 @@
         <!-- Cabeçalho -->
         <header class="cabecalho">
             <h1>TECLADO MEME INTERATIVO</h1>
-            <p class="subtitulo">Toque nas teclas para tocar sons!</p>
+            <p class="subtitulo">Toque nas teclas para tocar sons memes!</p>
         </header>
 
         <!-- Teclado -->
         <main class="teclado-container">
             <div class="teclado-principal">
-                <button class="tecla tecla_pom" data-som="pom">&#129300</button>
-                <button class="tecla tecla_clap" data-som="clap">&#129396</button>
-                <button class="tecla tecla_tim" data-som="tim">&#128578</button>
-                <button class="tecla tecla_extra1" data-som="extra1">🎮</button>
+                <button class="tecla tecla_pom" data-som="pom" data-audio="among-sound">&#129300</button>
+                <button class="tecla tecla_clap" data-som="clap" data-audio="tf_nemesis">&#129396</button>
+                <button class="tecla tecla_tim" data-som="tim" data-audio="anime-sound">&#128578</button>
+                <button class="tecla tecla_extra1" data-som="extra1" data-audio="creditos-finales">🎮</button>
                 
-                <button class="tecla tecla_puff" data-som="puff">&#128565</button>
-                <button class="tecla tecla_splash" data-som="splash">&#128571</button>
-                <button class="tecla tecla_toim" data-som="toim">&#128572</button>
-                <button class="tecla tecla_extra2" data-som="extra2">🎵</button>
+                <button class="tecla tecla_puff" data-som="puff" data-audio="dun-dun-dun-sound">&#128565</button>
+                <button class="tecla tecla_splash" data-som="splash" data-audio="error_sound">&#128571</button>
+                <button class="tecla tecla_toim" data-som="toim" data-audio="george-micael">&#128572</button>
+                <button class="tecla tecla_extra2" data-som="extra2" data-audio="lets-go-sound">🎵</button>
                 
-                <button class="tecla tecla_psh" data-som="psh">&#129303</button>
-                <button class="tecla tecla_tic" data-som="tic">&#129321</button>
-                <button class="tecla tecla_tom" data-som="tom">&#128520</button>
-                <button class="tecla tecla_extra3" data-som="extra3">✨</button>
+                <button class="tecla tecla_psh" data-som="psh" data-audio="m-e-o-w">&#129303</button>
+                <button class="tecla tecla_tic" data-som="tic" data-audio="para-tira-que-eu-vou-cagar">&#129321</button>
+                <button class="tecla tecla_tom" data-som="tom" data-audio="pedro-song">&#128520</button>
+                <button class="tecla tecla_extra3" data-som="extra3" data-audio="yippee">✨</button>
             </div>
         </main>
 
@@ -111,51 +111,51 @@
                     <span class="contador-icon">📱</span>
                     <div class="contador-info">
                         <span class="contador-label">Versão</span>
-                        <span class="contador-valor" id="versao-app">5.0</span>
+                        <span class="contador-valor" id="versao-app">5.1</span>
                     </div>
                 </div>
             </div>
             
-            <p class="creditos">Teclado Interativo &copy; 2024 - Desenvolvido com 💖 por Rafael Lira.</p>
+            <p class="creditos">Teclado Meme Interativo &copy; 2024 - Desenvolvido com 💖 por Rafael Lira.</p>
         </footer>
     </div>
 
-    <!-- Áudios originais (fallback) -->
+    <!-- Áudios Memes Padrão -->
     <audio id="som_tecla_pom" preload="auto">
-        <source src="sons/pom.mp3" type="audio/mpeg">
+        <source src="sounds-memes/among-sound.mp3" type="audio/mp3">
     </audio>
     <audio id="som_tecla_clap" preload="auto">
-        <source src="sons/clap.mp3" type="audio/mpeg">
+        <source src="sounds-memes/tf_nemesis.mp3" type="audio/mp3">
     </audio>
     <audio id="som_tecla_tim" preload="auto">
-        <source src="sons/tim.mp3" type="audio/mpeg">
+        <source src="sounds-memes/anime-sound.mp3" type="audio/mp3">
     </audio>
     <audio id="som_tecla_extra1" preload="auto">
-        <source src="sons/extra1.mp3" type="audio/mpeg">
+        <source src="sounds-memes/creditos-finales.mp3" type="audio/mp3">
     </audio>
     <audio id="som_tecla_puff" preload="auto">
-        <source src="sons/puff.mp3" type="audio/mpeg">
+        <source src="sounds-memes/dun-dun-dun-sound.mp3" type="audio/mp3">
     </audio>
     <audio id="som_tecla_splash" preload="auto">
-        <source src="sons/splash.mp3" type="audio/mpeg">
+        <source src="sounds-memes/error_sound.mp3" type="audio/mp3">
     </audio>
     <audio id="som_tecla_toim" preload="auto">
-        <source src="sons/toim.mp3" type="audio/mpeg">
+        <source src="sounds-memes/george-micael.mp3" type="audio/mp3">
     </audio>
     <audio id="som_tecla_extra2" preload="auto">
-        <source src="sons/extra2.mp3" type="audio/mpeg">
+        <source src="sounds-memes/lets-go-sound.mp3" type="audio/mp3">
     </audio>
     <audio id="som_tecla_psh" preload="auto">
-        <source src="sons/psh.mp3" type="audio/mpeg">
+        <source src="sounds-memes/m-e-o-w.mp3" type="audio/mp3">
     </audio>
     <audio id="som_tecla_tic" preload="auto">
-        <source src="sons/tic.mp3" type="audio/mpeg">
+        <source src="sounds-memes/para-tira-que-eu-vou-cagar.mp3" type="audio/mp3">
     </audio>
     <audio id="som_tecla_tom" preload="auto">
-        <source src="sons/tom.mp3" type="audio/mpeg">
+        <source src="sounds-memes/pedro-song.mp3" type="audio/mp3">
     </audio>
     <audio id="som_tecla_extra3" preload="auto">
-        <source src="sons/extra3.mp3" type="audio/mpeg">
+        <source src="sounds-memes/yippee.mp3" type="audio/mp3">
     </audio>
 
     <!-- Scripts -->

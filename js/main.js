@@ -1,10 +1,11 @@
-// main.js - Teclado Interativo v5.0 - SOLUÇÃO DEFINITIVA PARA ÁUDIO
-// Layout otimizado para caber em dispositivos móveis
+// main.js - Teclado Meme Interativo v5.1
+// Sistema de áudio aprimorado com controle de parada
 
 class TecladoInterativo {
     constructor() {
         // Estado do aplicativo
         this.audioAtual = null;
+        this.audioSourcesAtivas = new Set();
         this.modoEdicao = false;
         this.modoNoturno = localStorage.getItem('modoNoturno') === 'true';
         this.coresTeclas = JSON.parse(localStorage.getItem('coresTeclas')) || {};
@@ -25,6 +26,20 @@ class TecladoInterativo {
         this.audioBuffers = new Map();
         this.audioUnlocked = false;
         this.audioElements = new Map();
+        this.sonsPadrao = {
+            'pom': 'among-sound.mp3',
+            'clap': 'tf_nemesis.mp3',
+            'tim': 'anime-sound.mp3',
+            'extra1': 'creditos-finales.mp3',
+            'puff': 'dun-dun-dun-sound.mp3',
+            'splash': 'error_sound.mp3',
+            'toim': 'george-micael.mp3',
+            'extra2': 'lets-go-sound.mp3',
+            'psh': 'm-e-o-w.mp3',
+            'tic': 'para-tira-que-eu-vou-cagar.mp3',
+            'tom': 'pedro-song.mp3',
+            'extra3': 'yippee.mp3'
+        };
         
         // Controle de toque
         this.ultimoToque = 0;
@@ -68,7 +83,7 @@ class TecladoInterativo {
     // ========== INICIALIZAÇÃO ==========
     
     async inicializar() {
-        console.log('🎹 Teclado Interativo v5.0 - Iniciando...');
+        console.log('🎹 Teclado Meme Interativo v5.1 - Iniciando...');
         
         // Configurar modo noturno
         this.configurarModoNoturno();
@@ -123,21 +138,19 @@ class TecladoInterativo {
     }
     
     async carregarAudioBuffers() {
-        const sons = [
-            'pom', 'clap', 'tim', 'extra1',
-            'puff', 'splash', 'toim', 'extra2',
-            'psh', 'tic', 'tom', 'extra3'
-        ];
-        
-        for (const som of sons) {
+        for (const [somId, arquivo] of Object.entries(this.sonsPadrao)) {
             try {
-                const response = await fetch(`sons/${som}.mp3`);
+                const response = await fetch(`sounds-memes/${arquivo}`);
+                if (!response.ok) {
+                    throw new Error(`Arquivo não encontrado: ${arquivo}`);
+                }
+                
                 const arrayBuffer = await response.arrayBuffer();
                 const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
-                this.audioBuffers.set(som, audioBuffer);
-                console.log(`✅ Áudio carregado: ${som}`);
+                this.audioBuffers.set(somId, audioBuffer);
+                console.log(`✅ Áudio carregado: ${arquivo}`);
             } catch (error) {
-                console.warn(`⚠️ Não foi possível carregar ${som}.mp3:`, error);
+                console.warn(`⚠️ Não foi possível carregar ${arquivo}:`, error);
             }
         }
     }
@@ -171,13 +184,14 @@ class TecladoInterativo {
         // Criar elementos de áudio HTML5 como fallback
         console.log('🔄 Usando sistema de áudio HTML5');
         
-        document.querySelectorAll('audio').forEach(audio => {
-            const somId = audio.id.replace('som_tecla_', '');
-            this.audioElements.set(somId, audio);
-            
-            // Configurar para carregar automaticamente
-            audio.preload = 'auto';
-            audio.load();
+        // Mapear sons padrão para elementos de áudio
+        Object.keys(this.sonsPadrao).forEach(somId => {
+            const audioElement = document.querySelector(`#som_tecla_${somId}`);
+            if (audioElement) {
+                this.audioElements.set(somId, audioElement);
+                audioElement.preload = 'auto';
+                audioElement.load();
+            }
         });
     }
     
@@ -185,6 +199,9 @@ class TecladoInterativo {
         if (this.isScrolling || this.scrollAtivo) return;
         
         try {
+            // PARAR TODOS OS SONS ANTES DE TOCAR O NOVO
+            this.pararSomAtual();
+            
             // Tentar usar Web Audio API primeiro
             if (this.audioBuffers.has(somId) && this.audioContext && this.audioUnlocked) {
                 await this.tocarSomWebAudio(somId);
@@ -234,14 +251,18 @@ class TecladoInterativo {
         source.connect(gainNode);
         gainNode.connect(this.audioContext.destination);
         
-        // Tocar
-        source.start(0);
+        // Armazenar source ativa
+        this.audioSourcesAtivas.add(source);
         
-        // Limpar após terminar
+        // Configurar para remover da lista quando terminar
         source.onended = () => {
             source.disconnect();
             gainNode.disconnect();
+            this.audioSourcesAtivas.delete(source);
         };
+        
+        // Tocar
+        source.start(0);
     }
     
     async tocarSomHTML5(somId) {
@@ -259,6 +280,9 @@ class TecladoInterativo {
         if (playPromise !== undefined) {
             await playPromise;
         }
+        
+        // Armazenar como áudio atual
+        this.audioAtual = audioElement;
     }
     
     async tocarSomDOM(somId) {
@@ -276,22 +300,23 @@ class TecladoInterativo {
         if (playPromise !== undefined) {
             await playPromise;
         }
+        
+        // Armazenar como áudio atual
+        this.audioAtual = audioElement;
     }
     
-    animarTecla(somId) {
-        const tecla = document.querySelector(`[data-som="${somId}"]`);
-        if (tecla && !tecla.classList.contains('scrolling')) {
-            tecla.classList.add('tocando');
-            setTimeout(() => tecla.classList.remove('tocando'), 300);
-        }
-    }
-    
-    pararTodosSons() {
-        // Parar Web Audio
-        if (this.audioContext) {
-            // Não podemos parar buffers individuais, mas podemos parar o contexto
-            // Em vez disso, vamos apenas parar todos os elementos HTML5
-        }
+    // PARAR SOM ATUAL ANTES DE TOCAR OUTRO
+    pararSomAtual() {
+        // Parar Web Audio sources
+        this.audioSourcesAtivas.forEach(source => {
+            try {
+                source.stop();
+                source.disconnect();
+            } catch (e) {
+                // Ignorar erros se já estiver parado
+            }
+        });
+        this.audioSourcesAtivas.clear();
         
         // Parar elementos HTML5
         this.audioElements.forEach(audio => {
@@ -304,6 +329,21 @@ class TecladoInterativo {
             audio.pause();
             audio.currentTime = 0;
         });
+        
+        // Limpar referência atual
+        this.audioAtual = null;
+    }
+    
+    animarTecla(somId) {
+        const tecla = document.querySelector(`[data-som="${somId}"]`);
+        if (tecla && !tecla.classList.contains('scrolling')) {
+            tecla.classList.add('tocando');
+            setTimeout(() => tecla.classList.remove('tocando'), 300);
+        }
+    }
+    
+    pararTodosSons() {
+        this.pararSomAtual();
         
         document.querySelectorAll('.tecla').forEach(tecla => {
             tecla.classList.remove('tocando', 'ativa');
@@ -838,7 +878,7 @@ class TecladoInterativo {
         });
     }
     
-    salvarEdicaoTecla(tecla, modal) {
+    async salvarEdicaoTecla(tecla, modal) {
         let novoEmoji = modal.querySelector('#editar-emoji').value.trim();
         const novaCor = modal.querySelector('#editar-cor').value;
         const arquivoSom = modal.querySelector('#editar-som').files[0];
@@ -869,16 +909,35 @@ class TecladoInterativo {
                 const url = URL.createObjectURL(arquivoSom);
                 const somId = tecla.dataset.som;
                 
-                // Adicionar ao mapa de elementos de áudio
-                const audioElement = new Audio(url);
-                audioElement.preload = 'auto';
-                this.audioElements.set(somId, audioElement);
-                
-                this.sonsEditados[somId] = {
-                    url: url,
-                    name: arquivoSom.name
-                };
-                tecla.classList.add('editado');
+                try {
+                    // Carregar o novo áudio
+                    const response = await fetch(url);
+                    const arrayBuffer = await response.arrayBuffer();
+                    
+                    // Se Web Audio API estiver disponível, decodificar
+                    if (this.audioContext && this.audioUnlocked) {
+                        const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+                        this.audioBuffers.set(somId, audioBuffer);
+                    }
+                    
+                    // Também criar elemento HTML5 para fallback
+                    const audioElement = new Audio(url);
+                    audioElement.preload = 'auto';
+                    this.audioElements.set(somId, audioElement);
+                    
+                    this.sonsEditados[somId] = {
+                        url: url,
+                        name: arquivoSom.name,
+                        data: arrayBuffer
+                    };
+                    tecla.classList.add('editado');
+                    
+                    console.log(`✅ Som personalizado salvo: ${arquivoSom.name}`);
+                    
+                } catch (error) {
+                    console.error('❌ Erro ao salvar som personalizado:', error);
+                    this.mostrarFeedback('❌ Erro ao salvar som', 2000);
+                }
             }
         }
         
@@ -897,7 +956,7 @@ class TecladoInterativo {
         return tempDiv.textContent || tempDiv.innerText || codigo;
     }
 
-    resetarTeclaIndividual(tecla) {
+    async resetarTeclaIndividual(tecla) {
         const className = tecla.className;
         const somId = tecla.dataset.som;
         
@@ -912,7 +971,30 @@ class TecladoInterativo {
         delete this.coresTeclas[className];
         
         // Resetar som
-        delete this.sonsEditados[somId];
+        try {
+            // Restaurar som padrão
+            const arquivoPadrao = this.sonsPadrao[somId];
+            if (arquivoPadrao) {
+                const response = await fetch(`sounds-memes/${arquivoPadrao}`);
+                const arrayBuffer = await response.arrayBuffer();
+                
+                if (this.audioContext && this.audioUnlocked) {
+                    const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+                    this.audioBuffers.set(somId, audioBuffer);
+                }
+                
+                // Restaurar elemento HTML5
+                const audioElement = document.querySelector(`#som_tecla_${somId}`);
+                if (audioElement) {
+                    this.audioElements.set(somId, audioElement);
+                }
+            }
+            
+            delete this.sonsEditados[somId];
+            
+        } catch (error) {
+            console.warn(`⚠️ Erro ao resetar som ${somId}:`, error);
+        }
         
         // Remover marca
         tecla.classList.remove('editado');
@@ -980,7 +1062,7 @@ class TecladoInterativo {
 
     // ========== RESET GERAL ==========
     
-    resetarTudo() {
+    async resetarTudo() {
         if (this.isScrolling || this.scrollAtivo) return;
         
         if (confirm('Resetar TODAS as configurações?\n\n• Cores personalizadas\n• Emojis editados\n• Sons customizados')) {
@@ -1005,6 +1087,15 @@ class TecladoInterativo {
             this.sonsEditados = {};
             localStorage.removeItem('sonsEditados');
             
+            // Recarregar sons padrão
+            try {
+                await this.carregarAudioBuffers();
+                this.configurarAudioHTML5();
+                this.mostrarFeedback('🔄 Sons padrão restaurados', 2000);
+            } catch (error) {
+                console.error('Erro ao recarregar sons padrão:', error);
+            }
+            
             // Sair do modo edição
             if (this.modoEdicao) {
                 this.toggleModoEdicao();
@@ -1019,7 +1110,18 @@ class TecladoInterativo {
     salvarConfiguracoes() {
         localStorage.setItem('emojiEditados', JSON.stringify(this.emojiEditados));
         localStorage.setItem('coresTeclas', JSON.stringify(this.coresTeclas));
-        localStorage.setItem('sonsEditados', JSON.stringify(this.sonsEditados));
+        
+        // Salvar sons editados de forma otimizada
+        const sonsEditadosParaSalvar = {};
+        Object.entries(this.sonsEditados).forEach(([key, value]) => {
+            if (value && value.url) {
+                sonsEditadosParaSalvar[key] = {
+                    name: value.name,
+                    url: value.url
+                };
+            }
+        });
+        localStorage.setItem('sonsEditados', JSON.stringify(sonsEditadosParaSalvar));
     }
     
     mostrarFeedback(mensagem, duracao = 1500) {
@@ -1040,7 +1142,7 @@ class TecladoInterativo {
     }
     
     exibirVersao() {
-        const versao = '5.0';
+        const versao = '5.1';
         const elemento = document.getElementById('versao-app');
         if (elemento) {
             elemento.textContent = versao;
@@ -1049,11 +1151,16 @@ class TecladoInterativo {
     }
     
     restaurarConfiguracoes() {
+        // Restaurar sons editados
         Object.entries(this.sonsEditados).forEach(([somId, value]) => {
             if (value && value.url) {
-                const audioElement = new Audio(value.url);
-                audioElement.preload = 'auto';
-                this.audioElements.set(somId, audioElement);
+                try {
+                    const audioElement = new Audio(value.url);
+                    audioElement.preload = 'auto';
+                    this.audioElements.set(somId, audioElement);
+                } catch (error) {
+                    console.warn(`Erro ao restaurar som ${somId}:`, error);
+                }
             }
         });
     }
